@@ -1,61 +1,32 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import Custom_Input_Field from '../components/custom_Input_Field'
 import { useState } from 'react'
 import SocialLoginButton from '../components/SocialLoginButton'
 import { FaFacebook, FaGoogle } from 'react-icons/fa'
-
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 
-function LoginPage() {
+function SignEmail() {
     const navigate = useNavigate();
-    const [email, setEmail] = useState("");
-    const [error, setError] = useState("");
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            axios.get('/api/auth/check', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
-            .then(response => {
-                if (response.data.message === "Authenticated") {
-                    navigate('/home');
-                } else {
-                    setIsLoading(false);
-                }
-            })
-            .catch(() => {
-                localStorage.removeItem('token');
-                setIsLoading(false);
-            });
-        } else {
-            setIsLoading(false);
-        }
-    }, [navigate]);
-
-    if (isLoading) {
-        return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
-    }
+    const [email, setEmail] = useState("")
+    const [error, setError] = useState("")
 
     const handleChange = (e) => {
         if (e.target.id === "email") {
             setEmail(e.target.value)
-        } 
+        } else if (e.target.id === "password") {
+            setPassword(e.target.value)
+        }
     }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const response = await axios.post('/api/auth/checkEmail', { email });
-            if(response.data.exists) {
-                alert("Email verified! Please enter your password.");
-                navigate('/password', { state: { email: email } }); 
-            }
-            else {
-                setError("Email not found. Please check your email or sign up.");
+            if(!response.data.exists) {
+                navigate('/signup', { state: { email } });
+            } else {
+                setError("Email already exists. Please login instead.");
             }
         } catch (err) {
             console.error("Login failed:", err.response?.data || err.message);
@@ -102,20 +73,10 @@ function LoginPage() {
                     >
                         Login
                     </button>
-                <p className="text-center mt-4 text-gray-600">
-                    Don't Have An Account?{' '}
-                    <a 
-                        href="/signup-Email" 
-                        className="text-red-600 font-medium hover:text-red-700 hover:underline"
-                    >
-                        Signup
-                    </a>
-                </p>
                 </form>
             </div>
-           
         </>
     )
 }
 
-export default LoginPage
+export default SignEmail
