@@ -1,0 +1,74 @@
+.custom-arrow {
+  position: absolute;
+  top: 50%; /* يخليه في نص العنصر الأب */
+  transform: translateY(-50%);
+  z-index: 10;
+  cursor: pointer;
+  font-size: 24px;
+  color: white; 
+  background-color: gray; 
+ 
+  border-radius: 10%; 
+  transition: all 0.3s ease;
+  height: 210px; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+
+
+.custom-arrow.left {
+  left: -20px;
+}
+
+.custom-arrow.right {
+  right: -20px;
+}
+
+.custom-arrow:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.banner-shadow {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 400px;
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+
+
+:root[class~='dark'] .banner-shadow {
+  background: linear-gradient(to top, rgba(18, 18, 18, 1), transparent);
+}
+
+:root:not([class~='dark']) .banner-shadow {
+  background: linear-gradient(to top, rgba(249, 250, 251, 1), transparent);
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+
+:root[class~='dark'] .hero-overlay {
+  background: linear-gradient(to bottom, 
+    rgba(18, 18, 18, 0.8),
+    rgba(18, 18, 18, 0.4)
+  );
+}
+
+
+:root:not([class~='dark']) .hero-overlay {
+  background: linear-gradient(to bottom, 
+    rgba(249, 250, 251, 0.8),
+    rgba(249, 250, 251, 0.4)
+  );
+}

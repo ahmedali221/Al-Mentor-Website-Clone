@@ -1,0 +1,99 @@
+{
+  "common": {
+    "welcome": "Welcome to Al-Mentor",
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout",
+    "search": "Search courses, topics, instructors...",
+    "menu": "Menu",
+    "language": "Language"
+  },
+  "navigation": {
+    "home": "Home",
+    "courses": "Courses",
+    "instructors": "Instructors",
+    "programs": "Programs",
+    "subscribe": "Subscribe",
+    "about": "About",
+    "contact": "Contact",
+    "dashboard": "Dashboard",
+    "blog": "Blog",
+    "press": "Press",
+    "team": "Team"
+  },
+  "footer": {
+    "explore": "Explore",
+    "browseCourses": "Browse Courses",
+    "popularCourses": "Popular Courses",
+    "subscriptionPlans": "Subscription Plans",
+    "instructors": "Instructors",
+    "learningPartners": "Learning Partners",
+    "business": "Business",
+    "becomeInstructor": "Become an instructor",
+    "trainTeam": "Train Your Team",
+    "downloadApp": "Download App",
+    "termsOfUse": "Terms of use",
+    "privacyPolicy": "Privacy policy",
+    "helpCenter": "Help Center",
+    "support": "Support"
+  },
+  "home": {
+    "banner": {
+      "title": "Learn Online",
+      "subtitle": "From the biggest Arabic library of video-based courses",
+      "subscribeButton": "Subscribe Now"
+    },
+    "courses": {
+      "title": "Explore inspiring courses online",
+      "categories": {
+        "featured": "Featured Courses",
+        "business": "Business & Professional Skills",
+        "technology": "Technology & Innovation",
+        "arts": "Arts, Design & Media",
+        "wellbeing": "Wellbeing",
+        "lifestyle": "Lifestyle",
+        "education": "Education & Academics",
+        "humanities": "Humanities",
+        "family": "Family & Relationships",
+        "languages": "Languages",
+        "softSkills": "Soft Skills"
+      }
+    },
+    "instructors": {
+      "title": "Our Instructors"
+    },
+    "cta": {
+      "title": "Start your learning journey today.",
+      "subtitle": "Unlimited access to more than 1,000 video courses in Arabic, starting from 199 EGP",
+      "button": "Subscribe now"
+    }
+  },
+  "courses": {
+    "title": "Our Courses",
+    "enroll": "Enroll Now",
+    "viewDetails": "View Details",
+    "lessons": "Lessons",
+    "instructor": "Instructor",
+    "duration": "Duration",
+    "level": "Level",
+    "status": {
+      "active": "Active",
+      "completed": "Completed",
+      "inProgress": "In Progress"
+    }
+  },
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "edit": "Edit",
+    "delete": "Delete",
+    "back": "Back"
+  },
+  "messages": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success!",
+    "noResults": "No results found"
+  }
+} 
