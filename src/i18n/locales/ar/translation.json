@@ -1,0 +1,99 @@
+{
+  "common": {
+    "welcome": "مرحباً بك في المينتور",
+    "login": "تسجيل الدخول",
+    "signup": "إنشاء حساب",
+    "logout": "تسجيل الخروج",
+    "search": "ابحث عن الدورات، المواضيع، المدربين...",
+    "menu": "القائمة",
+    "language": "اللغة"
+  },
+  "navigation": {
+    "home": "الرئيسية",
+    "courses": "الدورات",
+    "instructors": "المدربين",
+    "programs": "البرامج",
+    "subscribe": "اشترك",
+    "about": "من نحن",
+    "contact": "اتصل بنا",
+    "dashboard": "لوحة التحكم",
+    "blog": "المدونة",
+    "press": "الصحافة",
+    "team": "الفريق"
+  },
+  "footer": {
+    "explore": "استكشف",
+    "browseCourses": "تصفح الدورات",
+    "popularCourses": "الدورات الشائعة",
+    "subscriptionPlans": "خطط الاشتراك",
+    "instructors": "المدربين",
+    "learningPartners": "شركاء التعلم",
+    "business": "الأعمال",
+    "becomeInstructor": "كن مدرباً",
+    "trainTeam": "درب فريقك",
+    "downloadApp": "حمل التطبيق",
+    "termsOfUse": "شروط الاستخدام",
+    "privacyPolicy": "سياسة الخصوصية",
+    "helpCenter": "مركز المساعدة",
+    "support": "الدعم"
+  },
+  "home": {
+    "banner": {
+      "title": "تعلم عبر الإنترنت",
+      "subtitle": "من أكبر مكتبة عربية للدورات التعليمية المرئية",
+      "subscribeButton": "اشترك الآن"
+    },
+    "courses": {
+      "title": "اكتشف دورات ملهمة عبر الإنترنت",
+      "categories": {
+        "featured": "الدورات المميزة",
+        "business": "الأعمال والمهارات المهنية",
+        "technology": "التكنولوجيا والابتكار",
+        "arts": "الفنون والتصميم والإعلام",
+        "wellbeing": "الصحة والرفاهية",
+        "lifestyle": "نمط الحياة",
+        "education": "التعليم والأكاديميا",
+        "humanities": "العلوم الإنسانية",
+        "family": "الأسرة والعلاقات",
+        "languages": "اللغات",
+        "softSkills": "المهارات الناعمة"
+      }
+    },
+    "instructors": {
+      "title": "مدربونا"
+    },
+    "cta": {
+      "title": "ابدأ رحلة التعلم اليوم.",
+      "subtitle": "وصول غير محدود لأكثر من 1000 دورة فيديو باللغة العربية، ابتداءً من 199 جنيه",
+      "button": "اشترك الآن"
+    }
+  },
+  "courses": {
+    "title": "دوراتنا",
+    "enroll": "سجل الآن",
+    "viewDetails": "عرض التفاصيل",
+    "lessons": "الدروس",
+    "instructor": "المدرب",
+    "duration": "المدة",
+    "level": "المستوى",
+    "status": {
+      "active": "نشط",
+      "completed": "مكتمل",
+      "inProgress": "قيد التقدم"
+    }
+  },
+  "buttons": {
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "submit": "إرسال",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "back": "رجوع"
+  },
+  "messages": {
+    "loading": "جاري التحميل...",
+    "error": "حدث خطأ",
+    "success": "تم بنجاح!",
+    "noResults": "لا توجد نتائج"
+  }
+} 
