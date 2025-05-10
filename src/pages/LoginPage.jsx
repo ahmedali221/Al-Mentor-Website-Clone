@@ -1,85 +1,44 @@
-import React, { useEffect } from 'react'
-import Custom_Input_Field from '../components/custom_Input_Field'
+import React from 'react'
+import Custom_Input_Field from '../components/login/custom_Input_Field'
 import { useState } from 'react'
-import SocialLoginButton from '../components/SocialLoginButton'
+import SocialLoginButton from '../components/login/SocialLoginButton'
 import { FaFacebook, FaGoogle } from 'react-icons/fa'
-
-import axios from 'axios'
-import { useNavigate } from 'react-router-dom'
+import Navbar from '../components/login/Navbar'
+import Footer from '../components/login/Footer'
 
 function LoginPage() {
-    const navigate = useNavigate();
-    const [email, setEmail] = useState("");
-    const [error, setError] = useState("");
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            axios.get('/api/auth/check', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
-            .then(response => {
-                if (response.data.message === "Authenticated") {
-                    navigate('/home');
-                } else {
-                    setIsLoading(false);
-                }
-            })
-            .catch(() => {
-                localStorage.removeItem('token');
-                setIsLoading(false);
-            });
-        } else {
-            setIsLoading(false);
-        }
-    }, [navigate]);
-
-    if (isLoading) {
-        return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
-    }
+    const [email, setEmail] = useState("")
 
     const handleChange = (e) => {
-        if (e.target.id === "email") {
+        if (e.target.id == "email") {
             setEmail(e.target.value)
-        } 
-    }
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await axios.post('/api/auth/checkEmail', { email });
-            if(response.data.exists) {
-                alert("Email verified! Please enter your password.");
-                navigate('/password', { state: { email: email } }); 
-            }
-            else {
-                setError("Email not found. Please check your email or sign up.");
-            }
-        } catch (err) {
-            console.error("Login failed:", err.response?.data || err.message);
-            setError(err.response?.data?.message || "An error occurred. Please try again.");
         }
-    }
 
+    }
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        console.log("Submitted")
+    }
     return (
         <>
+            {/* <Navbar /> */}
             <div className="flex justify-center items-center min-h-screen pt-16">
                 <form onSubmit={handleSubmit} className='flex flex-col gap-3 w-100'>
                     <h1 className='text-3xl font-semibold mb-4 text-center w-96 mx-auto'>Welcome to almentor!</h1>
-
-                    <SocialLoginButton
-                        provider="Facebook"
-                        icon={<FaFacebook className="text-xl" />}
+                    
+                    <SocialLoginButton 
+                        provider="Facebook" 
+                        icon={<FaFacebook className="text-xl" />} 
                     />
-                    <SocialLoginButton
-                        provider="Google"
-                        icon={<FaGoogle className="text-xl" />}
+                    <SocialLoginButton 
+                        provider="Google" 
+                        icon={<FaGoogle className="text-xl" />} 
                     />
 
                     <div className="relative flex py-5 items-center w-96 mx-auto">
                         <div className="flex-grow border-t border-gray-800"></div>
+                        {/* <span className="flex-shrink mx-4 text-gray-800">OR</span>
+                        <div className="flex-grow border-t border-gray-800"></div> */}
                     </div>
 
                     <div className="w-96 mx-auto">
@@ -89,12 +48,9 @@ function LoginPage() {
                             type="email"
                             onChange={handleChange}
                             value={email}
-                            placeholder="Type Your Email..."
+                            placeholder = "Type Your Email..."
                         ></Custom_Input_Field>
-                      
                     </div>
-
-                    {error && <p className="text-red-600 text-center">{error}</p>}
 
                     <button
                         type="submit"
@@ -102,18 +58,9 @@ function LoginPage() {
                     >
                         Login
                     </button>
-                <p className="text-center mt-4 text-gray-600">
-                    Don't Have An Account?{' '}
-                    <a 
-                        href="/signup-Email" 
-                        className="text-red-600 font-medium hover:text-red-700 hover:underline"
-                    >
-                        Signup
-                    </a>
-                </p>
                 </form>
             </div>
-           
+            {/* <Footer /> */}
         </>
     )
 }
