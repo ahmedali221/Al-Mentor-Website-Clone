@@ -1,10 +1,10 @@
 import React from 'react'
-import Custom_Input_Field from '../components/login/custom_Input_Field'
+import Custom_Input_Field from '../components/custom_Input_Field'
 import { useState } from 'react'
-import SocialLoginButton from '../components/login/SocialLoginButton'
+import SocialLoginButton from '../components/SocialLoginButton'
 import { FaFacebook, FaGoogle } from 'react-icons/fa'
-import Navbar from '../components/login/Navbar'
-import Footer from '../components/login/Footer'
+import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
 
 function LoginPage() {
     const [email, setEmail] = useState("")
@@ -21,7 +21,7 @@ function LoginPage() {
     }
     return (
         <>
-            {/* <Navbar /> */}
+            <Navbar />
             <div className="flex justify-center items-center min-h-screen pt-16">
                 <form onSubmit={handleSubmit} className='flex flex-col gap-3 w-100'>
                     <h1 className='text-3xl font-semibold mb-4 text-center w-96 mx-auto'>Welcome to almentor!</h1>
@@ -60,7 +60,7 @@ function LoginPage() {
                     </button>
                 </form>
             </div>
-            {/* <Footer /> */}
+            <Footer />
         </>
     )
 }
