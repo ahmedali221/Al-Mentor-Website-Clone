@@ -10,6 +10,7 @@ import SignEmail from './pages/SignEmail';
 import Home from './components/Home/home';
 import { ThemeProvider } from './context/ThemeContext'; 
 import './i18n/config'
+import ProgramsPage from './pages/ProgramsPage';
 
 function App() {
   return (
@@ -18,12 +19,13 @@ function App() {
         <Navbar />
         <div className="min-h-[calc(100vh-128px)] py-8">
           <Routes>
-            {/* <Route path="/" element={<LoginPage />} /> */}
+            <Route path="/loginPage" element={<LoginPage />} />
+            <Route path="/programs" element={<ProgramsPage />} />
             
             <Route path="/" element={<Home />} />
-            {/* <Route path="/signup-Email" element={<SignEmail />} />
+            <Route path="/signup-Email" element={<SignEmail />} />
             <Route path="/signup" element={<SignupPage />} />
-            <Route path="/password" element={<PasswordPage />} /> */}
+            <Route path="/password" element={<PasswordPage />} />
           </Routes>
         </div>
         <Footer />

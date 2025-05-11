@@ -96,7 +96,7 @@ const Navbar = () => {
   <button
     onClick={() => {
       localStorage.removeItem('token');
-      window.location.href = '/';
+      window.location.href = '/loginPage';
     }}
     className="bg-red-600 text-white px-4 py-1.5 rounded hover:bg-red-700 text-sm"
   >
@@ -104,10 +104,10 @@ const Navbar = () => {
   </button>
 ) : (
   <>
-    <Link to="/login" className={`text-sm ${theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-black'}`}>
+    <Link to="/LoginPage" className={`text-sm ${theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-black'}`}>
       {t('common.login')}
     </Link>
-    <Link to="/signup" className="bg-red-500 text-white px-4 py-1.5 rounded hover:bg-red-600 text-sm">
+    <Link to="/signup-Email" className="bg-red-500 text-white px-4 py-1.5 rounded hover:bg-red-600 text-sm">
       {t('common.signup')}
     </Link>
   </>
