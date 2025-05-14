@@ -60,12 +60,15 @@
       }
     },
     "instructors": {
-      "title": "Our Instructors"
+      "title": "Our Instructors",
+      "title2": "How To Become an Instructor?",
+      "subtitle": "Join our community of instructors and share your knowledge with the world.",
+      "button": "Apply Now",
+      "about": "About Mentor"
     },
     "cta": {
-      "title": "Start your learning journey today.",
-      "subtitle": "Unlimited access to more than 1,000 video courses in Arabic, starting from 199 EGP",
-      "button": "Subscribe now"
+      "title": "Only at 199 EGP /month! Get unlimited access to all courses when you subscribe to Almentor.",
+      "button": "Subscribe Now"
     }
   },
   "courses": {
@@ -80,7 +83,8 @@
       "active": "Active",
       "completed": "Completed",
       "inProgress": "In Progress"
-    }
+    },
+    "noCoursesAvailable": "No courses available."
   },
   "buttons": {
     "save": "Save",
@@ -88,12 +92,25 @@
     "submit": "Submit",
     "edit": "Edit",
     "delete": "Delete",
-    "back": "Back"
+    "back": "Back",
+    "subscribeNow": "Subscribe Now"
   },
   "messages": {
     "loading": "Loading...",
     "error": "An error occurred",
     "success": "Success!",
-    "noResults": "No results found"
+    "noResults": "No results found",
+    "readMore": "Read more",
+    "readLess": "Read less"
+  },
+  "instructorStats": {
+    "views": "Views",
+    "courses": "Courses",
+    "learners": "Learners",
+    "title": "Instructor Stats"
+  },
+  "subscriptionCTA": {
+    "label": "Subscribe now to get unlimited access to all courses.",
+    "button": "Subscribe Now"
   }
-} 
+}
