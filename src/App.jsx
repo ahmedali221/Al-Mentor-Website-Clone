@@ -9,7 +9,7 @@ import SignupPage from './pages/SignupPage';
 import SignEmail from './pages/SignEmail';
 import Home from './components/Home/home';
 import Instructors from './pages/Instructors';
-import InstructorDetails from './pages/InstructorDetails';
+import InstructorDetails from './pages/InstructorsDetails';
 import { ThemeProvider } from './context/ThemeContext'; 
 import './i18n/config'
 import ProgramsPage from './pages/ProgramsPage';
