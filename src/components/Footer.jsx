@@ -1,6 +1,5 @@
 import React from 'react';
 import { FaFacebook, FaTwitter, FaInstagram, FaYoutube, FaLinkedin } from 'react-icons/fa';
-
 const Footer = () => {
     return (
         <footer className="bg-white border-t border-gray-200 mt-auto">
