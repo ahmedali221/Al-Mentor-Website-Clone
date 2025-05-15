@@ -19,7 +19,8 @@
     "dashboard": "Dashboard",
     "blog": "Blog",
     "press": "Press",
-    "team": "Team"
+    "team": "Team",
+    "backToPrograms": "Back to Programs"
   },
   "footer": {
     "explore": "Explore",
@@ -35,7 +36,14 @@
     "termsOfUse": "Terms of use",
     "privacyPolicy": "Privacy policy",
     "helpCenter": "Help Center",
-    "support": "Support"
+    "support": "Support",
+    "terms": "Terms & Conditions",
+    "privacy": "Privacy Policy",
+    "blog": "Blog",
+    "about": "About",
+    "press": "Press",
+    "team": "Team",
+    "contact": "Contact"
   },
   "home": {
     "banner": {
@@ -84,7 +92,11 @@
       "completed": "Completed",
       "inProgress": "In Progress"
     },
+<<<<<<< HEAD
     "noCoursesAvailable": "No courses available."
+=======
+    "skills": "Skills You Will Gain"
+>>>>>>> origin/main
   },
   "buttons": {
     "save": "Save",
@@ -92,8 +104,7 @@
     "submit": "Submit",
     "edit": "Edit",
     "delete": "Delete",
-    "back": "Back",
-    "subscribeNow": "Subscribe Now"
+    "back": "Back"
   },
   "messages": {
     "loading": "Loading...",
