@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom';
 import { RiArrowDropDownLine } from 'react-icons/ri';
 import { CiSearch } from 'react-icons/ci';
 import { useTranslation } from 'react-i18next';
-import { changeLanguage } from '../../i18n/config'; 
+import { changeLanguage } from '../../i18n/config';
 import { useTheme } from '../../context/ThemeContext';
-import './navbar.css'; 
+import './navbar.css';
 
 
 const Navbar = () => {
@@ -24,7 +24,7 @@ const Navbar = () => {
   return (
     <nav className={`fixed top-0 left-0 right-0 px-6 py-4 z-50 shadow transition-all duration-300 text-lg font-medium ${theme === 'dark' ? 'bg-[#1a1a1a] text-white' : 'bg-white text-black'}`}>
       <div className={`flex items-center justify-start gap-16 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
-        
+
         {/* Logo */}
         <div className="flex items-center text-xl ml-4">
           <img src="/logo.jpeg" alt="Almentor Logo" className={`h-8 w-auto ${isRTL ? 'ml-3' : 'mr-3'}`} />
@@ -48,11 +48,10 @@ const Navbar = () => {
             </span>
           </li>
           <li className="ml-2">
-            <button className={`bg-transparent border-2 rounded px-6 py-2 transition-colors ${
-              theme === 'dark' 
-                ? 'border-gray-300 text-gray-300 hover:bg-gray-800' 
+            <button className={`bg-transparent border-2 rounded px-6 py-2 transition-colors ${theme === 'dark'
+                ? 'border-gray-300 text-gray-300 hover:bg-gray-800'
                 : 'border-black text-black hover:bg-gray-100'
-            }`}>
+              }`}>
               Subscribe
             </button>
           </li>

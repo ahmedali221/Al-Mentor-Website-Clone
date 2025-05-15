@@ -11,10 +11,10 @@ function ProgramsPage() {
     const [programs, setPrograms] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    
+
     const currentLanguage = i18n.language;
     const isRTL = currentLanguage === 'ar';
-    
+
     useEffect(() => {
         const fetchPrograms = async () => {
             try {
@@ -28,10 +28,10 @@ function ProgramsPage() {
                 setLoading(false);
             }
         };
-        
+
         fetchPrograms();
     }, [t]);
-    
+
     if (loading) {
         return (
             <div className={`min-h-screen flex items-center justify-center ${theme === 'dark' ? 'bg-[#1A1A1A] text-white' : 'bg-gray-50 text-gray-900'}`}>
@@ -42,7 +42,7 @@ function ProgramsPage() {
             </div>
         );
     }
-    
+
     if (error) {
         return (
             <div className={`min-h-screen flex items-center justify-center ${theme === 'dark' ? 'bg-[#1A1A1A] text-white' : 'bg-gray-50 text-gray-900'}`}>
@@ -52,7 +52,7 @@ function ProgramsPage() {
             </div>
         );
     }
-    
+
     return (
         <div className={`w-full pt-12 ${theme === 'dark' ? 'bg-[#1A1A1A] text-white' : 'bg-gray-50 text-gray-900'}`} dir={isRTL ? 'rtl' : 'ltr'}>
             <div className="w-full px-8 py-6">
@@ -72,9 +72,9 @@ function ProgramsPage() {
                                         <MdPlayCircle className="text-sm" />
                                         {t('navigation.programs')}
                                     </div>
-                                    <img 
-                                        src={program.thumbnail} 
-                                        alt={program.title[currentLanguage]} 
+                                    <img
+                                        src={program.thumbnail}
+                                        alt={program.title[currentLanguage]}
                                         className="w-full h-[300px] object-cover"
                                     />
                                     <div className="absolute bottom-4 left-4 bg-gray-900/75 text-white px-3 py-1 rounded-md flex items-center gap-2">
@@ -87,13 +87,12 @@ function ProgramsPage() {
                                     <p className={`mb-6 line-clamp-3 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                                         {program.description[currentLanguage]}
                                     </p>
-                                    <Link 
-                                        to={`/programs/${program._id}`} 
-                                        className={`inline-block border-2 px-6 py-2 rounded-md transition-colors ${
-                                            theme === 'dark' 
-                                                ? 'border-gray-300 text-gray-300 hover:bg-gray-700' 
+                                    <Link
+                                        to={`/programs/${program._id}`}
+                                        className={`inline-block border-2 px-6 py-2 rounded-md transition-colors ${theme === 'dark'
+                                                ? 'border-gray-300 text-gray-300 hover:bg-gray-700'
                                                 : 'border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white'
-                                        }`}
+                                            }`}
                                     >
                                         {t('courses.viewDetails')}
                                     </Link>
