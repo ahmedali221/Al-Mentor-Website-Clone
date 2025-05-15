@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Slider from 'react-slick';
 import './home.css';
 import { RiArrowDropLeftLine, RiArrowDropRightLine } from "react-icons/ri";
@@ -119,6 +120,13 @@ const Home = () => {
         backgroundPosition: '50% 90%',
         marginTop: '3rem',
       }}>
+      <main className="relative flex items-start justify-start min-h-screen px-6 pt-32" style={{
+        backgroundImage: `url(/banner.webp)`,
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: '50% 90%',
+        marginTop: '3rem',
+      }}>
         <div className="absolute inset-0 bg-black opacity-10"></div>
         <div className="banner-shadow"></div>
         <div className={`relative z-20 px-5 py-30 max-w-2xl text-white leading-none font-semibold text-xl ${isRTL ? 'mr-10' : 'ml-10'}`}>
@@ -137,7 +145,21 @@ const Home = () => {
         </h2>
 
         {/* Category Buttons */}
+        {/* Category Buttons */}
         <div className="flex justify-center gap-3 mb-8 flex-wrap max-w-4xl mx-auto text-2xl">
+          <button
+            onClick={() => handleCategoryClick(null)}
+            className={`px-4 py-2 rounded transition-colors duration-200 font-semibold
+              ${!selectedCategory
+                ? 'bg-red-600 text-white'
+                : theme === 'dark'
+                ? 'bg-gray-800 text-white hover:bg-gray-700'
+                : 'bg-[#D4D4D4] text-black hover:bg-gray-300'}`}
+          >
+            {t('Featured Courses')}
+          </button>
+
+          {categories.map((category) => (
           <button
             onClick={() => handleCategoryClick(null)}
             className={`px-4 py-2 rounded transition-colors duration-200 font-semibold
@@ -159,8 +181,16 @@ const Home = () => {
                   ? 'bg-red-600 text-white'
                   : theme === 'dark'
                   ? 'bg-gray-800 text-white hover:bg-gray-700'
+              key={category._id}
+              onClick={() => handleCategoryClick(category._id)}
+              className={`px-4 py-2 rounded transition-colors duration-200
+                ${selectedCategory === category._id
+                  ? 'bg-red-600 text-white'
+                  : theme === 'dark'
+                  ? 'bg-gray-800 text-white hover:bg-gray-700'
                   : 'bg-[#D4D4D4] text-black hover:bg-gray-300'}`}
             >
+              {category.name?.[currentLang] || category.name?.en}
               {category.name?.[currentLang] || category.name?.en}
             </button>
           ))}
@@ -216,6 +246,7 @@ const Home = () => {
       </section>
 
       {/* Instructors Section */}
+      <section className="py-10 px-6 mx-auto mt-10">
       <section className="py-10 px-6 mx-auto mt-10">
         <h2 className="text-4xl font-bold mb-6 text-center">{t('home.instructors.title')}</h2>
 
