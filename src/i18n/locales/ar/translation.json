@@ -92,91 +92,94 @@
       "completed": "مكتمل",
       "inProgress": "قيد التقدم"
     },
-    "skills": "المهارات التي ستكتسبها"
-    },
-    "noCoursesAvailable": "لا توجد دورات متاحة."
-  },
-  "buttons": {
-    "save": "حفظ",
-    "cancel": "إلغاء",
-    "submit": "إرسال",
-    "edit": "تعديل",
-    "delete": "حذف",
-    "back": "رجوع",
-    "continue": "المتابعة",
-    "back": "رجوع",
-    "subscribeNow": "اشترك الآن"
-  },
-  "messages": {
-    "loading": "جاري التحميل...",
-    "error": "حدث خطأ",
-    "success": "تم بنجاح!",
-    "noResults": "لا توجد نتائج",
-    "emailNotFound": "البريد الإلكتروني غير موجود. يرجى التحقق من بريدك الإلكتروني أو التسجيل.",
-    "emailExists": "البريد الإلكتروني موجود بالفعل. يرجى تسجيل الدخول بدلاً من ذلك.",
-    "loginFailed": "فشل تسجيل الدخول: لم يتم استلام رمز",
-    "signupSuccess": "تم التسجيل بنجاح!"
-  },
-  "auth": {
-    "welcomeBack": "مرحبًا بعودتك!",
-    "welcomeToAlmentor": "مرحبًا بك في المينتور!",
-    "welcomeMessage": "مرحبًا بك في المينتور!",
-    "createAccount": "إنشاء حسابك",
-    "signupAndLearn": "سجل وابدأ التعلم",
-    "signupSubtitle": "سجل وابدأ التعلم",
-    "loginWithFacebook": "تسجيل الدخول باستخدام فيسبوك",
-    "loginWithGoogle": "تسجيل الدخول باستخدام جوجل",
-    "enterEmail": "أدخل بريدك الإلكتروني",
-    "emailPlaceholder": "اكتب بريدك الإلكتروني...",
-    "enterPassword": "أدخل كلمة المرور",
-    "passwordPlaceholder": "اكتب كلمة المرور...",
-    "passwordCreatePlaceholder": "أنشئ كلمة مرور",
-    "fullNameEn": "الاسم الكامل (بالإنجليزية)",
-    "fullNameEnPlaceholder": "أدخل اسمك الكامل بالإنجليزية",
-    "fullNameAr": "الاسم الكامل (بالعربية)",
-    "fullNameArPlaceholder": "أدخل اسمك الكامل بالعربية",
-    "username": "اسم المستخدم",
-    "usernamePlaceholder": "اختر اسم مستخدم",
-    "email": "البريد الإلكتروني",
-    "emailInputPlaceholder": "أدخل بريدك الإلكتروني",
-    "password": "كلمة المرور",
-    "passwordInputPlaceholder": "أنشئ كلمة مرور",
-    "termsAgreement": "بالتسجيل، أوافق على",
-    "termsAndConditions": "الشروط والأحكام",
-    "and": "و",
-    "privacyPolicy": "سياسة الخصوصية",
-    "haveAccount": "لديك حساب بالفعل؟",
-    "noAccount": "ليس لديك حساب؟",
-    "minutes": "دقائق",
     "skills": "المهارات التي ستكتسبها",
-    "included": "الدورات المتضمنة",
-    "category": "الفئة",
-    "facebook": "فيسبوك",
-    "google": "جوجل",
-    "emailVerified": "تم التحقق من البريد الإلكتروني! يرجى إدخال كلمة المرور.",
-    "continue": "المتابعة بواسطة"
-  },
-  "programs": {
-    "subtitle": "تعلم منظم لإتقان المهارات بشكل أعمق",
-    "description": "ارتقِ بتعلمك إلى المستوى التالي مع برامج المينتور التعليمية—سلسلة دورات مختارة بعناية مصممة لمساعدتك على بناء مهاراتك خطوة بخطوة، وتوجيهك تدريجياً نحو أهدافك.",
-    "hours": "ساعات",
-    "minutes": "دقائق",
-    "mentors": "الخبراء",
-    "learners": "المتعلمون",
-    "lectures": "المحاضرات",
-    "aboutUs": "حول هذا البرنامج"
+    "noCoursesAvailable": "لا توجد دورات متاحة.",
     "noResults": "لا توجد نتائج",
     "readMore": "اقرأ المزيد",
-    "readLess": "اقرأ أقل"
-  },
-  "instructorStats": {
-    "views": "المشاهدات",
-    "courses": "الدورات",
-    "learners": "المتعلمين",
-    "title": "إحصائيات المدرب"
-  },
-  "subscriptionCTA": {
-    "label": "ندعوك للاشتراك الآن للحصول على وصول غير محدود لجميع الدورات.",
-    "button": "اشترك الآن"
-  }
+   "readLess": "اقرأ أقل"
+    },
+    "buttons": {
+      "save": "حفظ",
+      "cancel": "إلغاء",
+      "submit": "إرسال",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "back": "رجوع",
+      "continue": "المتابعة",
+      "subscribeNow": "اشترك الآن"
+    },
+    "messages": {
+      "loading": "جاري التحميل...",
+      "error": "حدث خطأ",
+      "success": "تم بنجاح!",
+      "noResults": "لا توجد نتائج",
+      "emailNotFound": "البريد الإلكتروني غير موجود. يرجى التحقق من بريدك الإلكتروني أو التسجيل.",
+      "emailExists": "البريد الإلكتروني موجود بالفعل. يرجى تسجيل الدخول بدلاً من ذلك.",
+      "loginFailed": "فشل تسجيل الدخول: لم يتم استلام رمز",
+      "signupSuccess": "تم التسجيل بنجاح!"
+    },
+    "auth": {
+      "welcomeBack": "مرحبًا بعودتك!",
+      "welcomeToAlmentor": "مرحبًا بك في المينتور!",
+      "welcomeMessage": "مرحبًا بك في المينتور!",
+      "createAccount": "إنشاء حسابك",
+      "signupAndLearn": "سجل وابدأ التعلم",
+      "signupSubtitle": "سجل وابدأ التعلم",
+      "loginWithFacebook": "تسجيل الدخول باستخدام فيسبوك",
+      "loginWithGoogle": "تسجيل الدخول باستخدام جوجل",
+      "enterEmail": "أدخل بريدك الإلكتروني",
+      "emailPlaceholder": "اكتب بريدك الإلكتروني...",
+      "enterPassword": "أدخل كلمة المرور",
+      "passwordPlaceholder": "اكتب كلمة المرور...",
+      "passwordCreatePlaceholder": "أنشئ كلمة مرور",
+      "fullNameEn": "الاسم الكامل (بالإنجليزية)",
+      "fullNameEnPlaceholder": "أدخل اسمك الكامل بالإنجليزية",
+      "fullNameAr": "الاسم الكامل (بالعربية)",
+      "fullNameArPlaceholder": "أدخل اسمك الكامل بالعربية",
+      "username": "اسم المستخدم",
+      "usernamePlaceholder": "اختر اسم مستخدم",
+      "email": "البريد الإلكتروني",
+      "emailInputPlaceholder": "أدخل بريدك الإلكتروني",
+      "password": "كلمة المرور",
+      "passwordInputPlaceholder": "أنشئ كلمة مرور",
+      "termsAgreement": "بالتسجيل، أوافق على",
+      "termsAndConditions": "الشروط والأحكام",
+      "and": "و",
+      "privacyPolicy": "سياسة الخصوصية",
+      "haveAccount": "لديك حساب بالفعل؟",
+      "noAccount": "ليس لديك حساب؟",
+      "minutes": "دقائق",
+      "skills": "المهارات التي ستكتسبها",
+      "included": "الدورات المتضمنة",
+      "category": "الفئة",
+      "facebook": "فيسبوك",
+      "google": "جوجل",
+      "emailVerified": "تم التحقق من البريد الإلكتروني! يرجى إدخال كلمة المرور.",
+      "continue": "المتابعة بواسطة"
+    },
+    "programs": {
+      "subtitle": "تعلم منظم لإتقان المهارات بشكل أعمق",
+      "description": "ارتقِ بتعلمك إلى المستوى التالي مع برامج المينتور التعليمية—سلسلة دورات مختارة بعناية مصممة لمساعدتك على بناء مهاراتك خطوة بخطوة، وتوجيهك تدريجياً نحو أهدافك.",
+      "hours": "ساعات",
+      "minutes": "دقائق",
+      "mentors": "الخبراء",
+      "learners": "المتعلمون",
+      "lectures": "المحاضرات",
+      "aboutUs": "حول هذا البرنامج",
+      "noResults": "لا توجد نتائج",
+      "readMore": "اقرأ المزيد",
+      "readLess": "اقرأ أقل"
+    },
+    "instructorStats": {
+      "views": "المشاهدات",
+      "courses": "الدورات",
+      "learners": "المتعلمين",
+      "title": "إحصائيات المدرب"
+    },
+    "subscriptionCTA": {
+      "label": "ندعوك للاشتراك الآن للحصول على وصول غير محدود لجميع الدورات.",
+      "button": "اشترك الآن"
+    }
+  
+
 }
