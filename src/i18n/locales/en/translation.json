@@ -92,11 +92,8 @@
       "completed": "Completed",
       "inProgress": "In Progress"
     },
-<<<<<<< HEAD
-    "noCoursesAvailable": "No courses available."
-=======
+    "noCoursesAvailable": "No courses available.",
     "skills": "Skills You Will Gain"
->>>>>>> origin/main
   },
   "buttons": {
     "save": "Save",
