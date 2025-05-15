@@ -11,17 +11,20 @@ import Home from './components/Home/home';
 import { ThemeProvider } from './context/ThemeContext'; 
 import './i18n/config'
 import ProgramsPage from './pages/ProgramsPage';
+import ProgramDetailPage from './pages/ProgramDetailPage';
+import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick-theme.css";
 
 function App() {
   return (
-    <ThemeProvider> {}
+    <ThemeProvider>
       <BrowserRouter>
         <Navbar />
-        <div className="min-h-[calc(100vh-128px)] py-8">
+        <div className="min-h-[calc(100vh-128px)]">
           <Routes>
             <Route path="/loginPage" element={<LoginPage />} />
             <Route path="/programs" element={<ProgramsPage />} />
-            
+            <Route path="/programs/:programId" element={<ProgramDetailPage />} />
             <Route path="/" element={<Home />} />
             <Route path="/signup-Email" element={<SignEmail />} />
             <Route path="/signup" element={<SignupPage />} />

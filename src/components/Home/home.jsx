@@ -123,7 +123,7 @@ const Home = () => {
   };
 
   return (
-    <div className={`${theme === 'dark' ? 'bg-[#121212] text-white' : 'bg-white text-black'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className={`${theme === 'dark' ? 'bg-[#1A1A1A] text-white' : 'bg-white text-black'}`} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Banner Section */}
       <main
         className="relative flex items-start justify-start min-h-screen px-6 pt-32"

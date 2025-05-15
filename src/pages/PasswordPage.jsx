@@ -2,12 +2,18 @@ import React, { useState } from 'react';
 import Custom_Input_Field from '../components/custom_Input_Field';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../context/ThemeContext';
 
 function PasswordPage() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { t, i18n } = useTranslation();
+    const { theme } = useTheme();
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    
+    const isRTL = i18n.language === 'ar';
 
     const handleChange = (e) => {
         if (e.target.id === "password") {
@@ -28,35 +34,35 @@ function PasswordPage() {
                 
                 navigate('/home');
             } else {
-                setError("Login failed: No token received");
+                setError(t('auth.loginFailed', 'Login failed: No token received'));
             }
         } catch (err) {
             console.error("Login failed:", err.response?.data || err.message);
-            setError(err.response?.data?.message || "An error occurred");
+            setError(err.response?.data?.message || t('messages.error', 'An error occurred'));
         }
     };
 
     return (
         <>
-            <div className="flex justify-center items-center min-h-screen pt-16">
+            <div className={`flex justify-center items-center min-h-screen pt-16 ${theme === 'dark' ? 'bg-[#1A1A1A] text-white' : 'bg-gray-50 text-gray-900'}`} dir={isRTL ? 'rtl' : 'ltr'}>
                 <form onSubmit={handleSubmit} className='flex flex-col gap-3 w-100'>
-                    <h1 className='text-3xl font-semibold mb-4 text-center w-96 mx-auto'>Welcome back!</h1>
+                    <h1 className='text-3xl font-semibold mb-4 text-center w-96 mx-auto'>{t('auth.welcomeBack', 'Welcome back!')}</h1>
 
                     <div className="w-96 mx-auto">
                         <Custom_Input_Field
-                            Label="Email"
+                            Label={t('auth.email', 'Email')}
                             id="email"
                             type="email"
                             value={location.state.email}
                             readOnly
                         />
                         <Custom_Input_Field
-                            Label="Enter Your Password"
+                            Label={t('auth.enterPassword', 'Enter Your Password')}
                             id="password"
                             type="password"
                             onChange={handleChange}
                             value={password}
-                            placeholder="Type Your Password..."
+                            placeholder={t('auth.passwordPlaceholder', 'Type Your Password...')}
                         />
                     </div>
 
@@ -66,7 +72,7 @@ function PasswordPage() {
                         type="submit"
                         className='bg-red-600 px-4 mt-1 py-2 text-white hover:bg-red-700 sm:px-8 sm:py-3 rounded-md w-100 sm:w-96 mx-auto'
                     >
-                        Continue
+                        {t('auth.continue', 'Continue')}
                     </button>
                 </form>
             </div>

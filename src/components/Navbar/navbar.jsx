@@ -22,19 +22,19 @@ const Navbar = () => {
   };
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 px-4 py-4 z-50 shadow transition-all duration-300 text-lg font-medium ${theme === 'dark' ? 'bg-[#1a1a1a] text-white' : 'bg-white text-black'}`}>
-      <div className={`flex items-center justify-start gap-12 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
+    <nav className={`fixed top-0 left-0 right-0 px-6 py-4 z-50 shadow transition-all duration-300 text-lg font-medium ${theme === 'dark' ? 'bg-[#1a1a1a] text-white' : 'bg-white text-black'}`}>
+      <div className={`flex items-center justify-start gap-16 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
         
         {/* Logo */}
         <div className="flex items-center text-xl ml-4">
-          <img src="/logo.jpeg" alt="Almentor Logo" className={`h-8 w-auto ${isRTL ? 'ml-2' : 'mr-2'}`} />
+          <img src="/logo.jpeg" alt="Almentor Logo" className={`h-8 w-auto ${isRTL ? 'ml-3' : 'mr-3'}`} />
           <a href="/" className="text-xl font-semibold">
             Almentor
           </a>
         </div>
 
         {/* Navigation Links */}
-        <ul className={`flex items-center ml-4 ${isRTL ? 'space-x-reverse space-x-6' : 'space-x-6'} text-base font-medium`}>
+        <ul className={`flex items-center ${isRTL ? 'space-x-reverse space-x-8' : 'space-x-8'} text-base font-medium`}>
           <li className="cursor-pointer hover:text-red-500 flex items-center">
             {t('navigation.courses')} <RiArrowDropDownLine className="text-2xl mt-1" />
           </li>
@@ -47,32 +47,35 @@ const Navbar = () => {
               NEW
             </span>
           </li>
-          <li>
-            <button className="bg-transparent text-black border-2 border-black rounded px-6 py-2 hover:bg-white hover:text-black transition">
+          <li className="ml-2">
+            <button className={`bg-transparent border-2 rounded px-6 py-2 transition-colors ${
+              theme === 'dark' 
+                ? 'border-gray-300 text-gray-300 hover:bg-gray-800' 
+                : 'border-black text-black hover:bg-gray-100'
+            }`}>
               Subscribe
             </button>
           </li>
         </ul>
 
         {/* Right Section */}
-        <div className={`flex items-center ml-auto ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
+        <div className={`flex items-center ml-auto ${isRTL ? 'space-x-reverse space-x-6' : 'space-x-6'}`}>
           {/* Search Bar */}
-         <div className="relative">
-  <input
-    type="text"
-    placeholder={t('common.search')}
-    className={`text-lg px-5 py-3 w-[360px] focus:outline-none focus:ring-2 placeholder-gray-500 transition-all duration-300 rounded-md
-      ${theme === 'dark' ? 'bg-[#2a2a2a] text-white focus:ring-gray-600' : 'bg-gray-200 text-gray-700 focus:ring-gray-300'}`}
-    dir={isRTL ? 'rtl' : 'ltr'}
-  />
-  <button className={`absolute top-1/2 transform -translate-y-1/2 ${isRTL ? 'left-4' : 'right-4'} text-gray-400 hover:text-red-500`}>
-    <CiSearch size={25} />
-  </button>
-</div>
-
+          <div className="relative">
+            <input
+              type="text"
+              placeholder={t('common.search')}
+              className={`text-lg px-5 py-3 w-[360px] focus:outline-none focus:ring-2 placeholder-gray-500 transition-all duration-300 rounded-md
+                ${theme === 'dark' ? 'bg-[#2a2a2a] text-white focus:ring-gray-600' : 'bg-gray-200 text-gray-700 focus:ring-gray-300'}`}
+              dir={isRTL ? 'rtl' : 'ltr'}
+            />
+            <button className={`absolute top-1/2 transform -translate-y-1/2 ${isRTL ? 'left-4' : 'right-4'} text-gray-400 hover:text-red-500`}>
+              <CiSearch size={25} />
+            </button>
+          </div>
 
           {/* Theme and Language Switch */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-4">
             <button
               onClick={toggleTheme}
               className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors
@@ -91,28 +94,26 @@ const Navbar = () => {
           </div>
 
           {/* Auth Buttons */}
-         {/* Auth Buttons */}
-{isLoggedIn ? (
-  <button
-    onClick={() => {
-      localStorage.removeItem('token');
-      window.location.href = '/loginPage';
-    }}
-    className="bg-red-600 text-white px-4 py-1.5 rounded hover:bg-red-700 text-sm"
-  >
-    Logout
-  </button>
-) : (
-  <>
-    <Link to="/LoginPage" className={`text-sm ${theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-black'}`}>
-      {t('common.login')}
-    </Link>
-    <Link to="/signup-Email" className="bg-red-500 text-white px-4 py-1.5 rounded hover:bg-red-600 text-sm">
-      {t('common.signup')}
-    </Link>
-  </>
-)}
-
+          {isLoggedIn ? (
+            <button
+              onClick={() => {
+                localStorage.removeItem('token');
+                window.location.href = '/loginPage';
+              }}
+              className="bg-red-600 text-white px-5 py-2 rounded hover:bg-red-700 text-sm ml-2"
+            >
+              Logout
+            </button>
+          ) : (
+            <div className="flex items-center space-x-4">
+              <Link to="/LoginPage" className={`text-sm ${theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-black'}`}>
+                {t('common.login')}
+              </Link>
+              <Link to="/signup-Email" className="bg-red-500 text-white px-5 py-2 rounded hover:bg-red-600 text-sm">
+                {t('common.signup')}
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </nav>
