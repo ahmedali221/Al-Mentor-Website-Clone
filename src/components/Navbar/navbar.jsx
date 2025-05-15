@@ -141,7 +141,6 @@ const Navbar = () => {
       ? course.title[lang] || course.title.en || 'Untitled Course'
       : course.title || 'Untitled Course';
 
-  // استخراج اسم الإنستراكتور فقط
   const profile = course.instructor?.profile || course.instructor?.user || course.instructor || {};
   const instructorName =
     `${profile.firstName?.[lang] || profile.firstName?.en || ''} ${profile.lastName?.[lang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
