@@ -68,12 +68,15 @@
       }
     },
     "instructors": {
-      "title": "Our Instructors"
+      "title": "Our Instructors",
+      "title2": "How To Become an Instructor?",
+      "subtitle": "Join our community of instructors and share your knowledge with the world.",
+      "button": "Apply Now",
+      "about": "About Mentor"
     },
     "cta": {
-      "title": "Start your learning journey today.",
-      "subtitle": "Unlimited access to more than 1,000 video courses in Arabic, starting from 199 EGP",
-      "button": "Subscribe now"
+      "title": "Only at 199 EGP /month! Get unlimited access to all courses when you subscribe to Almentor.",
+      "button": "Subscribe Now"
     }
   },
   "courses": {
@@ -89,6 +92,7 @@
       "completed": "Completed",
       "inProgress": "In Progress"
     },
+    "noCoursesAvailable": "No courses available.",
     "skills": "Skills You Will Gain"
   },
   "buttons": {
@@ -97,66 +101,24 @@
     "submit": "Submit",
     "edit": "Edit",
     "delete": "Delete",
-    "back": "Back",
-    "continue": "Continue"
+    "back": "Back"
   },
   "messages": {
     "loading": "Loading...",
     "error": "An error occurred",
     "success": "Success!",
     "noResults": "No results found",
-    "emailNotFound": "Email not found. Please check your email or sign up.",
-    "emailExists": "Email already exists. Please login instead.",
-    "loginFailed": "Login failed: No token received",
-    "signupSuccess": "Signup successful!"
+    "readMore": "Read more",
+    "readLess": "Read less"
   },
-  "auth": {
-    "welcomeBack": "Welcome back!",
-    "welcomeToAlmentor": "Welcome to almentor!",
-    "welcomeMessage": "Welcome to almentor!",
-    "createAccount": "Create Your Account",
-    "signupAndLearn": "Signup and start learning",
-    "signupSubtitle": "Signup and start learning",
-    "loginWithFacebook": "Login with Facebook",
-    "loginWithGoogle": "Login with Google",
-    "enterEmail": "Enter Your Email",
-    "emailPlaceholder": "Type Your Email...",
-    "enterPassword": "Enter Your Password",
-    "passwordPlaceholder": "Type Your Password...",
-    "passwordCreatePlaceholder": "Create a password",
-    "fullNameEn": "Full Name (English)",
-    "fullNameEnPlaceholder": "Enter your full name in English",
-    "fullNameAr": "Full Name (Arabic)",
-    "fullNameArPlaceholder": "Enter your full name in Arabic",
-    "username": "Username",
-    "usernamePlaceholder": "Choose a username",
-    "email": "Email",
-    "emailInputPlaceholder": "Enter your email",
-    "password": "Password",
-    "passwordInputPlaceholder": "Create a password",
-    "termsAgreement": "By signing up, I agree with almentor's",
-    "termsAndConditions": "Terms & Conditions",
-    "and": "and",
-    "privacyPolicy": "Privacy Policy",
-    "haveAccount": "Already have an account?",
-    "noAccount": "Don't Have An Account?",
-    "minutes": "minutes",
-    "skills": "Skills You Will Gain",
-    "included": "Courses Included",
-    "category": "Category",
-    "facebook": "Facebook",
-    "google": "Google",
-    "emailVerified": "Email verified! Please enter your password.",
-    "continue": "Continue with"
-  },
-  "programs": {
-    "subtitle": "Structured Learning for Deeper Skill Mastery",
-    "description": "Take your learning to the next level with almentor Learning Programs—carefully curated course series designed to help you build your skills step by step, guiding you progressively toward your goals.",
-    "hours": "hours",
-    "minutes": "minutes",
-    "mentors": "Mentors",
+  "instructorStats": {
+    "views": "Views",
+    "courses": "Courses",
     "learners": "Learners",
-    "lectures": "Lectures",
-    "aboutUs": "About This Program"
+    "title": "Instructor Stats"
+  },
+  "subscriptionCTA": {
+    "label": "Subscribe now to get unlimited access to all courses.",
+    "button": "Subscribe Now"
   }
 }
