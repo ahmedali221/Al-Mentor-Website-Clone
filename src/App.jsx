@@ -16,6 +16,7 @@ import ProgramsPage from './pages/ProgramsPage';
 import ProgramDetailPage from './pages/ProgramDetailPage';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import Subscribe from './pages/Subscribe';
 
 function App() {
   return (
@@ -33,7 +34,7 @@ function App() {
             <Route path="/signup-Email" element={<SignEmail />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/password" element={<PasswordPage />} />
-
+            <Route path="/subscribe" element={<Subscribe />} />
           </Routes>
         </div>
         <Footer />
