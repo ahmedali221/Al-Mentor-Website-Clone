@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { RiArrowDropDownLine } from 'react-icons/ri';
@@ -8,58 +8,199 @@ import { changeLanguage } from '../../i18n/config';
 import { useTheme } from '../../context/ThemeContext';
 import './navbar.css';
 
-
 const Navbar = () => {
   const { t, i18n } = useTranslation();
   const { theme, toggleTheme } = useTheme();
   const isRTL = i18n.language === 'ar';
   const isLoggedIn = !!localStorage.getItem('token');
 
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [categoryCourses, setCategoryCourses] = useState([]);
+  const [allCourses, setAllCourses] = useState([]);
 
   const toggleLanguage = () => {
     const newLang = i18n.language === 'en' ? 'ar' : 'en';
     changeLanguage(newLang);
   };
 
-  return (
-    <nav className={`fixed top-0 left-0 right-0 px-6 py-4 z-50 shadow transition-all duration-300 text-lg font-medium ${theme === 'dark' ? 'bg-[#1a1a1a] text-white' : 'bg-white text-black'}`}>
-      <div className={`flex items-center justify-start gap-16 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
+  // FETCH CATEGORIES
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/category');
+        if (!res.ok) throw new Error('Failed to fetch categories');
+        const data = await res.json();
+        setCategories(data.data || []);
+      } catch (err) {
+        console.error('Error fetching categories:', err);
+        setCategories([]);
+      }
+    };
 
+    fetchCategories();
+  }, []);
+
+  // FETCH ALL COURSES ONCE
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/courses');
+        if (!res.ok) throw new Error('Failed to fetch courses');
+        const data = await res.json();
+        setAllCourses(data.data || data);
+      } catch (err) {
+        setAllCourses([]);
+      }
+    };
+    fetchCourses();
+  }, []);
+
+  // FILTER COURSES BY CATEGORY ON HOVER
+  const handleCategoryHover = (categoryId) => {
+    setSelectedCategory(categoryId);
+    const filteredCourses = allCourses.filter(course =>
+      course.category === categoryId ||
+      course.category?._id === categoryId ||
+      course.category?.toString() === categoryId
+    );
+    setCategoryCourses(filteredCourses);
+  };
+
+  const handleDropdownEnter = () => setIsDropdownVisible(true);
+  const handleDropdownLeave = () => setIsDropdownVisible(false);
+
+  return (
+    <nav
+      className={`fixed top-0 left-0 right-0 px-4 py-4 z-50 shadow transition-all duration-300 text-lg font-medium ${
+        theme === 'dark' ? 'bg-[#1a1a1a] text-white' : 'bg-white text-black'
+      }`}
+    >
+      <div className={`flex items-center justify-start gap-12 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
         {/* Logo */}
-        <div className="flex items-center text-xl ml-4">
-          <img src="/logo.jpeg" alt="Almentor Logo" className={`h-8 w-auto ${isRTL ? 'ml-3' : 'mr-3'}`} />
-          <a href="/" className="text-xl font-semibold">
+        <div className="flex items-center text-3xl ml-4">
+          <img src="/logo.jpeg" alt="Almentor Logo" className={`h-12 w-auto ${isRTL ? 'ml-2' : 'mr-2'}`} />
+          <a href="/" className="text-3xl font-semibold">
             Almentor
           </a>
         </div>
 
-        {/* Navigation Links */}
-        <ul className={`flex items-center ${isRTL ? 'space-x-reverse space-x-8' : 'space-x-8'} text-base font-medium`}>
-          <li className="cursor-pointer hover:text-red-500 flex items-center">
-            {t('navigation.courses')} <RiArrowDropDownLine className="text-2xl mt-1" />
+        {/* Navigation */}
+        <ul className={`flex items-center ml-1 ${isRTL ? 'space-x-reverse space-x-6' : 'space-x-6'} text-3xl font-medium`}>
+          <li className="relative">
+            <button
+              onMouseEnter={handleDropdownEnter}
+              className="hover:text-red-500 flex items-center focus:outline-none"
+            >
+              {t('navigation.courses')}
+              <RiArrowDropDownLine className="text-5xl mt-3" />
+            </button>
+
+            {/* Dropdown */}
+            {isDropdownVisible && (
+              <div
+                className="absolute top-[80px] left-0 flex w-[800px] bg-white shadow-xl rounded-lg z-50 transition-all duration-300"
+                onMouseEnter={handleDropdownEnter}
+                onMouseLeave={handleDropdownLeave}
+              >
+                <div className="absolute -top-2 left-6 w-4 h-4 bg-white rotate-45 shadow-md z-40"></div>
+
+                <div className="w-1/2 border-r px-4 py-5">
+                  <ul>
+                    {categories.map((category) => (
+                      <li
+                        key={category._id}
+                        onMouseEnter={() => handleCategoryHover(category._id)}
+                        className="py-2 px-2 hover:bg-gray-100 cursor-pointer text-gray-800 text-sm font-medium rounded-md transition"
+                      >
+                        {category.name[i18n.language] || category.name.en}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="mt-6">
+                    <Link
+                      to="/courses"
+                      className="w-full flex items-center justify-center gap-2 bg-red-500 text-white py-2 rounded-md text-sm hover:bg-red-600 transition"
+                    >
+                      Browse Courses <span className="text-lg">→</span>
+                    </Link>
+                  </div>
+                </div>
+
+                <div className="w-1/2 p-5">
+                  {categoryCourses.length === 0 ? (
+                    <p className="text-gray-500">{t('common.noCourses')}</p>
+                  ) : (
+                    <ul>
+                   {categoryCourses.slice(0, 4).map((course) => {
+  const lang = i18n.language;
+  const title =
+    typeof course.title === 'object'
+      ? course.title[lang] || course.title.en || 'Untitled Course'
+      : course.title || 'Untitled Course';
+
+  const profile = course.instructor?.profile || course.instructor?.user || course.instructor || {};
+  const instructorName =
+    `${profile.firstName?.[lang] || profile.firstName?.en || ''} ${profile.lastName?.[lang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
+
+  return (
+    <li key={course._id} className="flex items-center gap-4 mb-5">
+      <img
+        src={course.thumbnail || '/default-course-img.png'}
+        alt={title}
+        className="w-20 h-14 object-cover rounded"
+      />
+      <div>
+        <h4 className="text-base font-semibold text-black text-red-600">
+          {title}
+        </h4>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          {instructorName}
+        </p>
+      </div>
+    </li>
+  );
+})}
+                    </ul>
+                  )}
+                </div>
+              </div>
+            )}
           </li>
+
           <li>
-            <Link to="/instructors" className="hover:text-red-500">{t('navigation.instructors')}</Link>
+            <Link to="/instructors" className="hover:text-red-500">
+              Instructors
+            </Link>
           </li>
+
           <li className="flex items-center">
-            <Link to="/programs" className="hover:text-red-500">{t('navigation.programs')}</Link>
+            <Link to="/programs" className="hover:text-red-500">
+              {t('navigation.programs')}
+            </Link>
             <span className="ml-2 bg-red-500 text-white text-[10px] px-1 py-0.5 rounded-full">
               NEW
             </span>
           </li>
-          <li className="ml-2">
-            <button className={`bg-transparent border-2 rounded px-6 py-2 transition-colors ${theme === 'dark'
-                ? 'border-gray-300 text-gray-300 hover:bg-gray-800'
-                : 'border-black text-black hover:bg-gray-100'
-              }`}>
+
+          <li>
+            <button
+              className={`rounded px-6 text-2xl py-2 border-2 transition ${
+                theme === 'dark'
+                  ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
+                  : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
+              }`}
+            >
               Subscribe
             </button>
           </li>
         </ul>
 
-        {/* Right Section */}
-        <div className={`flex items-center ml-auto ${isRTL ? 'space-x-reverse space-x-6' : 'space-x-6'}`}>
-          {/* Search Bar */}
+        {/* Right Side: Search + Theme + Language + Auth */}
+        <div className={`flex items-center ml-auto ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
+          {/* Search */}
           <div className="relative">
             <input
               type="text"
@@ -73,8 +214,8 @@ const Navbar = () => {
             </button>
           </div>
 
-          {/* Theme and Language Switch */}
-          <div className="flex items-center space-x-4">
+          {/* Theme + Language Switch */}
+          <div className="flex items-center space-x-2">
             <button
               onClick={toggleTheme}
               className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors
@@ -99,19 +240,19 @@ const Navbar = () => {
                 localStorage.removeItem('token');
                 window.location.href = '/loginPage';
               }}
-              className="bg-red-600 text-white px-5 py-2 rounded hover:bg-red-700 text-sm ml-2"
+              className="bg-red-600 text-white px-4 py-1.5 rounded hover:bg-red-700 text-sm"
             >
               Logout
             </button>
           ) : (
-            <div className="flex items-center space-x-4">
-              <Link to="/LoginPage" className={`text-sm ${theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-black'}`}>
+            <>
+              <Link to="/loginPage" className={`text-sm ${theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-black'}`}>
                 {t('common.login')}
               </Link>
-              <Link to="/signup-Email" className="bg-red-500 text-white px-5 py-2 rounded hover:bg-red-600 text-sm">
+              <Link to="/signup" className="bg-red-500 text-white px-4 py-1.5 rounded hover:bg-red-600 text-sm">
                 {t('common.signup')}
               </Link>
-            </div>
+            </>
           )}
         </div>
       </div>

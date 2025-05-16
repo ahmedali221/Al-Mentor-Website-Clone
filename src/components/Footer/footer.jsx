@@ -12,13 +12,10 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-4 gap-10">
         {/* Column 1 */}
         <div className="flex flex-col space-y-4">
-          <div className="bg-white p-3 rounded-md w-max">
-            <img
-             src="/logo.jpeg"
-              alt="Logo"
-              className="w-8 h-8"
-            />
-          </div>
+         <div className={`${theme === 'dark' ? 'bg-white' : 'bg-black'} p-3 rounded-md w-max`}>
+  <img src="/logo.jpeg" alt="Logo" className="w-8 h-8" />
+</div>
+
           <a href="#" className="hover:underline">{t('footer.blog', 'Blog')}</a>
           <a href="#" className="hover:underline">{t('footer.about', 'About')}</a>
           <a href="#" className="hover:underline">{t('footer.press', 'Press')}</a>

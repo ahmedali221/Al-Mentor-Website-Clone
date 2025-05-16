@@ -33,7 +33,6 @@ function App() {
             <Route path="/signup-Email" element={<SignEmail />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/password" element={<PasswordPage />} />
-
           </Routes>
         </div>
         <Footer />
