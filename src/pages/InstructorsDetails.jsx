@@ -2,11 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useTheme } from "../context/ThemeContext";
 import { useTranslation } from "react-i18next";
-import {
-  EyeIcon,
-  BookOpenIcon,
-  UserGroupIcon,
-} from "@heroicons/react/24/outline";
+import { EyeIcon, BookOpenIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 
 function getLocalizedString(obj = {}, lang = "en", defaultStr = "") {
   if (typeof obj === "string") return obj;
@@ -21,10 +17,13 @@ export default function InstructorDetails() {
   const navigate = useNavigate();
 
   const [instructor, setInstructor] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [courses, setCourses] = useState([]);
+  const [loadingInstructor, setLoadingInstructor] = useState(true);
+  const [loadingCourses, setLoadingCourses] = useState(true);
   const [showFullBio, setShowFullBio] = useState(false);
 
   useEffect(() => {
+    // Fetch the instructor details
     const fetchInstructor = async () => {
       try {
         const res = await fetch(`http://localhost:5000/api/instructors/${id}`);
@@ -34,14 +33,33 @@ export default function InstructorDetails() {
         console.error("Error loading instructor", err);
         setInstructor(null);
       } finally {
-        setLoading(false);
+        setLoadingInstructor(false);
       }
     };
 
     fetchInstructor();
   }, [id]);
 
-  if (loading)
+  useEffect(() => {
+    // Fetch courses by instructor id
+    if (!id) return;
+    const fetchCourses = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/courses/instructor/${id}`);
+        const data = await res.json();
+        setCourses(data || []);
+      } catch (err) {
+        console.error("Error loading instructor courses", err);
+        setCourses([]);
+      } finally {
+        setLoadingCourses(false);
+      }
+    };
+
+    fetchCourses();
+  }, [id]);
+
+  if (loadingInstructor || loadingCourses)
     return <div className="p-10 text-center">{t("messages.loading")}</div>;
 
   if (!instructor)
@@ -51,7 +69,6 @@ export default function InstructorDetails() {
   const professionalTitle = instructor.professionalTitle || {};
   const biography = instructor.biography || instructor.bio || {};
   const stats = instructor.stats || {};
-  const courses = instructor.courses || [];
 
   const lang = i18n.language;
 
@@ -185,18 +202,18 @@ export default function InstructorDetails() {
               const courseTitle = getLocalizedString(course.title, lang, t("messages.noResults"));
               return (
                 <div
-                  key={course.id || course._id}
+                  key={course._id}
                   className={`relative rounded-lg overflow-hidden shadow-lg group cursor-pointer ${
                     theme === "dark" ? "bg-gray-800" : "bg-white"
                   }`}
                   onClick={() => {
-                    navigate(`/courses/${course.id || course._id}`);
+                    navigate(`/courses/${course._id}`);
                   }}
                   role="link"
                   tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
-                      navigate(`/courses/${course.id || course._id}`);
+                      navigate(`/courses/${course._id}`);
                     }
                   }}
                   aria-label={courseTitle}

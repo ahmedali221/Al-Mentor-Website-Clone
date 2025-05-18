@@ -16,7 +16,9 @@ import ProgramsPage from './pages/ProgramsPage';
 import ProgramDetailPage from './pages/ProgramDetailPage';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-
+import BecomeInstructor from './pages/BecomeInstructor';
+import Home2 from './components/Home2/home2';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 function App() {
   return (
     <ThemeProvider>
@@ -28,8 +30,10 @@ function App() {
             <Route path="/programs" element={<ProgramsPage />} />
             <Route path="/programs/:programId" element={<ProgramDetailPage />} />
             <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Home2 />} />
             <Route path='/instructors' element={<Instructors />} />
             <Route path="/instructors/:id" element={<InstructorDetails />} />
+            <Route path ="/become-instructor" element={<BecomeInstructor/>} />
             <Route path="/signup-Email" element={<SignEmail />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/password" element={<PasswordPage />} />
