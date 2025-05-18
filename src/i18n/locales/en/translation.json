@@ -120,5 +120,56 @@
   "subscriptionCTA": {
     "label": "Subscribe now to get unlimited access to all courses.",
     "button": "Subscribe Now"
-  }
+  },
+  "payment": {
+    "title": "Payment",
+    "details": "Payment Details",
+    "loggedInWith": "Logged in with",
+    "buttons": {
+      "change": "Change",
+      "proceed": "Proceed"
+    },
+    "planDuration": "{{value}} {{unit}}",
+    "paymentMethods": {
+      "creditCard": "Credit Card",
+      "fawry": "Fawry",
+      "vodafone": "Vodafone Cash",
+      "valu": "Valu"
+    },
+    "forms": {
+      "phoneNumber": "Mobile Number",
+      "cardNumber": "Card Number",
+      "expiryDate": "Expiry Date",
+      "cvv": "CVV",
+      "cardholderName": "Cardholder Name"
+    },
+    "orderSummary": {
+      "price": "Price",
+      "total": "Total"
+    }
+  },
+  "subscription": {
+    "mainTitle": "Subscribe now and start learning",
+    "subtitle": "Choose a plan and get unlimited access to the best learning content in the Arab world for the best price",
+    "duration": "Duration: {{value}} {{unit}}",
+    "selectPlan": "Select plan",
+    "features": "What Every Plan Gets You",
+    "feature1": "Unlimited access to all courses",
+    "feature1Desc": "Enjoy unlimited access to all our courses. Learn at your own pace and explore new subjects anytime",
+    "feature2": "Ad-free learning journey",
+    "feature2Desc": "Focus on your studies without interruptions. Our platform is completely ad-free for a seamless experience",
+    "feature3": "Access on multiple devices",
+    "feature3Desc": "Learn on any device. Our platform works smoothly across laptops, tablets, and smartphones",
+    "feature4": "Download to watch offline",
+    "feature4Desc": "Download courses to watch offline. Learn wherever you are, even without an internet connection",
+    "paymentMethods": "Pay in various ways — Cancel anytime"
+  },
+  "ai": {
+    "chat": {
+      "welcome": "Welcome! How can I assist you today?",
+      "placeholder": "Type your message...",
+      "send": "Send"
+    }
+  },
+  "changePlan": "Change Plan"
 }

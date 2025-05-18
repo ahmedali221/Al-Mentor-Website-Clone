@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../context/ThemeContext";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function Subscribe() {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
+  const navigate = useNavigate();
   const isRTL = i18n.language === "ar";
 
   const [subscriptions, setSubscriptions] = useState([]);
@@ -31,7 +33,7 @@ function Subscribe() {
     const fetchSubscriptions = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("/api/subscriptions");
+        const response = await axios.get("http://localhost:5000/api/subscriptions");
         setSubscriptions(response.data);
         setLoading(false);
       } catch (err) {
@@ -158,6 +160,11 @@ function Subscribe() {
               )}
 
               <button
+                onClick={() => navigate('/payment', { 
+                  state: { 
+                    planId: plan._id || plan.id // Handle both _id and id formats
+                  } 
+                })}
                 className={`w-full py-3 px-6 rounded-lg text-lg font-semibold transition-all duration-300 
                 bg-red-600 text-white hover:bg-red-700 shadow-lg hover:shadow-xl`}>
                 {t("subscription.selectPlan", "Select plan")}

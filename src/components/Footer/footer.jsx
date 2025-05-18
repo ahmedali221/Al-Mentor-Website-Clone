@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTheme } from '../../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   const { theme } = useTheme();
@@ -101,27 +102,37 @@ const Footer = () => {
               </svg>
             </a>
 
-            {/* Support Button */}
-            <button
-              type="button"
-              className="fixed bottom-6 right-6 z-50 bg-[#3f8e9b] hover:bg-[#4b9fb1] text-white font-semibold px-6 py-2 rounded-full flex items-center space-x-2 shadow-lg"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
+            {/* Support Button with AI Icon */}
+            <div className="fixed bottom-6 right-6 z-50 flex flex-col items-center">
+              {/* AI Icon */}
+              <Link
+                to="/ai-chat"
+                className="mb-2 p-2 rounded-full shadow-lg  transition-all duration-200 hover:scale-110"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M8 10h.01M12 14a2 2 0 10-4 0 2 2 0 004 0zM12 20h.01M18 10h.01M16.5 15a7.5 7.5 0 11-9 0"
-                />
-              </svg>
-              <span className="font-bold">{t('footer.support', 'Support')}</span>
-            </button>
+                <img src="public/vecteezy_chatbot-support-service_53135090.png" alt="AI Icon" className="w-17 h-17" />
+              </Link>
+              {/* Support Button */}
+              <button
+                type="button"
+                className="bg-[#3f8e9b] hover:bg-[#4b9fb1] text-white font-semibold px-6 py-2 rounded-full flex items-center space-x-2 shadow-lg"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M8 10h.01M12 14a2 2 0 10-4 0 2 2 0 004 0zM12 20h.01M18 10h.01M16.5 15a7.5 7.5 0 11-9 0"
+                  />
+                </svg>
+                <span className="font-bold">{t('footer.support', 'Support')}</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
