@@ -1,21 +1,17 @@
-/* Navbar transitions */
 nav {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Add spacing between nav items */
 nav ul li {
   position: relative;
   transition: color 0.2s ease;
 }
 
-/* Hover effect for nav links */
 nav a:hover, 
 nav button:hover {
   transition: all 0.2s ease;
 }
 
-/* Theme-specific styles */
 .dark-theme-nav {
   background-color: #1A1A1A;
   color: #ffffff;
@@ -28,19 +24,16 @@ nav button:hover {
   border-bottom: 1px solid #eaeaea;
 }
 
-/* Responsive adjustments */
 @media (max-width: 1024px) {
   nav ul {
     gap: 1rem;
   }
 }
 
-/* RTL support */
 [dir="rtl"] nav .space-x-6 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-x-reverse: 1;
 }
 
-/* Button transitions */
 nav button {
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
