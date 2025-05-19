@@ -187,7 +187,7 @@ const Home = () => {
                 <div 
                   key={index} 
                   className={`rounded shadow-sm overflow-hidden border transition-all duration-200 cursor-pointer hover:shadow-lg
-                    ${theme === 'dark'
+                  ${theme === 'dark'
                       ? 'bg-[#1a1a1a] border-gray-700 text-white hover:bg-[#2a2a2a]'
                       : 'bg-white border-gray-200 text-black hover:bg-gray-50'}`}
                   onClick={() => navigate(`/courses/${course._id}`)}

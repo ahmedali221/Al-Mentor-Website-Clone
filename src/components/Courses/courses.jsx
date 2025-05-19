@@ -379,26 +379,25 @@ const Courses = () => {
   // Instructor card
   const InstructorCard = ({ instructor }) => {
     if (!instructor) return null;
-    // Support both .user and direct fields
-    const user = instructor.user || instructor;
-    const name =
-      (user.firstName?.[currentLang] || user.firstName?.en || user.firstName || '') +
-      ' ' +
-      (user.lastName?.[currentLang] || user.lastName?.en || user.lastName || '');
-    const title =
-      instructor.professionalTitle?.[currentLang] ||
-      instructor.professionalTitle?.en ||
-      instructor.professionalTitle ||
-      'Instructor Title';
-    const image = user.profilePicture || 'https://placehold.co/150x150';
+    // Try to get the profile object, fallback to user, fallback to instructor itself
+    const profile = instructor.profile || instructor.user || instructor;
+    const name = `${profile.firstName?.[currentLang] || profile.firstName?.en || profile.firstName || ''} ${profile.lastName?.[currentLang] || profile.lastName?.en || profile.lastName || ''}`.trim() || 'Unknown Instructor';
+    const title = instructor.professionalTitle?.[currentLang] || instructor.professionalTitle?.en || instructor.professionalTitle || '';
+    const image = profile.profilePicture || '/default-profile.png';
+
+    console.log('InstructorCard instructor:', instructor);
 
     return (
-      <div className="flex flex-col items-center justify-start px-3">
-        <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-gray-700">
+      <div className="px-4 min-h-72 flex flex-col items-center justify-start">
+        <div className={`w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden shadow transition-all duration-200 ${
+          theme === 'dark' ? 'shadow-gray-800' : 'shadow-gray-200'
+        }`}>
           <img src={image} alt={name} className="w-full h-full object-cover" />
         </div>
-        <h3 className={`text-base font-semibold mt-3 text-center ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{name.trim() || 'Unknown Instructor'}</h3>
-        <p className="text-gray-400 text-xs text-center">{title}</p>
+        <h3 className={`text-lg font-semibold mt-4 text-center ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{name}</h3>
+        <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} text-sm text-center`}>
+          {title}
+        </p>
       </div>
     );
   };

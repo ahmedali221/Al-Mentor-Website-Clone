@@ -13,11 +13,13 @@ const CertificatePage = () => {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   const currentLang = i18n.language;
+  const isRTL = i18n.language === 'ar';
   const [certificateData, setCertificateData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userData, setUserData] = useState(null);
-  const [instructorData, setInstructorData] = useState(null);
+  const [allInstructors, setAllInstructors] = useState([]);
+  const [matchedInstructor, setMatchedInstructor] = useState(null);
 
   useEffect(() => {
     const fetchCertificateData = async () => {
@@ -25,30 +27,55 @@ const CertificatePage = () => {
         setLoading(true);
         // Fetch course data
         const courseResponse = await axios.get(`/api/courses/${courseId}`);
-        
+        const course = courseResponse.data;
+        console.log('Certificate course:', course);
+
         // Fetch user data from localStorage or context
         const userData = JSON.parse(localStorage.getItem('userData'));
-        
-        // Fetch instructor data
-        let instructorId;
-        if (courseResponse.data.instructor) {
-          if (typeof courseResponse.data.instructor === 'object') {
-            instructorId = courseResponse.data.instructor._id || courseResponse.data.instructor.$oid;
-          } else {
-            instructorId = courseResponse.data.instructor;
-          }
-        }
 
-        if (instructorId) {
-          try {
-            const instructorResponse = await axios.get(`/api/instructors/${instructorId}`);
-            setInstructorData(instructorResponse.data);
-          } catch (err) {
-            console.error('Error fetching instructor data:', err);
+        // Fetch all instructors
+        const instructorsResponse = await axios.get('/api/instructors');
+        const instructors = instructorsResponse.data.data || instructorsResponse.data;
+        setAllInstructors(instructors);
+        console.log('All instructors:', instructors);
+
+        // Extract instructor ID from course (supporting various fields and types)
+        let instructorId = null;
+        if (course.instructor) {
+          if (typeof course.instructor === 'object') {
+            instructorId = course.instructor._id || course.instructor.id || course.instructor.$oid;
+          } else {
+            instructorId = course.instructor;
+          }
+        } else if (Array.isArray(course.instructors) && course.instructors.length > 0) {
+          const first = course.instructors[0];
+          instructorId = typeof first === 'object' ? (first._id || first.id || first.$oid) : first;
+        } else if (course.instructorDetails) {
+          if (typeof course.instructorDetails === 'object') {
+            instructorId = course.instructorDetails._id || course.instructorDetails.id || course.instructorDetails.$oid;
+          } else {
+            instructorId = course.instructorDetails;
           }
         }
-        
-        setCertificateData(courseResponse.data);
+        console.log('Matching instructorId:', instructorId);
+
+        // Match instructor (robustly check all possible id fields)
+        let matched = null;
+        if (instructorId && instructors.length > 0) {
+          matched = instructors.find(inst =>
+            inst._id === instructorId ||
+            inst.id === instructorId ||
+            (inst._id && instructorId && inst._id.toString() === instructorId.toString()) ||
+            (inst.id && instructorId && inst.id.toString() === instructorId.toString())
+          );
+        }
+        // Fallback: if not matched, but course.instructor is an object, use it
+        if (!matched && course.instructor && typeof course.instructor === 'object') {
+          matched = course.instructor;
+        }
+        console.log('Matched instructor:', matched);
+        setMatchedInstructor(matched);
+        setCertificateData(course);
         setUserData(userData);
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to load certificate data');
@@ -56,7 +83,6 @@ const CertificatePage = () => {
         setLoading(false);
       }
     };
-
     if (courseId) {
       fetchCertificateData();
     }
@@ -68,14 +94,16 @@ const CertificatePage = () => {
     return obj[currentLang] || obj.en || obj.ar || '';
   };
 
+  // Debug instructor data structure
+  console.log('instructorData:', matchedInstructor);
+
   const getInstructorName = () => {
-    if (!instructorData) return 'Course Instructor';
-    
-    const firstName = getLocalizedText(instructorData.user?.firstName);
-    const lastName = getLocalizedText(instructorData.user?.lastName);
-    const title = getLocalizedText(instructorData.professionalTitle);
-    
-    return `${firstName} ${lastName}${title ? ` - ${title}` : ''}`;
+    if (!matchedInstructor) return t('Unknown Instructor');
+    const profile = matchedInstructor.profile || matchedInstructor.user || matchedInstructor;
+    const firstName = getLocalizedText(profile.firstName);
+    const lastName = getLocalizedText(profile.lastName);
+    const title = getLocalizedText(matchedInstructor.professionalTitle);
+    return `${firstName} ${lastName}${title ? ` - ${title}` : ''}`.trim() || t('Unknown Instructor');
   };
 
   const handleDownloadPDF = async () => {
@@ -205,7 +233,7 @@ const CertificatePage = () => {
           <div className="relative p-12 text-center">
             {/* Logo */}
             <div className="mb-8">
-              <img src="/logo.png" alt="Al-Mentor" className="h-16 mx-auto" />
+              <img src="/logo.jpeg" alt="Almentor Logo" className={`h-12 w-auto ${isRTL ? 'ml-2' : 'mr-2'}`} />
             </div>
 
             {/* Title */}
@@ -233,6 +261,17 @@ const CertificatePage = () => {
                 day: 'numeric'
               })}
             </p>
+
+            {/* Instructor Name */}
+            <div className="mt-4 text-lg font-semibold text-[#00bcd4]">
+              {getInstructorName()}
+            </div>
+
+            {!matchedInstructor && (
+              <div className="mt-4 text-lg font-semibold text-red-500">
+                No instructor assigned for this course.
+              </div>
+            )}
 
             {/* Signature */}
             <div className="mt-12 flex justify-between items-end">

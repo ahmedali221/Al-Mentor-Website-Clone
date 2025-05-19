@@ -457,16 +457,15 @@ const CourseDetails = () => {
               <div className="absolute bottom-6 left-6 flex gap-4 items-center">
                 {(() => {
                   const instructor = displayInstructors[0];
-                  const user = instructor.user || instructor;
-                  const name =
-                    (user.firstName?.[currentLang] || user.firstName?.en || user.firstName || '') +
-                    ' ' +
-                    (user.lastName?.[currentLang] || user.lastName?.en || user.lastName || '');
-                  const image = user.profilePicture || 'https://placehold.co/150x150';
-                  return <>
-                    <img src={image} alt={name} className="w-10 h-10 rounded-full object-cover border border-gray-700" />
-                    <p className="text-white font-semibold text-base drop-shadow-lg">{name.trim() || t('Unknown Instructor')}</p>
-                  </>;
+                  const profile = instructor?.profile || instructor?.user || instructor || {};
+                  const name = `${profile.firstName?.[currentLang] || profile.firstName?.en || profile.firstName || ''} ${profile.lastName?.[currentLang] || profile.lastName?.en || profile.lastName || ''}`.trim() || t('Unknown Instructor');
+                  const image = profile.profilePicture || '/default-profile.png';
+                  return (
+                    <>
+                      <img src={image} alt={name} className="w-10 h-10 rounded-full object-cover border border-gray-700" />
+                      <p className="text-white font-semibold text-base drop-shadow-lg">{name}</p>
+                    </>
+                  );
                 })()}
               </div>
             )}
@@ -673,17 +672,11 @@ const CourseDetails = () => {
                     </div>
                   );
                 }
-                const user = instructor.user || instructor;
-                const name =
-                  (user.firstName?.[currentLang] || user.firstName?.en || user.firstName || '') +
-                  ' ' +
-                  (user.lastName?.[currentLang] || user.lastName?.en || user.lastName || '');
-                const title =
-                  instructor.professionalTitle?.[currentLang] ||
-                  instructor.professionalTitle?.en ||
-                  instructor.professionalTitle ||
-                  'Instructor Title';
-                const image = user.profilePicture || 'https://placehold.co/150x150';
+                // Use robust extraction like in courses.jsx
+                const profile = instructor.profile || instructor.user || instructor;
+                const name = `${profile.firstName?.[currentLang] || profile.firstName?.en || profile.firstName || ''} ${profile.lastName?.[currentLang] || profile.lastName?.en || profile.lastName || ''}`.trim() || t('Unknown Instructor');
+                const title = instructor.professionalTitle?.[currentLang] || instructor.professionalTitle?.en || instructor.professionalTitle || '';
+                const image = profile.profilePicture || '/default-profile.png';
                 return (
                   <div key={idx} className="flex items-center gap-5">
                     <img
@@ -692,7 +685,7 @@ const CourseDetails = () => {
                       className="w-16 h-16 object-cover rounded-full border border-gray-700"
                     />
                     <div className="flex flex-col justify-center">
-                      <div className={`font-bold text-lg md:text-xl leading-tight ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{name.trim() || t('Unknown Instructor')}</div>
+                      <div className={`font-bold text-lg md:text-xl leading-tight ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{name}</div>
                       <div className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} text-sm leading-tight`}>{title}</div>
                     </div>
                   </div>
