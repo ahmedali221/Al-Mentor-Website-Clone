@@ -4,12 +4,14 @@ import './home.css';
 import { RiArrowDropLeftLine, RiArrowDropRightLine } from "react-icons/ri";
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../context/ThemeContext';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   const isRTL = i18n.language === 'ar';
   const currentLang = i18n.language;
+  const navigate = useNavigate();
 
   const [instructors, setInstructors] = useState([]);
   const [allCourses, setAllCourses] = useState([]);
@@ -104,7 +106,7 @@ const Home = () => {
   };
 
   return (
-    <div className={`${theme === 'dark' ? 'bg-[#1A1A1A] text-white' : 'bg-white text-black'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className={`${theme === 'dark' ? 'bg-[#121212] text-white' : 'bg-white text-black'} min-h-screen transition-colors duration-200`} dir={isRTL ? 'rtl' : 'ltr'}>
       
       {/* Banner Section */}
       <main className="relative flex items-start justify-start min-h-screen px-6 pt-32" style={{
@@ -119,7 +121,7 @@ const Home = () => {
         <div className={`relative z-20 px-5 py-30 max-w-2xl text-white leading-none font-semibold text-xl ${isRTL ? 'mr-10' : 'ml-10'}`}>
           <h1 className="text-6xl font-bold mb-4 leading-none">{t('home.banner.title')}</h1>
           <p className="text-2xl mb-8 text-gray-300">{t('home.banner.subtitle')}</p>
-          <button className="bg-red-500 hover:bg-red-700 text-white px-8 py-6 rounded font-semibold text-xl">
+          <button className="bg-red-500 hover:bg-red-700 text-white px-8 py-6 rounded font-semibold text-xl transition-colors duration-200">
             {t('home.banner.subscribeButton')}
           </button>
         </div>
@@ -127,7 +129,7 @@ const Home = () => {
 
       {/* Courses Section */}
       <section className="py-1 px-6">
-        <h2 className="text-[60px] leading-[60px] font-bold text-center font-inter mb-6">
+        <h2 className={`text-[60px] leading-[60px] font-bold text-center font-inter mb-6 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
           {t('home.courses.title')}
         </h2>
 
@@ -140,7 +142,7 @@ const Home = () => {
                 ? 'bg-red-600 text-white'
                 : theme === 'dark'
                 ? 'bg-gray-800 text-white hover:bg-gray-700'
-                : 'bg-[#D4D4D4] text-black hover:bg-gray-300'}`}
+                : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
           >
             {t('Featured Courses')}
           </button>
@@ -154,7 +156,7 @@ const Home = () => {
                   ? 'bg-red-600 text-white'
                   : theme === 'dark'
                   ? 'bg-gray-800 text-white hover:bg-gray-700'
-                  : 'bg-[#D4D4D4] text-black hover:bg-gray-300'}`}
+                  : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
             >
               {category.name?.[currentLang] || category.name?.en}
             </button>
@@ -163,7 +165,7 @@ const Home = () => {
 
         {/* Courses Grid */}
         {loadingCourses ? (
-          <p className="text-center text-xl my-10">{t('Loading Courses')}...</p>
+          <p className={`text-center text-xl my-10 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{t('Loading Courses')}...</p>
         ) : errorCourses ? (
           <p className="text-center text-red-500 my-10">{t('Failed to load courses')}: {errorCourses}</p>
         ) : (
@@ -182,14 +184,18 @@ const Home = () => {
               const image = course.thumbnail || '/default-course-img.png';
 
               return (
-                <div key={index} className={`rounded shadow-sm overflow-hidden border transition-all duration-200 
-                  ${theme === 'dark'
-                    ? 'bg-[#2a2a2a] border-gray-700 text-white'
-                    : 'bg-gray-100 border-gray-200 text-black'}`}>
+                <div 
+                  key={index} 
+                  className={`rounded shadow-sm overflow-hidden border transition-all duration-200 cursor-pointer hover:shadow-lg
+                    ${theme === 'dark'
+                      ? 'bg-[#1a1a1a] border-gray-700 text-white hover:bg-[#2a2a2a]'
+                      : 'bg-white border-gray-200 text-black hover:bg-gray-50'}`}
+                  onClick={() => navigate(`/courses/${course._id}`)}
+                >
                   <img src={image} alt={title} className="w-full h-64 object-cover" />
                   <div className="p-6">
                     <h3 className="text-lg font-semibold">{title}</h3>
-                    <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{instructorName}</p>
+                    <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{instructorName}</p>
                   </div>
                 </div>
               );
@@ -199,7 +205,8 @@ const Home = () => {
 
         <div className="text-center mt-8">
           <button
-            className={`rounded px-6 py-2 border-2 transition  text-3xl ${
+            onClick={() => navigate('/all-courses')}
+            className={`rounded px-6 py-2 border-2 transition-all duration-200 text-3xl ${
               theme === 'dark'
                 ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
                 : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
@@ -212,10 +219,12 @@ const Home = () => {
 
       {/* Instructors Section */}
       <section className="py-10 px-6 mx-auto mt-10">
-        <h2 className="text-4xl font-bold mb-6 text-center">{t('home.instructors.title')}</h2>
+        <h2 className={`text-4xl font-bold mb-6 text-center ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+          {t('home.instructors.title')}
+        </h2>
 
         {loadingInstructors ? (
-          <p className="text-center text-xl my-10">{t('Loading Instructors')}...</p>
+          <p className={`text-center text-xl my-10 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{t('Loading Instructors')}...</p>
         ) : errorInstructors ? (
           <p className="text-center text-red-500 my-10">{t('Failed to load instructors')}: {errorInstructors}</p>
         ) : (
@@ -229,11 +238,13 @@ const Home = () => {
 
                 return (
                   <div key={index} className="px-4 min-h-72 flex flex-col items-center justify-start">
-                    <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden shadow">
+                    <div className={`w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden shadow transition-all duration-200 ${
+                      theme === 'dark' ? 'shadow-gray-800' : 'shadow-gray-200'
+                    }`}>
                       <img src={image} alt={name} className="w-full h-full object-cover" />
                     </div>
-                    <h3 className="text-lg font-semibold mt-4 text-center">{name}</h3>
-                    <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} text-sm text-center`}>
+                    <h3 className={`text-lg font-semibold mt-4 text-center ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{name}</h3>
+                    <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} text-sm text-center`}>
                       {title}
                     </p>
                   </div>
@@ -245,7 +256,8 @@ const Home = () => {
 
         <div className="text-center mt-8">
           <button
-            className={`rounded px-6 py-2 border-2 transition text-3xl ${
+            onClick={() => navigate('/instructors')}
+            className={`rounded px-6 py-2 border-2 transition-all duration-200 text-3xl ${
               theme === 'dark'
                 ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
                 : 'bg-transparent text-black border-black hover:bg-black hover:text-white'

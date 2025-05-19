@@ -1,0 +1,16 @@
+{
+  "home": {
+    "categories": {
+      "title": "تصنيفات الدورات"
+    },
+    "courses": {
+      "title": "الدورات المميزة",
+      "picks": "الاختيارات",
+      "loadingTopics": "جاري تحميل المواضيع...",
+      "noCoursesForTopic": "لم يتم العثور على دورات لهذا الموضوع",
+      "noCoursesAvailable": "لا توجد دورات متاحة",
+      "viewAll": "عرض الكل",
+      "seeAllCourses": "عرض جميع الدورات"
+    }
+  }
+} 

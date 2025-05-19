@@ -1,0 +1,16 @@
+{
+  "home": {
+    "categories": {
+      "title": "Course Categories"
+    },
+    "courses": {
+      "title": "Featured Courses",
+      "picks": "Picks",
+      "loadingTopics": "Loading topics...",
+      "noCoursesForTopic": "No courses found for this topic",
+      "noCoursesAvailable": "No courses available",
+      "viewAll": "View all",
+      "seeAllCourses": "See all courses"
+    }
+  }
+} 
