@@ -308,7 +308,15 @@ const Courses = () => {
   const getLocalizedText = (obj) => {
     if (!obj) return '';
     if (typeof obj === 'string') return obj;
+    if (obj && typeof obj === 'object') {
+      // Handle translation objects with en/ar keys
+      if (obj.en || obj.ar) {
+        return obj[currentLang] || obj.en || obj.ar || '';
+      }
+      // Handle other object types
     return obj[currentLang] || obj.en || '';
+    }
+    return '';
   };
 
   // Course card
@@ -389,7 +397,7 @@ const Courses = () => {
         <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-gray-700">
           <img src={image} alt={name} className="w-full h-full object-cover" />
         </div>
-        <h3 className="text-base font-semibold mt-3 text-white text-center">{name.trim() || 'Unknown Instructor'}</h3>
+        <h3 className={`text-base font-semibold mt-3 text-center ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{name.trim() || 'Unknown Instructor'}</h3>
         <p className="text-gray-400 text-xs text-center">{title}</p>
       </div>
     );
@@ -437,7 +445,7 @@ const Courses = () => {
 
   // Category Hero Card (for the top section)
   const CategoryHeroCard = ({ category }) => {
-    const title = category.name?.ar || category.name?.en || category.name;
+    const title = getLocalizedText(category.name);
     const image = category.thumbnailImgUrl || 'https://placehold.co/400x300';
     return (
       <div
@@ -508,10 +516,12 @@ const Courses = () => {
   console.log('newlyReleased:', newlyReleased);
 
   return (
-    <div className={`${theme === 'dark' ? 'bg-[#121212] text-white' : 'bg-white text-black'} min-h-screen`} dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Category Hero Carousel (NEW) */}
+    <div className={`${theme === 'dark' ? 'bg-[#121212] text-white' : 'bg-white text-black'} min-h-screen transition-colors duration-200`} dir={isRTL ? 'rtl' : 'ltr'}>
+      {/* Category Hero Carousel */}
       <section className="py-12 px-6 mt-10">
-        <h2 className="text-3xl font-bold mb-8 text-right">تصنيفات الدورات التدريبية</h2>
+        <h2 className={`text-3xl font-bold mb-8 text-right ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+          {t('Course Categories')}
+        </h2>
         <div className="relative">
           <Slider {...categorySliderSettings}>
             {categories.map((category) => (
@@ -522,30 +532,16 @@ const Courses = () => {
           </Slider>
         </div>
       </section>
-      {/* Course Categories */}
-      {/* <section className="py-8 px-6">
-        <h2 className="text-2xl font-bold mb-4">Course Categories</h2>
-        <div className="flex overflow-x-auto space-x-4 scrollbar-hide pb-2">
-          {categories.map((category) => (
-            <button
-              key={category._id}
-              onClick={() => handleCategoryClick(category._id)}
-              className={`whitespace-nowrap px-6 py-3 rounded-full font-semibold text-base transition border-2 focus:outline-none ${selectedCategory === category._id ? 'bg-white text-black border-white' : 'bg-black text-white border-gray-700 hover:bg-gray-800'}`}
-            >
-              {category.name?.[currentLang] || category.name?.en || category.name}
-            </button>
-          ))}
-        </div>
-      </section> */}
-      {/* Picks Section */}
+
+      {/* Course List Section */}
       <section id="course-list-section" className="py-6 px-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">{t('Picks')}</h2>
+          <h2 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Picks')}</h2>
           <div className="flex items-center">
             {topicLoading ? (
               <div className="flex items-center gap-2">
                 <FaSpinner className="animate-spin" />
-                <span className="text-sm text-gray-400">{t('Loading topics...')}</span>
+                <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{t('Loading topics...')}</span>
               </div>
             ) : topicError ? (
               <div className="text-red-500 text-sm">{topicError}</div>
@@ -554,21 +550,18 @@ const Courses = () => {
                 {topics.map((topic, index) => (
                   <React.Fragment key={topic._id}>
                     <button
-                      onClick={() => {
-                        console.log('Selected topic:', topic);
-                        handleTopicClick(topic._id);
-                      }}
+                      onClick={() => handleTopicClick(topic._id)}
                       className={`
-                        text-sm mx-3 whitespace-nowrap transition-colors
+                        text-sm mx-3 whitespace-nowrap transition-colors duration-200
                         ${selectedTopic === topic._id 
                           ? 'text-[#00ffd0] font-semibold' 
-                          : 'text-white hover:text-gray-300'}
+                          : theme === 'dark' ? 'text-white hover:text-gray-300' : 'text-gray-800 hover:text-gray-600'}
                       `}
                     >
                       {getLocalizedText(topic.name)}
                     </button>
                     {index < topics.length - 1 && (
-                      <div className="border-r border-gray-600 h-4" />
+                      <div className={`border-r ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'} h-4`} />
                     )}
                   </React.Fragment>
                 ))}
@@ -576,15 +569,16 @@ const Courses = () => {
             )}
           </div>
         </div>
+
         {topicCoursesLoading ? (
           <div className="flex justify-center items-center py-8">
             <FaSpinner className="animate-spin text-2xl text-[#00ffd0]" />
           </div>
         ) : filteredPicks.length === 0 ? (
-          <div className="text-center py-8 text-gray-400">
+          <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
             {selectedTopic 
-              ? t('No courses found for this topic')
-              : t('No courses available')}
+              ? t('home.courses.noCoursesForTopic')
+              : t('home.courses.noCoursesAvailable')}
           </div>
         ) : (
           filteredPicks.length < 4 ? (
@@ -598,15 +592,19 @@ const Courses = () => {
               {filteredPicks.map((course, idx) => (
                 <CourseCard key={idx} course={course} />
               ))}
-            </Slider>
+        </Slider>
           )
         )}
       </section>
+
       {/* Trending Courses */}
       <section className="py-6 px-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">{t('Trending Courses')}</h2>
-          <button onClick={() => navigate('/all-courses')} className="text-gray-400 hover:text-white">
+          <h2 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Trending Courses')}</h2>
+          <button 
+            onClick={() => navigate('/all-courses')} 
+            className={`${theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors duration-200`}
+          >
             {t('View all')}
           </button>
         </div>
@@ -614,11 +612,15 @@ const Courses = () => {
           {getFiltered(trending).map((course, idx) => <CourseCard key={idx} course={course} />)}
         </Slider>
       </section>
+
       {/* Newly Released */}
       <section className="py-6 px-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">{t('Newly Released')}</h2>
-          <button onClick={() => navigate('/all-courses')} className="text-gray-400 hover:text-white flex items-center gap-1">
+          <h2 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Newly Released')}</h2>
+          <button 
+            onClick={() => navigate('/all-courses')} 
+            className={`${theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors duration-200 flex items-center gap-1`}
+          >
             {t('View all')} <span className="ml-1">&rarr;</span>
           </button>
         </div>
@@ -630,34 +632,25 @@ const Courses = () => {
           ))}
         </Slider>
       </section>
-      {/* Start with Free Courses */}
-      <section className="py-6 px-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">{t('Start with free courses')}</h2>
-          <button onClick={() => navigate('/all-courses')} className="text-gray-400 hover:text-white">
-            {t('View all')}
-          </button>
-        </div>
-        <Slider {...sliderSettings}>
-          {getFiltered(freeCourses).map((course, idx) => <CourseCard key={idx} course={course} />)}
-        </Slider>
-      </section>
+
       {/* Subscription Section */}
-      <section className="py-8 px-6 bg-[#101c1c] my-8 rounded-xl max-w-6xl mx-auto flex items-center justify-between relative overflow-visible">
+      <section className={`py-8 px-6 ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-gray-100'} my-8 rounded-xl max-w-6xl mx-auto flex items-center justify-between relative overflow-visible transition-colors duration-200`}>
         {/* Left: Title, subtitle, button */}
         <div className="flex-1 min-w-[260px]">
-          <h2 className="text-lg md:text-xl font-bold mb-1">{t('Subscribe for a great price')}</h2>
-          <p className="text-gray-400 mb-4 text-sm md:text-base">
+          <h2 className={`text-lg md:text-xl font-bold mb-1 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Subscribe for a great price')}</h2>
+          <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} mb-4 text-sm md:text-base`}>
             {t('And get access to all almentor courses whenever you like')}
           </p>
           <button 
             onClick={handleSubscribe}
             disabled={!selectedPlan || subscriptionLoading}
-            className={`
-              bg-transparent border border-gray-400 text-white px-4 py-2 rounded 
-              transition hover:bg-gray-800
-              ${(!selectedPlan || subscriptionLoading) ? 'opacity-50 cursor-not-allowed' : ''}
-            `}
+            className={
+              `px-4 py-2 rounded border transition font-semibold text-base
+              ${theme === 'dark'
+                ? 'bg-transparent border-gray-400 text-white hover:bg-gray-800'
+                : 'bg-transparent border-gray-400 text-black hover:bg-gray-200'}
+              ${(!selectedPlan || subscriptionLoading) ? 'opacity-50 cursor-not-allowed' : ''}`
+            }
           >
             {subscriptionLoading ? (
               <span className="flex items-center gap-2">
@@ -681,7 +674,7 @@ const Courses = () => {
               {subscriptionError}
             </div>
           ) : subscriptionPlans.length === 0 ? (
-            <div className="text-gray-400 text-center w-full">
+            <div className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} text-center w-full`}>
               {t('No subscription plans available')}
             </div>
           ) : (
@@ -692,57 +685,58 @@ const Courses = () => {
               const currency = typeof plan.price === 'object' ? plan.price.currency : plan.currency || 'EGP';
               const period = plan.period || 'mo';
 
-              return (
-                <div
+            return (
+              <div
                   key={plan._id}
                   onClick={() => handlePlanSelection(plan._id)}
-                  className={`
-                    cursor-pointer transition
-                    ${isSelected
-                      ? 'bg-[#1e2b2b] border-2 border-[#00ffd0] shadow-lg'
-                      : 'bg-[#181f1f] border-2 border-transparent'}
-                    rounded-lg p-4 w-32 md:w-40 flex flex-col items-center relative
-                  `}
-                >
-                  <p className="text-xs mb-1 text-gray-300">{getLocalizedText(plan.name)}</p>
-                  <div className="flex items-baseline mb-1">
+                className={
+                  `cursor-pointer transition rounded-lg p-4 w-32 md:w-40 flex flex-col items-center relative
+                  ${isSelected
+                    ? (theme === 'dark' ? 'bg-[#1e2b2b] border-2 border-[#00ffd0] shadow-lg' : 'bg-white border-2 border-[#00ffd0] shadow-lg')
+                    : (theme === 'dark' ? 'bg-[#181f1f] border-2 border-transparent' : 'bg-gray-100 border-2 border-transparent')}
+                  `
+                }
+              >
+                  <p className={`text-xs mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{getLocalizedText(plan.name)}</p>
+                <div className="flex items-baseline mb-1">
                     {oldPrice && (
-                      <span className="text-xs text-gray-500 line-through mr-1">
-                        {oldPrice} {currency}
-                      </span>
+                      <span className={`text-xs line-through mr-1 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>{oldPrice} {currency}</span>
                     )}
-                    <span className={`text-xl md:text-2xl font-bold ${isSelected ? 'text-[#00ffd0]' : ''}`}>
-                      {price}
-                    </span>
-                    <span className="text-xs text-gray-400 ml-1">
-                      {currency}/{period}
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-400">{getLocalizedText(plan.description)}</p>
-                  {plan.isBestValue && isSelected && (
-                    <span className="absolute top-2 right-2 bg-[#00ffd0] text-black text-[10px] font-bold px-2 py-0.5 rounded-full">
-                      {t('Best Value')}
-                    </span>
-                  )}
+                    <span className={`text-xl md:text-2xl font-bold ${isSelected ? 'text-[#00ffd0]' : (theme === 'dark' ? 'text-white' : 'text-black')}`}>{price}</span>
+                    <span className={`text-xs ml-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{currency}/{period}</span>
                 </div>
-              );
+                  <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{getLocalizedText(plan.description)}</p>
+                  {plan.isBestValue && isSelected && (
+                  <span className="absolute top-2 right-2 bg-[#00ffd0] text-black text-[10px] font-bold px-2 py-0.5 rounded-full">
+                      {t('Best Value')}
+                  </span>
+                )}
+              </div>
+            );
             })
           )}
         </div>
       </section>
+
       {/* Popular Courses */}
       <section className="py-6 px-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">Popular Courses</h2>
-          <button onClick={() => navigate('/all-courses')} className="text-gray-400 hover:text-white">View all</button>
+          <h2 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Popular Courses')}</h2>
+          <button 
+            onClick={() => navigate('/all-courses')} 
+            className={`${theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors duration-200`}
+          >
+            {t('View all')}
+          </button>
         </div>
         <Slider {...sliderSettings}>
           {getFiltered(allCourses).map((course, idx) => <CourseCard key={idx} course={course} />)}
         </Slider>
       </section>
+
       {/* Instructors Section */}
       <section className="py-10 px-6 mx-auto mt-6">
-        <h2 className="text-2xl font-bold mb-6">Our Instructors</h2>
+        <h2 className={`text-2xl font-bold mb-6 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Our Instructors')}</h2>
         <div className="max-w-6xl mx-auto">
           <Slider {...sliderSettings}>
             {instructors.map((instructor, index) => (
@@ -752,10 +746,14 @@ const Courses = () => {
         </div>
         <div className="text-center mt-8">
           <button 
-            className="rounded px-6 py-2 border border-white text-white hover:bg-white hover:text-black transition"
             onClick={() => navigate('/instructors')}
+            className={`rounded px-6 py-2 border transition-all duration-200 ${
+              theme === 'dark'
+                ? 'border-white text-white hover:bg-white hover:text-black'
+                : 'border-black text-black hover:bg-black hover:text-white'
+            }`}
           >
-            See all instructors
+            {t('See all instructors')}
           </button>
         </div>
       </section>

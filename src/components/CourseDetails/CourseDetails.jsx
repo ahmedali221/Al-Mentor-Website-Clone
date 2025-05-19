@@ -446,8 +446,9 @@ const CourseDetails = () => {
           <div className="relative w-full rounded-2xl overflow-hidden shadow-lg min-h-[340px] bg-black flex items-center justify-center">
             <img src={image} alt={title} className="w-full h-[340px] object-cover" />
             <button
-              aria-label="Play preview"
+              aria-label={t('Play preview')}
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-40 rounded-full p-4 border-2 border-white flex items-center justify-center"
+              onClick={() => navigate(`/lesson-viewer/${id}`)}
             >
               <svg width="48" height="48" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,0.5)"/><polygon points="20,16 36,24 20,32" fill="#fff"/></svg>
             </button>
@@ -464,7 +465,7 @@ const CourseDetails = () => {
                   const image = user.profilePicture || 'https://placehold.co/150x150';
                   return <>
                     <img src={image} alt={name} className="w-10 h-10 rounded-full object-cover border border-gray-700" />
-                    <p className="text-white font-semibold text-base">{name.trim() || 'Unknown Instructor'}</p>
+                    <p className="text-white font-semibold text-base drop-shadow-lg">{name.trim() || t('Unknown Instructor')}</p>
                   </>;
                 })()}
               </div>
@@ -474,7 +475,7 @@ const CourseDetails = () => {
           {/* Objectives */}
           {objectives.length > 0 && (
             <div className="mb-10">
-              <h3 className="text-2xl font-bold mb-6">{t('By the end of this course, you will be able to')}</h3>
+              <h3 className={`text-2xl font-bold mb-6 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('By the end of this course, you will be able to')}</h3>
               <ul className="list-none space-y-3">
                 {objectives.map((obj, idx) => (
                   <li key={idx} className="flex items-start gap-3 text-lg">
@@ -488,26 +489,26 @@ const CourseDetails = () => {
 
           {/* Course Details */}
           <div className="mb-10">
-            <h3 className="text-2xl font-bold mb-6">{t('Course details')}</h3>
+            <h3 className={`text-2xl font-bold mb-6 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Course details')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="flex items-center gap-3">
                 <FaClock className="text-[#00bcd4]" />
-                <span>{formattedDuration} / {lessonsCount} {t('lessons')}</span>
+                <span className={`${theme === 'dark' ? 'text-white' : 'text-black'}`}>{formattedDuration} / {lessonsCount} {t('lessons')}</span>
               </div>
               <div className="flex items-center gap-3">
                 <FaInfinity className="text-[#00bcd4]" />
-                <span>{t('Last updated')}: {lastUpdated}</span>
+                <span className={`${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Last updated')}: {lastUpdated}</span>
               </div>
               <div className="flex items-center gap-3">
                 <FaCertificate className="text-[#00bcd4]" />
-                <span>{hasCertificate ? t('Course completion certificate') : t('No certificate')}</span>
+                <span className={`${theme === 'dark' ? 'text-white' : 'text-black'}`}>{hasCertificate ? t('Course completion certificate') : t('No certificate')}</span>
               </div>
             </div>
           </div>
 
           {/* Course Content */}
           <div className="mb-10">
-            <h3 className="text-2xl font-bold mb-6">{t('Course Content')}</h3>
+            <h3 className={`text-2xl font-bold mb-6 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Course Content')}</h3>
             {lessonsLoading ? (
               <div className="text-center py-4">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00bcd4] mx-auto"></div>
@@ -614,7 +615,7 @@ const CourseDetails = () => {
 
           {/* About This Course */}
           <div className="mb-10">
-            <h3 className="text-2xl font-bold mb-4">{t('About this course')}</h3>
+            <h3 className={`text-2xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('About this course')}</h3>
             <div className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} mb-2 whitespace-pre-line`}>
               {displayedDescription}
               {isLongDescription && (
@@ -631,7 +632,7 @@ const CourseDetails = () => {
 
           {/* Course Requirements */}
           <div className="mb-10">
-            <h3 className="text-2xl font-bold mb-4">{t('Course requirements and prerequisites')}</h3>
+            <h3 className={`text-2xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Course requirements and prerequisites')}</h3>
             {requirements.length > 0 ? (
               <ul className="list-disc pl-5 space-y-2">
                 {requirements.map((req, idx) => (
@@ -653,7 +654,7 @@ const CourseDetails = () => {
 
           {/* Mentor/Instructor Section */}
           <div className="mb-10">
-            <h3 className="text-2xl font-bold mb-6">{t('Mentor')}</h3>
+            <h3 className={`text-2xl font-bold mb-6 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Mentor')}</h3>
             <div className="flex flex-col gap-6">
               {(displayInstructors.length > 0 ? displayInstructors : [null]).map((instructor, idx) => {
                 if (!instructor) {
@@ -666,8 +667,8 @@ const CourseDetails = () => {
                         className="w-16 h-16 object-cover rounded-full border border-gray-700"
                       />
                       <div className="flex flex-col justify-center">
-                        <div className="font-bold text-lg md:text-xl text-white leading-tight">Unknown Instructor</div>
-                        <div className="text-sm text-gray-400 leading-tight">No instructor data found for this course.</div>
+                        <div className={`font-bold text-lg md:text-xl leading-tight ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Unknown Instructor')}</div>
+                        <div className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} text-sm leading-tight`}>{t('No instructor data found for this course.')}</div>
                       </div>
                     </div>
                   );
@@ -691,8 +692,8 @@ const CourseDetails = () => {
                       className="w-16 h-16 object-cover rounded-full border border-gray-700"
                     />
                     <div className="flex flex-col justify-center">
-                      <div className="font-bold text-lg md:text-xl text-white leading-tight">{name.trim() || 'Unknown Instructor'}</div>
-                      <div className="text-sm text-gray-400 leading-tight">{title}</div>
+                      <div className={`font-bold text-lg md:text-xl leading-tight ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{name.trim() || t('Unknown Instructor')}</div>
+                      <div className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} text-sm leading-tight`}>{title}</div>
                     </div>
                   </div>
                 );
@@ -703,7 +704,7 @@ const CourseDetails = () => {
 
           {/* Course Rating Section */}
           <div className="mb-10">
-            <h3 className="text-2xl font-bold mb-6">{t('Course Rating')}</h3>
+            <h3 className={`text-2xl font-bold mb-6 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Course Rating')}</h3>
             <div className="flex flex-col gap-6">
               {/* Average Rating Display */}
               <div className="flex items-center gap-4">
@@ -718,12 +719,12 @@ const CourseDetails = () => {
                         className={`w-5 h-5 ${
                           star <= Math.round(courseRating.average)
                             ? 'text-yellow-400'
-                            : 'text-gray-300'
+                            : theme === 'dark' ? 'text-gray-700' : 'text-gray-300'
                         }`}
                       />
                     ))}
                   </div>
-                  <div className="text-sm text-gray-400">
+                  <div className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}> 
                     {courseRating.totalRatings} {t('ratings')}
                   </div>
                 </div>
@@ -731,7 +732,7 @@ const CourseDetails = () => {
 
               {/* User Rating Input */}
               <div className="flex flex-col gap-2">
-                <h4 className="font-semibold">{t('Rate this course')}</h4>
+                <h4 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Rate this course')}</h4>
                 <div className="flex items-center gap-2">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
@@ -746,7 +747,7 @@ const CourseDetails = () => {
                         className={`w-6 h-6 transition-colors ${
                           star <= (hoverRating || userRating)
                             ? 'text-yellow-400'
-                            : 'text-gray-300'
+                            : theme === 'dark' ? 'text-gray-700' : 'text-gray-300'
                         } ${isSubmitting ? 'opacity-50' : ''}`}
                       />
                     </button>
@@ -766,10 +767,10 @@ const CourseDetails = () => {
               {/* Recent Ratings */}
               {courseRating.ratings.length > 0 && (
                 <div className="flex flex-col gap-2">
-                  <h4 className="font-semibold">{t('Recent Ratings')}</h4>
+                  <h4 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Recent Ratings')}</h4>
                   <div className="space-y-3">
                     {courseRating.ratings.slice(-3).reverse().map((rating, index) => (
-                      <div key={index} className="flex items-center gap-2 p-2 bg-gray-100 dark:bg-gray-800 rounded">
+                      <div key={index} className={`flex items-center gap-2 p-2 rounded ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}`}> 
                         <div className="flex items-center gap-1">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <FaStar
@@ -777,12 +778,12 @@ const CourseDetails = () => {
                               className={`w-4 h-4 ${
                                 star <= rating.rating
                                   ? 'text-yellow-400'
-                                  : 'text-gray-300'
+                                  : theme === 'dark' ? 'text-gray-700' : 'text-gray-300'
                               }`}
                             />
                           ))}
                         </div>
-                        <span className="text-sm text-gray-500">
+                        <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}> 
                           {new Date(rating.timestamp).toLocaleDateString()}
                         </span>
                       </div>
@@ -796,8 +797,7 @@ const CourseDetails = () => {
 
           {/* Comments Section */}
           <div className="mb-10">
-            <h3 className="text-2xl font-bold mb-6">{t('Comments')}</h3>
-            
+            <h3 className={`text-2xl font-bold mb-6 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Comments')}</h3>
             {/* Comment Form */}
             <form onSubmit={handleCommentSubmit} className="mb-8">
               <div className="flex flex-col gap-4">
@@ -856,8 +856,8 @@ const CourseDetails = () => {
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-semibold">{comment.user.name}</h4>
-                          <span className="text-sm text-gray-500">
+                          <h4 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{comment.user.name}</h4>
+                          <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}> 
                             {new Date(comment.timestamp).toLocaleDateString()}
                           </span>
                         </div>
@@ -924,6 +924,13 @@ const CourseDetails = () => {
             >
               <FaBookmark className="text-white" />
               {t('View My Courses')}
+            </button>
+            <button
+              onClick={() => navigate('/saved-courses')}
+              className="flex items-center justify-center gap-2 py-3 rounded-lg text-lg font-bold bg-gray-500 hover:bg-gray-700 text-white transition mb-2"
+            >
+              <FaBookmark className="text-white" />
+              {t('View Saved Courses')}
             </button>
             <button 
               className="flex items-center justify-center gap-2 text-gray-300 hover:text-white text-sm py-2" 
