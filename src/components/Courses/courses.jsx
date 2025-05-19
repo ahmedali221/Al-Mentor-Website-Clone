@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../context/ThemeContext';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { FaSearch, FaBell, FaShoppingCart, FaUserCircle, FaBookmark, FaPlayCircle } from 'react-icons/fa';
+import { FaSearch, FaBell, FaShoppingCart, FaUserCircle, FaBookmark, FaPlayCircle, FaSpinner } from 'react-icons/fa';
 import { Route } from 'react-router-dom';
 import CourseDetailsPage from '../CourseDetails/CourseDetails';
 
@@ -31,12 +31,27 @@ const Courses = () => {
   const [freeCourses, setFreeCourses] = useState([]);
   const [popular, setPopular] = useState([]);
 
-  const [selectedPlan, setSelectedPlan] = useState('Yearly Plan'); // Default to Yearly Plan
+  const [subscriptionPlans, setSubscriptionPlans] = useState([]);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [subscriptionLoading, setSubscriptionLoading] = useState(true);
+  const [subscriptionError, setSubscriptionError] = useState(null);
 
   const [savedCourses, setSavedCourses] = useState(() => {
     // Load from localStorage or start with empty array
     const saved = localStorage.getItem('savedCourses');
     return saved ? JSON.parse(saved) : [];
+  });
+
+  const [topics, setTopics] = useState([]);
+  const [selectedTopic, setSelectedTopic] = useState(null);
+  const [topicLoading, setTopicLoading] = useState(true);
+  const [topicError, setTopicError] = useState(null);
+  const [filteredPicks, setFilteredPicks] = useState([]);
+  const [topicCoursesLoading, setTopicCoursesLoading] = useState(false);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0
   });
 
   useEffect(() => {
@@ -82,6 +97,150 @@ const Courses = () => {
       .then((res) => setCategories(res.data.data))
       .catch((err) => console.error('Error fetching categories:', err));
   }, []);
+
+  useEffect(() => {
+    // Fetch subscription plans
+    const fetchSubscriptionPlans = async () => {
+      try {
+        setSubscriptionLoading(true);
+        const response = await axios.get('/api/subscriptions');
+        setSubscriptionPlans(response.data);
+        // Set the first plan as selected by default
+        if (response.data.length > 0) {
+          setSelectedPlan(response.data[0]._id);
+        }
+      } catch (err) {
+        console.error('Error fetching subscription plans:', err);
+        setSubscriptionError('Failed to load subscription plans');
+      } finally {
+        setSubscriptionLoading(false);
+      }
+    };
+
+    fetchSubscriptionPlans();
+  }, []);
+
+  // Fetch topics
+  useEffect(() => {
+    const fetchTopics = async () => {
+      try {
+        setTopicLoading(true);
+        const response = await axios.get('/api/topics');
+        setTopics(response.data);
+      } catch (err) {
+        console.error('Error fetching topics:', err);
+        setTopicError('Failed to load topics');
+      } finally {
+        setTopicLoading(false);
+      }
+    };
+
+    fetchTopics();
+  }, []);
+
+  // Fetch initial courses
+  useEffect(() => {
+    const fetchInitialCourses = async () => {
+      try {
+        const response = await axios.get('/api/courses');
+        setFilteredPicks(response.data);
+      } catch (err) {
+        console.error('Error fetching initial courses:', err);
+        setTopicError('Failed to load courses');
+      }
+    };
+
+    fetchInitialCourses();
+  }, []);
+
+  // Handle topic selection and filtering
+  useEffect(() => {
+    const filterCoursesByTopic = async () => {
+      if (!selectedTopic) {
+        // If no topic selected, fetch all courses
+        try {
+          const response = await axios.get('/api/courses');
+          console.log('All courses response:', response.data);
+          setFilteredPicks(response.data);
+        } catch (err) {
+          console.error('Error fetching courses:', err);
+          setTopicError('Failed to load courses');
+        }
+        return;
+      }
+
+      try {
+        setTopicCoursesLoading(true);
+        // Get courses for the selected topic
+        const topicResponse = await axios.get(`/api/topics/${selectedTopic}`);
+        console.log('Topic response:', topicResponse.data);
+
+        // Get all courses and filter by topic
+        const coursesResponse = await axios.get('/api/courses');
+        console.log('Courses response:', coursesResponse.data);
+
+        // Debug the first course structure
+        if (coursesResponse.data.length > 0) {
+          console.log('First course structure:', coursesResponse.data[0]);
+        }
+
+        // Filter courses based on topic
+        const coursesWithTopic = coursesResponse.data.filter(course => {
+          // Check if course has category field that matches topic's category
+          const courseCategory = course.category?._id || course.category;
+          const topicCategory = topicResponse.data.category;
+          
+          console.log('Comparing categories:', {
+            courseCategory,
+            topicCategory,
+            matches: courseCategory === topicCategory
+          });
+
+          return courseCategory === topicCategory;
+        });
+
+        console.log('Filtered courses:', coursesWithTopic);
+        setFilteredPicks(coursesWithTopic);
+      } catch (err) {
+        console.error('Error filtering courses by topic:', err);
+        setTopicError('Failed to load courses for this topic');
+        setFilteredPicks([]);
+      } finally {
+        setTopicCoursesLoading(false);
+      }
+    };
+
+    filterCoursesByTopic();
+  }, [selectedTopic]);
+
+  const handleTopicClick = (topicId) => {
+    setSelectedTopic(prevTopic => prevTopic === topicId ? null : topicId);
+  };
+
+  // Original getFiltered function for other sections
+  const getFiltered = (list) => {
+    let filtered = list;
+    
+    // Apply category filter
+    if (selectedCategory) {
+      filtered = filtered.filter(course => course.category === selectedCategory);
+    }
+    
+    // Apply search filter
+    if (searchQuery) {
+      const searchLower = searchQuery.toLowerCase();
+      filtered = filtered.filter(course => {
+        const title = course.title?.[currentLang] || course.title?.en || '';
+        const description = course.description?.[currentLang] || course.description?.en || '';
+        return (
+          title.toLowerCase().includes(searchLower) ||
+          description.toLowerCase().includes(searchLower)
+        );
+      });
+    }
+    
+    return filtered;
+  };
 
   const handleCategoryClick = (categoryId) => {
     setSelectedCategory(categoryId);
@@ -143,26 +302,6 @@ const Courses = () => {
       { breakpoint: 1024, settings: { slidesToShow: 1, rows: 2 } },
       { breakpoint: 768, settings: { slidesToShow: 1, rows: 1 } },
     ],
-  };
-
-  // Filtered courses by category and search
-  const getFiltered = (list) => {
-    let filtered = list;
-    if (selectedCategory) {
-      filtered = filtered.filter(course => course.category === selectedCategory);
-    }
-    if (searchQuery) {
-      const searchLower = searchQuery.toLowerCase();
-      filtered = filtered.filter(course => {
-        const title = course.title?.[currentLang] || course.title?.en || '';
-        const description = course.description?.[currentLang] || course.description?.en || '';
-        return (
-          title.toLowerCase().includes(searchLower) ||
-          description.toLowerCase().includes(searchLower)
-        );
-      });
-    }
-    return filtered;
   };
 
   // Helper function to get localized text
@@ -281,12 +420,20 @@ const Courses = () => {
     { title: "Arts, Design & Media", image: "https://via.placeholder.com/280x160" }
   ];
 
-  // Subscription plans
-  const subscriptionPlans = [
-    { name: "Monthly Plan", price: "399", period: "/month", type: "Monthly Plan" },
-    { name: "Quarterly Plan", price: "266", period: "/month", type: "Quarterly Plan" },
-    { name: "Yearly Plan", price: "199", period: "/month", type: "Yearly Plan" }
-  ];
+  const handlePlanSelection = (planId) => {
+    setSelectedPlan(planId);
+  };
+
+  const handleSubscribe = async () => {
+    if (!selectedPlan) return;
+
+    try {
+      // Navigate to subscription page with selected plan
+      navigate(`/subscription/${selectedPlan}`);
+    } catch (err) {
+      console.error('Error handling subscription:', err);
+    }
+  };
 
   // Category Hero Card (for the top section)
   const CategoryHeroCard = ({ category }) => {
@@ -324,7 +471,10 @@ const Courses = () => {
     const image = course.thumbnail || 'https://placehold.co/280x160';
     const isNew = course.isNew || false;
     return (
-      <div className="flex bg-[#181f1f] hover:bg-[#232b2b] transition rounded-2xl overflow-hidden shadow-lg min-h-[160px] max-h-[200px] w-full">
+      <div 
+        className="flex bg-[#181f1f] hover:bg-[#232b2b] transition rounded-2xl overflow-hidden shadow-lg min-h-[160px] max-h-[200px] w-full cursor-pointer"
+        onClick={() => navigate(`/courses/${course._id}`)}
+      >
         <div className="relative min-w-[260px] max-w-[300px] h-[180px] flex-shrink-0 border-2 border-gray-700 shadow-xl">
           <img
             src={image}
@@ -390,41 +540,90 @@ const Courses = () => {
       {/* Picks Section */}
       <section id="course-list-section" className="py-6 px-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">Picks</h2>
-          <div className="flex">
-            <a href="#" className="text-white hover:text-gray-300 text-sm mx-3">Protect your Kids From Sexual Harassment</a>
-            <div className="border-r border-gray-600"></div>
-            <a href="#" className="text-white hover:text-gray-300 text-sm mx-3">Popular Courses in Saudi</a>
-            <div className="border-r border-gray-600"></div>
-            <a href="#" className="text-white hover:text-gray-300 text-sm mx-3">Be Kind to Yourself</a>
-            <div className="border-r border-gray-600"></div>
-            <a href="#" className="text-white hover:text-gray-300 text-sm mx-3">Master Business and Management Skills</a>
+          <h2 className="text-2xl font-bold">{t('Picks')}</h2>
+          <div className="flex items-center">
+            {topicLoading ? (
+              <div className="flex items-center gap-2">
+                <FaSpinner className="animate-spin" />
+                <span className="text-sm text-gray-400">{t('Loading topics...')}</span>
+              </div>
+            ) : topicError ? (
+              <div className="text-red-500 text-sm">{topicError}</div>
+            ) : (
+              <div className="flex items-center overflow-x-auto scrollbar-hide">
+                {topics.map((topic, index) => (
+                  <React.Fragment key={topic._id}>
+                    <button
+                      onClick={() => {
+                        console.log('Selected topic:', topic);
+                        handleTopicClick(topic._id);
+                      }}
+                      className={`
+                        text-sm mx-3 whitespace-nowrap transition-colors
+                        ${selectedTopic === topic._id 
+                          ? 'text-[#00ffd0] font-semibold' 
+                          : 'text-white hover:text-gray-300'}
+                      `}
+                    >
+                      {getLocalizedText(topic.name)}
+                    </button>
+                    {index < topics.length - 1 && (
+                      <div className="border-r border-gray-600 h-4" />
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
+            )}
           </div>
         </div>
-        <Slider {...sliderSettings}>
-          {getFiltered(picks).map((course, idx) => <CourseCard key={idx} course={course} />)}
-        </Slider>
+        {topicCoursesLoading ? (
+          <div className="flex justify-center items-center py-8">
+            <FaSpinner className="animate-spin text-2xl text-[#00ffd0]" />
+          </div>
+        ) : filteredPicks.length === 0 ? (
+          <div className="text-center py-8 text-gray-400">
+            {selectedTopic 
+              ? t('No courses found for this topic')
+              : t('No courses available')}
+          </div>
+        ) : (
+          filteredPicks.length < 4 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {filteredPicks.map((course, idx) => (
+                <CourseCard key={idx} course={course} />
+              ))}
+            </div>
+          ) : (
+            <Slider {...{...sliderSettings, arrows: filteredPicks.length >= 4}}>
+              {filteredPicks.map((course, idx) => (
+                <CourseCard key={idx} course={course} />
+              ))}
+            </Slider>
+          )
+        )}
       </section>
       {/* Trending Courses */}
       <section className="py-6 px-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">Trending Courses</h2>
-          <button onClick={() => navigate('/all-courses')} className="text-gray-400 hover:text-white">View all</button>
+          <h2 className="text-2xl font-bold">{t('Trending Courses')}</h2>
+          <button onClick={() => navigate('/all-courses')} className="text-gray-400 hover:text-white">
+            {t('View all')}
+          </button>
         </div>
         <Slider {...sliderSettings}>
-          {getFiltered(allCourses).map((course, idx) => <CourseCard key={idx} course={course} />)}
+          {getFiltered(trending).map((course, idx) => <CourseCard key={idx} course={course} />)}
         </Slider>
       </section>
       {/* Newly Released */}
       <section className="py-6 px-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">Newly Released</h2>
+          <h2 className="text-2xl font-bold">{t('Newly Released')}</h2>
           <button onClick={() => navigate('/all-courses')} className="text-gray-400 hover:text-white flex items-center gap-1">
-            View all <span className="ml-1">&rarr;</span>
+            {t('View all')} <span className="ml-1">&rarr;</span>
           </button>
         </div>
         <Slider {...newlyReleasedSliderSettings} className="newly-released-slider">
-          {getFiltered(allCourses).map((course, idx) => (
+          {getFiltered(newlyReleased).map((course, idx) => (
             <div key={idx} className="px-3 py-3">
               <NewlyReleasedCard course={course} />
             </div>
@@ -434,76 +633,101 @@ const Courses = () => {
       {/* Start with Free Courses */}
       <section className="py-6 px-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">Start with free courses</h2>
-          <button onClick={() => navigate('/all-courses')} className="text-gray-400 hover:text-white">View all</button>
+          <h2 className="text-2xl font-bold">{t('Start with free courses')}</h2>
+          <button onClick={() => navigate('/all-courses')} className="text-gray-400 hover:text-white">
+            {t('View all')}
+          </button>
         </div>
         <Slider {...sliderSettings}>
-          {getFiltered(allCourses).map((course, idx) => <CourseCard key={idx} course={course} />)}
+          {getFiltered(freeCourses).map((course, idx) => <CourseCard key={idx} course={course} />)}
         </Slider>
       </section>
-      {/* Subscription Section (Cloned & Redesigned) */}
+      {/* Subscription Section */}
       <section className="py-8 px-6 bg-[#101c1c] my-8 rounded-xl max-w-6xl mx-auto flex items-center justify-between relative overflow-visible">
         {/* Left: Title, subtitle, button */}
         <div className="flex-1 min-w-[260px]">
-          <h2 className="text-lg md:text-xl font-bold mb-1">Subscribe for a great price</h2>
-          <p className="text-gray-400 mb-4 text-sm md:text-base">And get access to all almentor courses whenever you like</p>
-          <button className="bg-transparent border border-gray-400 text-white px-4 py-2 rounded hover:bg-gray-800 transition">Choose Plan</button>
+          <h2 className="text-lg md:text-xl font-bold mb-1">{t('Subscribe for a great price')}</h2>
+          <p className="text-gray-400 mb-4 text-sm md:text-base">
+            {t('And get access to all almentor courses whenever you like')}
+          </p>
+          <button 
+            onClick={handleSubscribe}
+            disabled={!selectedPlan || subscriptionLoading}
+            className={`
+              bg-transparent border border-gray-400 text-white px-4 py-2 rounded 
+              transition hover:bg-gray-800
+              ${(!selectedPlan || subscriptionLoading) ? 'opacity-50 cursor-not-allowed' : ''}
+            `}
+          >
+            {subscriptionLoading ? (
+              <span className="flex items-center gap-2">
+                <FaSpinner className="animate-spin" />
+                {t('Loading...')}
+              </span>
+            ) : (
+              t('Choose Plan')
+            )}
+          </button>
         </div>
+
         {/* Center: Plans */}
         <div className="flex-1 flex justify-center items-center gap-2 md:gap-4">
-          {[
-            {
-              name: 'Monthly Plan',
-              price: '399',
-              oldPrice: null,
-              highlight: false,
-              value: 'Monthly Plan',
-            },
-            {
-              name: 'Quarterly Plan',
-              price: '266',
-              oldPrice: '399',
-              highlight: false,
-              value: 'Quarterly Plan',
-            },
-            {
-              name: 'Yearly Plan',
-              price: '199',
-              oldPrice: '399',
-              highlight: true,
-              value: 'Yearly Plan',
-            },
-          ].map((plan) => {
-            const isSelected = selectedPlan === plan.value;
-            return (
-              <div
-                key={plan.value}
-                onClick={() => setSelectedPlan(plan.value)}
-                className={`
-                  cursor-pointer transition
-                  ${isSelected
-                    ? 'bg-[#1e2b2b] border-2 border-[#00ffd0] shadow-lg'
-                    : 'bg-[#181f1f] border-2 border-transparent'}
-                  rounded-lg p-4 w-32 md:w-40 flex flex-col items-center relative
-                `}
-              >
-                <p className="text-xs mb-1 text-gray-300">{plan.name}</p>
-                <div className="flex items-baseline mb-1">
-                  {plan.oldPrice && (
-                    <span className="text-xs text-gray-500 line-through mr-1">{plan.oldPrice}</span>
+          {subscriptionLoading ? (
+            <div className="flex items-center justify-center w-full py-8">
+              <FaSpinner className="animate-spin text-2xl text-[#00ffd0]" />
+            </div>
+          ) : subscriptionError ? (
+            <div className="text-red-500 text-center w-full">
+              {subscriptionError}
+            </div>
+          ) : subscriptionPlans.length === 0 ? (
+            <div className="text-gray-400 text-center w-full">
+              {t('No subscription plans available')}
+            </div>
+          ) : (
+            subscriptionPlans.map((plan) => {
+              const isSelected = selectedPlan === plan._id;
+              const price = typeof plan.price === 'object' ? plan.price.amount : plan.price;
+              const oldPrice = typeof plan.oldPrice === 'object' ? plan.oldPrice.amount : plan.oldPrice;
+              const currency = typeof plan.price === 'object' ? plan.price.currency : plan.currency || 'EGP';
+              const period = plan.period || 'mo';
+
+              return (
+                <div
+                  key={plan._id}
+                  onClick={() => handlePlanSelection(plan._id)}
+                  className={`
+                    cursor-pointer transition
+                    ${isSelected
+                      ? 'bg-[#1e2b2b] border-2 border-[#00ffd0] shadow-lg'
+                      : 'bg-[#181f1f] border-2 border-transparent'}
+                    rounded-lg p-4 w-32 md:w-40 flex flex-col items-center relative
+                  `}
+                >
+                  <p className="text-xs mb-1 text-gray-300">{getLocalizedText(plan.name)}</p>
+                  <div className="flex items-baseline mb-1">
+                    {oldPrice && (
+                      <span className="text-xs text-gray-500 line-through mr-1">
+                        {oldPrice} {currency}
+                      </span>
+                    )}
+                    <span className={`text-xl md:text-2xl font-bold ${isSelected ? 'text-[#00ffd0]' : ''}`}>
+                      {price}
+                    </span>
+                    <span className="text-xs text-gray-400 ml-1">
+                      {currency}/{period}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-400">{getLocalizedText(plan.description)}</p>
+                  {plan.isBestValue && isSelected && (
+                    <span className="absolute top-2 right-2 bg-[#00ffd0] text-black text-[10px] font-bold px-2 py-0.5 rounded-full">
+                      {t('Best Value')}
+                    </span>
                   )}
-                  <span className={`text-xl md:text-2xl font-bold ${isSelected ? 'text-[#00ffd0]' : ''}`}>{plan.price}</span>
-                  <span className="text-xs text-gray-400 ml-1">EGP/mo</span>
                 </div>
-                <p className="text-xs text-gray-400">{plan.name}</p>
-                {plan.highlight && isSelected && (
-                  <span className="absolute top-2 right-2 bg-[#00ffd0] text-black text-[10px] font-bold px-2 py-0.5 rounded-full">
-                    Best Value
-                  </span>
-                )}
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       </section>
       {/* Popular Courses */}
@@ -527,7 +751,10 @@ const Courses = () => {
           </Slider>
         </div>
         <div className="text-center mt-8">
-          <button className="rounded px-6 py-2 border border-white text-white hover:bg-white hover:text-black transition">
+          <button 
+            className="rounded px-6 py-2 border border-white text-white hover:bg-white hover:text-black transition"
+            onClick={() => navigate('/instructors')}
+          >
             See all instructors
           </button>
         </div>

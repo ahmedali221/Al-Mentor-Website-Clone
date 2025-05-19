@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo, createContext, useContext } from 'react';
 import { ChevronRight, ChevronDown, ChevronLeft, Star, Clock, FileText, 
          Bell, X, PlayCircle, Volume2, Maximize, Settings, Book, 
-         BookOpen, Menu, Bookmark, Video, Share, Download, ExternalLink } from 'lucide-react';
+         BookOpen, Menu, Bookmark, Video, Share, Download, ExternalLink,
+         Award } from 'lucide-react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Route } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -31,10 +32,17 @@ export default function EnhancedLessonViewer() {
   const currentLang = i18n.language;
   const [lessons, setLessons] = useState([]);
   const [lessonsLoading, setLessonsLoading] = useState(true);
+  const [watchedLessons, setWatchedLessons] = useState(() => {
+    const stored = localStorage.getItem(`course_${courseId}_watched`);
+    return stored ? JSON.parse(stored) : [];
+  });
   const [notes, setNotes] = useState(() => {
     const savedNotes = localStorage.getItem(`course_${courseId}_notes`);
     return savedNotes ? JSON.parse(savedNotes) : [];
   });
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [isCourseCompleted, setIsCourseCompleted] = useState(false);
+  const navigate = useNavigate();
   
   // Fetch course data
   useEffect(() => {
@@ -83,6 +91,19 @@ export default function EnhancedLessonViewer() {
       fetchLessons();
     }
   }, [courseId]);
+  
+  // Load watched lessons from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem(`course_${courseId}_watched`);
+    if (stored) {
+      setWatchedLessons(JSON.parse(stored));
+    }
+  }, [courseId]);
+  
+  // Save watched lessons to localStorage
+  useEffect(() => {
+    localStorage.setItem(`course_${courseId}_watched`, JSON.stringify(watchedLessons));
+  }, [watchedLessons, courseId]);
   
   // Persist favoriteLessons to localStorage
   useEffect(() => {
@@ -237,6 +258,26 @@ export default function EnhancedLessonViewer() {
     return lessons.find(l => l._id === currentLesson.lessonId) || null;
   }, [lessons, currentLesson]);
   
+  // Mark lesson as watched
+  const markLessonAsWatched = (lessonId) => {
+    if (!watchedLessons.includes(lessonId)) {
+      setWatchedLessons(prev => [...prev, lessonId]);
+      showToast('Lesson marked as watched');
+    }
+  };
+  
+  // Calculate progress for a lesson
+  const calculateLessonProgress = (lessonId) => {
+    return watchedLessons.includes(lessonId) ? 100 : 0;
+  };
+  
+  // Calculate overall course progress
+  const calculateCourseProgress = () => {
+    if (!lessons.length) return 0;
+    const watchedCount = watchedLessons.length;
+    return Math.round((watchedCount / lessons.length) * 100);
+  };
+  
   // Context value
   const contextValue = {
     courseData,
@@ -254,7 +295,34 @@ export default function EnhancedLessonViewer() {
     goToNextLesson,
     goToPreviousLesson,
     isPlaying,
-    togglePlay
+    togglePlay,
+    watchedLessons,
+    markLessonAsWatched,
+    calculateLessonProgress,
+    calculateCourseProgress
+  };
+  
+  // Check if all lessons are watched
+  useEffect(() => {
+    const allLessonsWatched = lessons.length > 0 && watchedLessons.length === lessons.length;
+    setIsCourseCompleted(allLessonsWatched);
+    
+    // Show completion modal if course is completed
+    if (allLessonsWatched && !showCompletionModal) {
+      setShowCompletionModal(true);
+      
+      // Save completed course to localStorage
+      const completedCourses = JSON.parse(localStorage.getItem('completedCourses') || '[]');
+      if (!completedCourses.includes(courseId)) {
+        completedCourses.push(courseId);
+        localStorage.setItem('completedCourses', JSON.stringify(completedCourses));
+      }
+    }
+  }, [watchedLessons, lessons, courseId, showCompletionModal]);
+  
+  // Handle getting certificate
+  const handleGetCertificate = () => {
+    navigate(`/certificate/${courseId}`);
   };
   
   // Render loading state
@@ -299,6 +367,37 @@ export default function EnhancedLessonViewer() {
     );
   }
 
+  // Completion Modal
+  const CompletionModal = () => {
+    if (!showCompletionModal) return null;
+    
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-[#232323] p-8 rounded-lg max-w-md w-full mx-4">
+          <div className="text-center">
+            <Award size={64} className="mx-auto text-[#00bcd4] mb-4" />
+            <h2 className="text-2xl font-bold mb-2">Congratulations! 🎉</h2>
+            <p className="text-gray-300 mb-6">
+              You have successfully completed the course "{getLocalizedText(courseData?.title)}"
+            </p>
+            <button
+              onClick={handleGetCertificate}
+              className="w-full bg-[#00bcd4] hover:bg-[#0097a7] text-white font-bold py-3 px-6 rounded-lg transition-colors"
+            >
+              Get Your Certificate
+            </button>
+            <button
+              onClick={() => setShowCompletionModal(false)}
+              className="mt-4 text-gray-400 hover:text-white transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <CourseContext.Provider value={contextValue}>
       <div className="min-h-screen bg-[#181818] text-white flex flex-col mt-10">
@@ -316,6 +415,15 @@ export default function EnhancedLessonViewer() {
             </h1>
           </div>
           <div className="flex items-center space-x-4">
+            {isCourseCompleted && (
+              <button
+                onClick={() => setShowCompletionModal(true)}
+                className="flex items-center space-x-2 bg-[#00bcd4] hover:bg-[#0097a7] text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                <Award size={20} />
+                <span>Get Certificate</span>
+              </button>
+            )}
             <button className="text-gray-400 hover:text-white transition-colors">
               <Share size={20} />
             </button>
@@ -359,7 +467,7 @@ export default function EnhancedLessonViewer() {
                     <div className="flex justify-between items-center mb-4">
                       <h2 className="font-bold">Lessons</h2>
                       <span className="text-xs text-gray-400">
-                        {lessons.filter(l => l.progress === 100).length}/{lessons.length} complete
+                        {watchedLessons.length}/{lessons.length} complete ({calculateCourseProgress()}%)
                       </span>
                     </div>
                     
@@ -372,10 +480,13 @@ export default function EnhancedLessonViewer() {
                         <div 
                           key={lesson._id}
                           className={`p-3 rounded-lg ${currentLesson?.lessonId === lesson._id ? 'bg-blue-500 bg-opacity-20 border border-blue-500' : 'hover:bg-gray-700 border border-transparent'} cursor-pointer transition-colors`}
-                          onClick={() => setCurrentLesson({ 
-                            lessonId: lesson._id, 
-                            title: getLocalizedText(lesson.title) 
-                          })}
+                          onClick={() => {
+                            setCurrentLesson({ 
+                              lessonId: lesson._id, 
+                              title: getLocalizedText(lesson.title) 
+                            });
+                            markLessonAsWatched(lesson._id);
+                          }}
                         >
                           <div className="flex justify-between mb-1">
                             <h3 className="font-medium flex-1 truncate">{getLocalizedText(lesson.title)}</h3>
@@ -388,12 +499,12 @@ export default function EnhancedLessonViewer() {
                           </div>
                           <div className="flex justify-between items-center">
                             <span className="text-xs text-gray-400">{lesson.duration}</span>
-                            <span className="text-xs text-gray-400">{lesson.progress}% complete</span>
+                            <span className="text-xs text-gray-400">{calculateLessonProgress(lesson._id)}% complete</span>
                           </div>
                           <div className="mt-2 h-1 bg-gray-700 rounded-full overflow-hidden">
                             <div 
                               className="h-full bg-[#00bcd4] rounded-full" 
-                              style={{ width: `${lesson.progress}%` }}
+                              style={{ width: `${calculateLessonProgress(lesson._id)}%` }}
                             ></div>
                           </div>
                         </div>
@@ -685,6 +796,9 @@ export default function EnhancedLessonViewer() {
           </button>
         </div>
       )}
+      
+      {/* Completion Modal */}
+      <CompletionModal />
     </CourseContext.Provider>
   );
 }
