@@ -4,7 +4,6 @@ import './home.css';
 import { RiArrowDropLeftLine, RiArrowDropRightLine } from "react-icons/ri";
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../context/ThemeContext';
-import axios from 'axios';
 
 const Home = () => {
   const { t, i18n } = useTranslation();
@@ -18,25 +17,54 @@ const Home = () => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
+  const [loadingCourses, setLoadingCourses] = useState(true);
+  const [errorCourses, setErrorCourses] = useState(null);
+  const [loadingInstructors, setLoadingInstructors] = useState(true);
+  const [errorInstructors, setErrorInstructors] = useState(null);
+
   useEffect(() => {
-    axios.get('/api/instructors')
-      .then((res) => setInstructors(res.data.data))
-      .catch((err) => console.error('Error fetching instructors:', err));
+    const fetchCourses = async () => {
+      setLoadingCourses(true);
+      try {
+        const res = await fetch('http://localhost:5000/api/courses');
+        if (!res.ok) throw new Error('Failed to fetch courses');
+        const data = await res.json();
+        setAllCourses(data.data || data);
+        setCourses(data.data || data);
+      } catch (error) {
+        setErrorCourses(error.message);
+        setAllCourses([]);
+        setCourses([]);
+      } finally {
+        setLoadingCourses(false);
+      }
+    };
+    fetchCourses();
   }, []);
 
   useEffect(() => {
-    axios.get('/api/courses')
-      .then((res) => {
-        setAllCourses(res.data.data || res.data);
-        setCourses(res.data.data || res.data);
-      })
-      .catch((err) => console.error('Error fetching courses:', err));
+    fetch('http://localhost:5000/api/category')
+      .then(res => res.json())
+      .then(data => setCategories(data.data || []))
+      .catch(err => console.error('Error fetching categories:', err));
   }, []);
 
   useEffect(() => {
-    axios.get('/api/category')
-      .then((res) => setCategories(res.data.data))
-      .catch((err) => console.error('Error fetching categories:', err));
+    const fetchInstructors = async () => {
+      setLoadingInstructors(true);
+      try {
+        const res = await fetch('http://localhost:5000/api/instructors');
+        if (!res.ok) throw new Error('Failed to fetch instructors');
+        const data = await res.json();
+        setInstructors(data.data || []);
+      } catch (error) {
+        setErrorInstructors(error.message);
+        setInstructors([]);
+      } finally {
+        setLoadingInstructors(false);
+      }
+    };
+    fetchInstructors();
   }, []);
 
   const handleCategoryClick = (categoryId) => {
@@ -76,7 +104,8 @@ const Home = () => {
   };
 
   return (
-    <div className={`${theme === 'dark' ? 'bg-[#121212] text-white' : 'bg-white text-black'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className={`${theme === 'dark' ? 'bg-[#1A1A1A] text-white' : 'bg-white text-black'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+      
       {/* Banner Section */}
       <main className="relative flex items-start justify-start min-h-screen px-6 pt-32" style={{
         backgroundImage: `url(/banner.webp)`,
@@ -110,8 +139,8 @@ const Home = () => {
               ${!selectedCategory
                 ? 'bg-red-600 text-white'
                 : theme === 'dark'
-                  ? 'bg-gray-800 text-white hover:bg-gray-700'
-                  : 'bg-[#D4D4D4] text-black hover:bg-gray-300'}`}
+                ? 'bg-gray-800 text-white hover:bg-gray-700'
+                : 'bg-[#D4D4D4] text-black hover:bg-gray-300'}`}
           >
             {t('Featured Courses')}
           </button>
@@ -120,12 +149,12 @@ const Home = () => {
             <button
               key={category._id}
               onClick={() => handleCategoryClick(category._id)}
-              className={`px-4 py-2 rounded transition-colors duration-200
+              className={`px-4 py-2 rounded transition-colors duration-200 font-semibold
                 ${selectedCategory === category._id
                   ? 'bg-red-600 text-white'
                   : theme === 'dark'
-                    ? 'bg-gray-800 text-white hover:bg-gray-700'
-                    : 'bg-[#D4D4D4] text-black hover:bg-gray-300'}`}
+                  ? 'bg-gray-800 text-white hover:bg-gray-700'
+                  : 'bg-[#D4D4D4] text-black hover:bg-gray-300'}`}
             >
               {category.name?.[currentLang] || category.name?.en}
             </button>
@@ -133,37 +162,50 @@ const Home = () => {
         </div>
 
         {/* Courses Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
-          {courses.map((course, index) => {
-            const title = course.title?.[currentLang] || course.title?.en;
-            const instructor = course.instructor?.user;
-            const instructorName = instructor
-              ? `${instructor.firstName?.[currentLang] || instructor.firstName?.en || ''} ${instructor.lastName?.[currentLang] || instructor.lastName?.en || ''}`
-              : 'Unknown Instructor';
-            const image = course.thumbnail || '/default-course-img.png';
+        {loadingCourses ? (
+          <p className="text-center text-xl my-10">{t('Loading Courses')}...</p>
+        ) : errorCourses ? (
+          <p className="text-center text-red-500 my-10">{t('Failed to load courses')}: {errorCourses}</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
+            {courses.map((course, index) => {
+              const instructorObj = instructors.find(inst => inst._id === course.instructor);
+              let instructorName = 'Unknown Instructor';
+              let instructorImage = '/default-course-img.png';
 
-            return (
-              <div key={index} className={`rounded shadow-sm overflow-hidden border transition-all duration-200 
-                ${theme === 'dark'
-                  ? 'bg-[#2a2a2a] border-gray-700 text-white'
-                  : 'bg-gray-100 border-gray-200 text-black'}`}>
-                <img src={image} alt={title} className="w-full h-64 object-cover" />
-                <div className="p-6">
-                  <h3 className="text-lg font-semibold">{title}</h3>
-                  <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{instructorName}</p>
+              if (instructorObj && instructorObj.profile) {
+                instructorName = `${instructorObj.profile.firstName?.[currentLang] || ''} ${instructorObj.profile.lastName?.[currentLang] || ''}`;
+                instructorImage = instructorObj.profile.profilePicture || '/default-course-img.png';
+              }
+
+              const title = course.title?.[currentLang] || course.title?.en;
+              const image = course.thumbnail || '/default-course-img.png';
+
+              return (
+                <div key={index} className={`rounded shadow-sm overflow-hidden border transition-all duration-200 
+                  ${theme === 'dark'
+                    ? 'bg-[#2a2a2a] border-gray-700 text-white'
+                    : 'bg-gray-100 border-gray-200 text-black'}`}>
+                  <img src={image} alt={title} className="w-full h-64 object-cover" />
+                  <div className="p-6">
+                    <h3 className="text-lg font-semibold">{title}</h3>
+                    <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{instructorName}</p>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
+
         <div className="text-center mt-8">
           <button
-            className={`rounded px-6 py-2 border-2 transition  text-3xl ${theme === 'dark'
-              ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
-              : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
-              }`}
+            className={`rounded px-6 py-2 border-2 transition  text-3xl ${
+              theme === 'dark'
+                ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
+                : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
+            }`}
           >
-            See all courses
+            {t('See all courses')}
           </button>
         </div>
       </section>
@@ -171,52 +213,46 @@ const Home = () => {
       {/* Instructors Section */}
       <section className="py-10 px-6 mx-auto mt-10">
         <h2 className="text-4xl font-bold mb-6 text-center">{t('home.instructors.title')}</h2>
-        <div className="max-w-6xl mx-auto">
-          <Slider {...sliderSettings}>
-            {instructors.map((instructor, index) => {
-              const user = instructor.user || {};
-              const name = `${user.firstName?.[currentLang] || ''} ${user.lastName?.[currentLang] || ''}`;
-              const title = instructor.professionalTitle?.[currentLang] || '';
-              const image = user.profilePicture || '/default-profile.png';
 
-              return (
-                <div key={index} className="px-4 min-h-72 flex flex-col items-center justify-start">
-                  <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden shadow">
-                    <img src={image} alt={name} className="w-full h-full object-cover" />
+        {loadingInstructors ? (
+          <p className="text-center text-xl my-10">{t('Loading Instructors')}...</p>
+        ) : errorInstructors ? (
+          <p className="text-center text-red-500 my-10">{t('Failed to load instructors')}: {errorInstructors}</p>
+        ) : (
+          <div className="max-w-6xl mx-auto">
+            <Slider {...sliderSettings}>
+              {instructors.map((instructor, index) => {
+                const profile = instructor.profile || {};
+                const name = `${profile.firstName?.[currentLang] || ''} ${profile.lastName?.[currentLang] || ''}`;
+                const title = instructor.professionalTitle?.[currentLang] || '';
+                const image = profile.profilePicture || '/default-profile.png';
+
+                return (
+                  <div key={index} className="px-4 min-h-72 flex flex-col items-center justify-start">
+                    <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden shadow">
+                      <img src={image} alt={name} className="w-full h-full object-cover" />
+                    </div>
+                    <h3 className="text-lg font-semibold mt-4 text-center">{name}</h3>
+                    <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} text-sm text-center`}>
+                      {title}
+                    </p>
                   </div>
-                  <h3 className="text-lg font-semibold mt-4 text-center">{name}</h3>
-                  <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} text-sm text-center`}>
-                    {title}
-                  </p>
-                </div>
-              );
-            })}
-          </Slider>
-        </div>
+                );
+              })}
+            </Slider>
+          </div>
+        )}
+
         <div className="text-center mt-8">
           <button
-            className={`rounded px-6 py-2 border-2 transition text-3xl ${theme === 'dark'
-              ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
-              : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
-              }`}
+            className={`rounded px-6 py-2 border-2 transition text-3xl ${
+              theme === 'dark'
+                ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
+                : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
+            }`}
           >
-            See all instructor
+            {t('See all instructors')}
           </button>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className={`relative py-16 ${theme === 'dark' ? 'bg-[#1a1a1a] text-white' : 'bg-gray-100 text-black'}`}>
-        <div className="relative z-10 max-w-2xl mx-auto px-1 text-center">
-          <div className="p-8">
-            <h1 className="text-4xl font-bold mb-3 leading-tight">{t('home.cta.title')}</h1>
-            <p className={`text-2xl mb-6 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-              {t('home.cta.subtitle')}
-            </p>
-            <button className="bg-red-500 hover:bg-red-700 text-white px-8 py-4 rounded font-medium text-lg">
-              {t('home.cta.button')}
-            </button>
-          </div>
         </div>
       </section>
     </div>
