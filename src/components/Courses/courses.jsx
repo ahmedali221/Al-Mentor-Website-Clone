@@ -189,7 +189,7 @@ const Courses = () => {
           // Check if course has category field that matches topic's category
           const courseCategory = course.category?._id || course.category;
           const topicCategory = topicResponse.data.category;
-          
+
           console.log('Comparing categories:', {
             courseCategory,
             topicCategory,
@@ -220,12 +220,12 @@ const Courses = () => {
   // Original getFiltered function for other sections
   const getFiltered = (list) => {
     let filtered = list;
-    
+
     // Apply category filter
     if (selectedCategory) {
       filtered = filtered.filter(course => course.category === selectedCategory);
     }
-    
+
     // Apply search filter
     if (searchQuery) {
       const searchLower = searchQuery.toLowerCase();
@@ -238,7 +238,7 @@ const Courses = () => {
         );
       });
     }
-    
+
     return filtered;
   };
 
@@ -451,7 +451,7 @@ const Courses = () => {
           className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="relative z-10 p-6 w-full flex items-end justify-center h-full">
-          <h3 className="text-white text-2xl font-bold text-center drop-shadow-lg" style={{textShadow: '0 2px 8px rgba(0,0,0,0.7)'}}>
+          <h3 className="text-white text-2xl font-bold text-center drop-shadow-lg" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.7)' }}>
             {title}
           </h3>
         </div>
@@ -471,7 +471,7 @@ const Courses = () => {
     const image = course.thumbnail || 'https://placehold.co/280x160';
     const isNew = course.isNew || false;
     return (
-      <div 
+      <div
         className="flex bg-[#181f1f] hover:bg-[#232b2b] transition rounded-2xl overflow-hidden shadow-lg min-h-[160px] max-h-[200px] w-full cursor-pointer"
         onClick={() => navigate(`/courses/${course._id}`)}
       >
@@ -560,8 +560,8 @@ const Courses = () => {
                       }}
                       className={`
                         text-sm mx-3 whitespace-nowrap transition-colors
-                        ${selectedTopic === topic._id 
-                          ? 'text-[#00ffd0] font-semibold' 
+                        ${selectedTopic === topic._id
+                          ? 'text-[#00ffd0] font-semibold'
                           : 'text-white hover:text-gray-300'}
                       `}
                     >
@@ -582,7 +582,7 @@ const Courses = () => {
           </div>
         ) : filteredPicks.length === 0 ? (
           <div className="text-center py-8 text-gray-400">
-            {selectedTopic 
+            {selectedTopic
               ? t('No courses found for this topic')
               : t('No courses available')}
           </div>
@@ -594,7 +594,7 @@ const Courses = () => {
               ))}
             </div>
           ) : (
-            <Slider {...{...sliderSettings, arrows: filteredPicks.length >= 4}}>
+            <Slider {...{ ...sliderSettings, arrows: filteredPicks.length >= 4 }}>
               {filteredPicks.map((course, idx) => (
                 <CourseCard key={idx} course={course} />
               ))}
@@ -650,7 +650,7 @@ const Courses = () => {
           <p className="text-gray-400 mb-4 text-sm md:text-base">
             {t('And get access to all almentor courses whenever you like')}
           </p>
-          <button 
+          <button
             onClick={handleSubscribe}
             disabled={!selectedPlan || subscriptionLoading}
             className={`
@@ -751,7 +751,7 @@ const Courses = () => {
           </Slider>
         </div>
         <div className="text-center mt-8">
-          <button 
+          <button
             className="rounded px-6 py-2 border border-white text-white hover:bg-white hover:text-black transition"
             onClick={() => navigate('/instructors')}
           >

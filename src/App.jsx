@@ -46,8 +46,7 @@ function App() {
                 <Route path="/all-courses" element={<AllCourses />} />
                 <Route path="/lesson-viewer/:courseId" element={<LessonViewerPage />} />
                 <Route path="/my-courses" element={<MyCourses />} />
-                <Route path="/certificate/:courseId" element={<CertificatePage />} />
-              </Routes>
+                <Route path="/certificate/:courseId" element={<CertificatePage />} />              </Routes>
             </div>
             <Footer />
           </CourseProvider>
