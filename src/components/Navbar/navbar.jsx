@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaMoon, FaSun } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { RiArrowDropDownLine } from 'react-icons/ri';
 import { CiSearch } from 'react-icons/ci';
 import { useTranslation } from 'react-i18next';
@@ -13,12 +13,14 @@ const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
   const isRTL = i18n.language === 'ar';
   const isLoggedIn = !!localStorage.getItem('token');
+  const navigate = useNavigate();
 
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categoryCourses, setCategoryCourses] = useState([]);
   const [allCourses, setAllCourses] = useState([]);
+  const [instructors, setInstructors] = useState([]);
 
   const toggleLanguage = () => {
     const newLang = i18n.language === 'en' ? 'ar' : 'en';
@@ -55,6 +57,22 @@ const Navbar = () => {
       }
     };
     fetchCourses();
+  }, []);
+
+  // FETCH INSTRUCTORS
+  useEffect(() => {
+    const fetchInstructors = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/instructors');
+        if (!res.ok) throw new Error('Failed to fetch instructors');
+        const data = await res.json();
+        setInstructors(data.data || []);
+      } catch (err) {
+        console.error('Error fetching instructors:', err);
+        setInstructors([]);
+      }
+    };
+    fetchInstructors();
   }, []);
 
   // FILTER COURSES BY CATEGORY ON HOVER
@@ -134,35 +152,47 @@ const Navbar = () => {
                     <p className="text-gray-500">{t('common.noCourses')}</p>
                   ) : (
                     <ul>
-                   {categoryCourses.slice(0, 4).map((course) => {
-  const lang = i18n.language;
-  const title =
-    typeof course.title === 'object'
-      ? course.title[lang] || course.title.en || 'Untitled Course'
-      : course.title || 'Untitled Course';
+                      {categoryCourses.slice(0, 4).map((course) => {
+                        const lang = i18n.language;
+                        const title =
+                          typeof course.title === 'object'
+                            ? course.title[lang] || course.title.en || 'Untitled Course'
+                            : course.title || 'Untitled Course';
 
-  const profile = course.instructor?.profile || course.instructor?.user || course.instructor || {};
-  const instructorName =
-    `${profile.firstName?.[lang] || profile.firstName?.en || ''} ${profile.lastName?.[lang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
+                        // Find instructor from instructors list
+                        const instructorObj = instructors.find(inst => inst._id === (typeof course.instructor === 'object' ? course.instructor._id : course.instructor));
+                        let instructorName = 'Unknown Instructor';
 
-  return (
-    <li key={course._id} className="flex items-center gap-4 mb-5">
-      <img
-        src={course.thumbnail || '/default-course-img.png'}
-        alt={title}
-        className="w-20 h-14 object-cover rounded"
-      />
-      <div>
-        <h4 className="text-base font-semibold text-black text-red-600">
-          {title}
-        </h4>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          {instructorName}
-        </p>
-      </div>
-    </li>
-  );
-})}
+                        if (instructorObj && instructorObj.profile) {
+                          instructorName = `${instructorObj.profile.firstName?.[lang] || instructorObj.profile.firstName?.en || ''} ${instructorObj.profile.lastName?.[lang] || instructorObj.profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
+                        } else if (course.instructor && typeof course.instructor === 'object') {
+                          // Fallback to embedded instructor data
+                          const profile = course.instructor.profile || course.instructor.user || course.instructor;
+                          instructorName = `${profile.firstName?.[lang] || profile.firstName?.en || ''} ${profile.lastName?.[lang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
+                        }
+
+                        return (
+                          <li
+                            key={course._id}
+                            className="flex items-center gap-4 mb-5 cursor-pointer hover:bg-gray-100 rounded transition"
+                            onClick={() => navigate(`/courses/${course._id}`)}
+                          >
+                            <img
+                              src={course.thumbnail || '/default-course-img.png'}
+                              alt={title}
+                              className="w-20 h-14 object-cover rounded"
+                            />
+                            <div>
+                              <h4 className="text-base font-semibold text-black text-red-600">
+                                {title}
+                              </h4>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">
+                                {instructorName}
+                              </p>
+                            </div>
+                          </li>
+                        );
+                      })}
                     </ul>
                   )}
                 </div>
