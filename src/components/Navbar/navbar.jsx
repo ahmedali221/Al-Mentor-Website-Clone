@@ -41,6 +41,9 @@ const Navbar = () => {
           <li>
             <Link to="/instructors" className="hover:text-red-500">{t('navigation.instructors')}</Link>
           </li>
+          <li>
+            <Link to="/become-instructor" className="hover:text-red-500">Become An Instructor</Link>
+          </li>
           <li className="flex items-center">
             <Link to="/programs" className="hover:text-red-500">{t('navigation.programs')}</Link>
             <span className="ml-2 bg-red-500 text-white text-[10px] px-1 py-0.5 rounded-full">
@@ -49,8 +52,8 @@ const Navbar = () => {
           </li>
           <li className="ml-2">
             <button className={`bg-transparent border-2 rounded px-6 py-2 transition-colors ${theme === 'dark'
-                ? 'border-gray-300 text-gray-300 hover:bg-gray-800'
-                : 'border-black text-black hover:bg-gray-100'
+              ? 'border-gray-300 text-gray-300 hover:bg-gray-800'
+              : 'border-black text-black hover:bg-gray-100'
               }`}>
               Subscribe
             </button>
