@@ -22,6 +22,7 @@ import AllCourses from './components/Courses/AllCourses';
 import LessonViewerPage from './components/LessonViewer/LessonViewerPage';
 import { CourseProvider } from './components/LessonViewer/CourseContext';
 import MyCourses from './components/MyCourses/MyCourses';
+import CertificatePage from './components/Certificate/CertificatePage';
 
 function App() {
   return (
@@ -45,7 +46,7 @@ function App() {
                 <Route path="/all-courses" element={<AllCourses />} />
                 <Route path="/lesson-viewer/:courseId" element={<LessonViewerPage />} />
                 <Route path="/my-courses" element={<MyCourses />} />
-              </Routes>
+                <Route path="/certificate/:courseId" element={<CertificatePage />} />              </Routes>
             </div>
             <Footer />
           </CourseProvider>
