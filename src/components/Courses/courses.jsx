@@ -367,7 +367,13 @@ const Courses = () => {
                   toggleSaveCourse(course._id);
                 }}
               >
-                <FaBookmark className={savedCourses.includes(course._id) ? "text-red-600" : "text-white"} />
+                <FaBookmark className={
+                  savedCourses.includes(course._id)
+                    ? 'text-red-600'
+                    : theme === 'dark'
+                      ? 'text-white'
+                      : 'text-gray-700'
+                } />
               </button>
             </div>
           </div>
@@ -495,8 +501,8 @@ const Courses = () => {
         </div>
         <div className="flex flex-col justify-center p-6 flex-1 min-w-0">
           <h3 className={`text-lg font-bold mb-2 truncate ${theme === 'dark' ? 'text-white' : 'text-black'}`} title={title}>{title}</h3>
-          <p className={`text-base font-medium mt-1 truncate ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>{instructorName}</p>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mt-1">
+            <p className={`text-base font-medium truncate ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>{instructorName}</p>
             <button
               className={`bg-transparent border-none p-0 ml-2`}
               onClick={e => {
@@ -504,7 +510,13 @@ const Courses = () => {
                 toggleSaveCourse(course._id);
               }}
             >
-              <FaBookmark className={savedCourses.includes(course._id) ? "text-red-600" : "text-white"} />
+              <FaBookmark className={
+                savedCourses.includes(course._id)
+                  ? 'text-red-600'
+                  : theme === 'dark'
+                    ? 'text-white'
+                    : 'text-gray-700'
+              } />
             </button>
           </div>
         </div>
