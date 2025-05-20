@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { RiArrowDropDownLine } from 'react-icons/ri';
@@ -21,6 +21,11 @@ const Navbar = () => {
   const [categoryCourses, setCategoryCourses] = useState([]);
   const [allCourses, setAllCourses] = useState([]);
   const [instructors, setInstructors] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState({ courses: [], instructors: [] });
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const searchInputRef = useRef(null);
+  const searchDropdownRef = useRef(null);
 
   const toggleLanguage = () => {
     const newLang = i18n.language === 'en' ? 'ar' : 'en';
@@ -88,6 +93,54 @@ const Navbar = () => {
 
   const handleDropdownEnter = () => setIsDropdownVisible(true);
   const handleDropdownLeave = () => setIsDropdownVisible(false);
+
+  // Unified search handler
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults({ courses: [], instructors: [] });
+      setShowSearchDropdown(false);
+      return;
+    }
+    const q = searchQuery.trim().toLowerCase();
+    // Filter courses
+    const matchedCourses = allCourses.filter(course => {
+      const lang = i18n.language;
+      const title = typeof course.title === 'object'
+        ? course.title[lang] || course.title.en || ''
+        : course.title || '';
+      return title.toLowerCase().includes(q);
+    });
+    // Filter instructors
+    const matchedInstructors = instructors.filter(inst => {
+      const profile = inst.profile || inst.user || inst;
+      const firstName = profile.firstName?.[i18n.language] || profile.firstName?.en || profile.firstName || '';
+      const lastName = profile.lastName?.[i18n.language] || profile.lastName?.en || profile.lastName || '';
+      const fullName = `${firstName} ${lastName}`.trim();
+      return fullName.toLowerCase().includes(q);
+    });
+    setSearchResults({ courses: matchedCourses, instructors: matchedInstructors });
+    setShowSearchDropdown(true);
+  }, [searchQuery, allCourses, instructors, i18n.language]);
+
+  // Hide dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        searchDropdownRef.current &&
+        !searchDropdownRef.current.contains(event.target) &&
+        searchInputRef.current &&
+        !searchInputRef.current.contains(event.target)
+      ) {
+        setShowSearchDropdown(false);
+      }
+    }
+    if (showSearchDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showSearchDropdown]);
 
   return (
     <nav
@@ -238,10 +291,79 @@ const Navbar = () => {
               className={`text-lg px-5 py-3 w-[360px] focus:outline-none focus:ring-2 placeholder-gray-500 transition-all duration-300 rounded-md
                 ${theme === 'dark' ? 'bg-[#2a2a2a] text-white focus:ring-gray-600' : 'bg-gray-200 text-gray-700 focus:ring-gray-300'}`}
               dir={isRTL ? 'rtl' : 'ltr'}
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              onFocus={() => searchQuery && setShowSearchDropdown(true)}
+              ref={searchInputRef}
             />
             <button className={`absolute top-1/2 transform -translate-y-1/2 ${isRTL ? 'left-4' : 'right-4'} text-gray-400 hover:text-red-500`}>
               <CiSearch size={25} />
             </button>
+            {/* Search Dropdown */}
+            {showSearchDropdown && (
+              <div
+                ref={searchDropdownRef}
+                className={`absolute left-0 mt-2 w-[360px] max-h-96 overflow-y-auto rounded-md shadow-lg z-50 ${theme === 'dark' ? 'bg-[#232323] text-white' : 'bg-white text-black'}`}
+                style={{ direction: isRTL ? 'rtl' : 'ltr' }}
+              >
+                {searchResults.courses.length === 0 && searchResults.instructors.length === 0 ? (
+                  <div className="p-4 text-center text-gray-400">{t('common.noResults') || 'No results found'}</div>
+                ) : (
+                  <>
+                    {searchResults.courses.length > 0 && (
+                      <div>
+                        <div className="px-4 pt-3 pb-1 text-xs font-bold uppercase text-gray-500">{t('Courses')}</div>
+                        {searchResults.courses.map(course => {
+                          const lang = i18n.language;
+                          const title = typeof course.title === 'object'
+                            ? course.title[lang] || course.title.en || ''
+                            : course.title || '';
+                          return (
+                            <div
+                              key={course._id}
+                              className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#333] rounded"
+                              onClick={() => {
+                                setShowSearchDropdown(false);
+                                setSearchQuery('');
+                                navigate(`/courses/${course._id}`);
+                              }}
+                            >
+                              <img src={course.thumbnail || '/default-course-img.png'} alt={title} className="w-10 h-8 object-cover rounded" />
+                              <span className="font-medium">{title}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                    {searchResults.instructors.length > 0 && (
+                      <div>
+                        <div className="px-4 pt-3 pb-1 text-xs font-bold uppercase text-gray-500">{t('Instructors')}</div>
+                        {searchResults.instructors.map(inst => {
+                          const profile = inst.profile || inst.user || inst;
+                          const firstName = profile.firstName?.[i18n.language] || profile.firstName?.en || profile.firstName || '';
+                          const lastName = profile.lastName?.[i18n.language] || profile.lastName?.en || profile.lastName || '';
+                          const fullName = `${firstName} ${lastName}`.trim();
+                          return (
+                            <div
+                              key={inst._id}
+                              className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#333] rounded"
+                              onClick={() => {
+                                setShowSearchDropdown(false);
+                                setSearchQuery('');
+                                navigate(`/instructors/${inst._id}`);
+                              }}
+                            >
+                              <img src={profile.profilePicture || '/default-profile.png'} alt={fullName} className="w-10 h-10 object-cover rounded-full" />
+                              <span className="font-medium">{fullName}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Theme + Language Switch */}

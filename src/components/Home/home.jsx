@@ -172,14 +172,14 @@ const Home = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
             {courses.map((course, index) => {
               const instructorObj = instructors.find(inst => inst._id === course.instructor);
-              let instructorName = 'Unknown Instructor';
-              let instructorImage = '/default-course-img.png';
-
+              let instructorName = '';
               if (instructorObj && instructorObj.profile) {
-                instructorName = `${instructorObj.profile.firstName?.[currentLang] || ''} ${instructorObj.profile.lastName?.[currentLang] || ''}`;
-                instructorImage = instructorObj.profile.profilePicture || '/default-course-img.png';
+                const firstName = instructorObj.profile.firstName?.[currentLang] || instructorObj.profile.firstName?.en || '';
+                const lastName = instructorObj.profile.lastName?.[currentLang] || instructorObj.profile.lastName?.en || '';
+                instructorName = (firstName + ' ' + lastName).trim();
               }
-
+              if (!instructorName) instructorName = t('Unknown Instructor');
+              const instructorImage = instructorObj?.profile?.profilePicture || '/default-course-img.png';
               const title = course.title?.[currentLang] || course.title?.en;
               const image = course.thumbnail || '/default-course-img.png';
 
@@ -195,7 +195,11 @@ const Home = () => {
                   <img src={image} alt={title} className="w-full h-64 object-cover" />
                   <div className="p-6">
                     <h3 className="text-lg font-semibold">{title}</h3>
-                    <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{instructorName}</p>
+                    <p className={`mt-1 font-medium text-base ${
+                      theme === 'dark' ? 'text-red-400' : 'text-red-600'
+                    }`}>
+                      {instructorName}
+                    </p>
                   </div>
                 </div>
               );
@@ -232,8 +236,10 @@ const Home = () => {
             <Slider {...sliderSettings}>
               {instructors.map((instructor, index) => {
                 const profile = instructor.profile || {};
-                const name = `${profile.firstName?.[currentLang] || ''} ${profile.lastName?.[currentLang] || ''}`;
-                const title = instructor.professionalTitle?.[currentLang] || '';
+                const firstName = profile.firstName?.[currentLang] || profile.firstName?.en || '';
+                const lastName = profile.lastName?.[currentLang] || profile.lastName?.en || '';
+                const name = (firstName + ' ' + lastName).trim() || t('Unknown Instructor');
+                const title = instructor.professionalTitle?.[currentLang] || instructor.professionalTitle?.en || '';
                 const image = profile.profilePicture || '/default-profile.png';
 
                 return (
@@ -243,8 +249,14 @@ const Home = () => {
                     }`}>
                       <img src={image} alt={name} className="w-full h-full object-cover" />
                     </div>
-                    <h3 className={`text-lg font-semibold mt-4 text-center ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{name}</h3>
-                    <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} text-sm text-center`}>
+                    <h3 className={`mt-4 font-bold text-lg ${
+                      theme === 'dark' ? 'text-red-400' : 'text-red-600'
+                    }`}>
+                      {name}
+                    </h3>
+                    <p className={`text-sm text-center ${
+                      theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                    }`}>
                       {title}
                     </p>
                   </div>

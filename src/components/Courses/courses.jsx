@@ -344,7 +344,7 @@ const Courses = () => {
         className="course-card mx-1 relative mt-10 cursor-pointer"
         onClick={() => navigate(`/courses/${course._id}`)}
       >
-        <div className="rounded overflow-hidden bg-[#1a1a1a] shadow-lg mt-10">
+        <div className={`rounded overflow-hidden ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'} shadow-lg mt-10`}>
           <div className="relative">
             <img src={image} alt={title} className="w-full h-40 object-cover" />
             {isNew && (
@@ -354,8 +354,8 @@ const Courses = () => {
             )}
           </div>
           <div className="p-3 mt-10">
-            <h3 className="text-base font-semibold text-white mb-1 h-12 overflow-hidden">{title}</h3>
-            <p className="text-gray-400 text-sm">{instructorName}</p>
+            <h3 className={`text-base font-semibold mb-1 h-12 overflow-hidden ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{title}</h3>
+            <p className={`text-base font-medium mt-1 ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>{instructorName}</p>
             <div className="flex justify-between items-center mt-2">
               <div className="flex items-center">
                 <span className="text-yellow-500 mr-1">★★★★★</span>
@@ -479,7 +479,7 @@ const Courses = () => {
     const isNew = course.isNew || false;
     return (
       <div
-        className="flex bg-[#181f1f] hover:bg-[#232b2b] transition rounded-2xl overflow-hidden shadow-lg min-h-[160px] max-h-[200px] w-full cursor-pointer"
+        className={`flex ${theme === 'dark' ? 'bg-[#181f1f] hover:bg-[#232b2b]' : 'bg-white hover:bg-gray-100'} transition rounded-2xl overflow-hidden shadow-lg min-h-[160px] max-h-[200px] w-full cursor-pointer`}
         onClick={() => navigate(`/courses/${course._id}`)}
       >
         <div className="relative min-w-[260px] max-w-[300px] h-[180px] flex-shrink-0 border-2 border-gray-700 shadow-xl">
@@ -494,9 +494,9 @@ const Courses = () => {
           )}
         </div>
         <div className="flex flex-col justify-center p-6 flex-1 min-w-0">
-          <h3 className="text-lg font-bold text-white mb-2 truncate" title={title}>{title}</h3>
+          <h3 className={`text-lg font-bold mb-2 truncate ${theme === 'dark' ? 'text-white' : 'text-black'}`} title={title}>{title}</h3>
+          <p className={`text-base font-medium mt-1 truncate ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>{instructorName}</p>
           <div className="flex items-center justify-between">
-            <p className="text-gray-400 text-sm truncate">{instructorName}</p>
             <button
               className={`bg-transparent border-none p-0 ml-2`}
               onClick={e => {
@@ -591,7 +591,7 @@ const Courses = () => {
               {filteredPicks.map((course, idx) => (
                 <CourseCard key={idx} course={course} />
               ))}
-        </Slider>
+            </Slider>
           )
         )}
       </section>
@@ -684,53 +684,37 @@ const Courses = () => {
               const currency = typeof plan.price === 'object' ? plan.price.currency : plan.currency || 'EGP';
               const period = plan.period || 'mo';
 
-            return (
-              <div
+              return (
+                <div
                   key={plan._id}
                   onClick={() => handlePlanSelection(plan._id)}
-                className={
-                  `cursor-pointer transition rounded-lg p-4 w-32 md:w-40 flex flex-col items-center relative
-                  ${isSelected
-                    ? (theme === 'dark' ? 'bg-[#1e2b2b] border-2 border-[#00ffd0] shadow-lg' : 'bg-white border-2 border-[#00ffd0] shadow-lg')
-                    : (theme === 'dark' ? 'bg-[#181f1f] border-2 border-transparent' : 'bg-gray-100 border-2 border-transparent')}
-                  `
-                }
-              >
+                  className={
+                    `cursor-pointer transition rounded-lg p-4 w-32 md:w-40 flex flex-col items-center relative
+                    ${isSelected
+                      ? (theme === 'dark' ? 'bg-[#1e2b2b] border-2 border-[#00ffd0] shadow-lg' : 'bg-white border-2 border-[#00ffd0] shadow-lg')
+                      : (theme === 'dark' ? 'bg-[#181f1f] border-2 border-transparent' : 'bg-gray-100 border-2 border-transparent')}
+                    `
+                  }
+                >
                   <p className={`text-xs mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{getLocalizedText(plan.name)}</p>
-                <div className="flex items-baseline mb-1">
+                  <div className="flex items-baseline mb-1">
                     {oldPrice && (
                       <span className={`text-xs line-through mr-1 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>{oldPrice} {currency}</span>
                     )}
                     <span className={`text-xl md:text-2xl font-bold ${isSelected ? 'text-[#00ffd0]' : (theme === 'dark' ? 'text-white' : 'text-black')}`}>{price}</span>
                     <span className={`text-xs ml-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{currency}/{period}</span>
-                </div>
+                  </div>
                   <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{getLocalizedText(plan.description)}</p>
                   {plan.isBestValue && isSelected && (
-                  <span className="absolute top-2 right-2 bg-[#00ffd0] text-black text-[10px] font-bold px-2 py-0.5 rounded-full">
+                    <span className="absolute top-2 right-2 bg-[#00ffd0] text-black text-[10px] font-bold px-2 py-0.5 rounded-full">
                       {t('Best Value')}
-                  </span>
-                )}
-              </div>
-            );
+                    </span>
+                  )}
+                </div>
+              );
             })
           )}
         </div>
-      </section>
-
-      {/* Popular Courses */}
-      <section className="py-6 px-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Popular Courses')}</h2>
-          <button 
-            onClick={() => navigate('/all-courses')} 
-            className={`${theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors duration-200`}
-          >
-            {t('View all')}
-          </button>
-        </div>
-        <Slider {...sliderSettings}>
-          {getFiltered(allCourses).map((course, idx) => <CourseCard key={idx} course={course} />)}
-        </Slider>
       </section>
 
       {/* Instructors Section */}
@@ -758,6 +742,6 @@ const Courses = () => {
       </section>
     </div>
   );
-};
+}
 
 export default Courses;

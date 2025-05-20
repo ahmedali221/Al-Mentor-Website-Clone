@@ -7,6 +7,17 @@ import { Award, Download, Share, Printer } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
+function getUserIdFromToken() {
+  const token = localStorage.getItem('token');
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.userId;
+  } catch (e) {
+    return null;
+  }
+}
+
 const CertificatePage = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
@@ -22,24 +33,41 @@ const CertificatePage = () => {
   const [matchedInstructor, setMatchedInstructor] = useState(null);
 
   useEffect(() => {
-    const fetchCertificateData = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
+        setError(null);
+
+        // Get token and check authentication
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+
+        // Extract userId from token
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const userId = payload.userId;
+        if (!userId) {
+          throw new Error('No user ID found in token');
+        }
+
+        // Fetch user data
+        const userResponse = await axios.get(`/api/users/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setUserData(userResponse.data);
+
         // Fetch course data
         const courseResponse = await axios.get(`/api/courses/${courseId}`);
         const course = courseResponse.data;
-        console.log('Certificate course:', course);
-
-        // Fetch user data from localStorage or context
-        const userData = JSON.parse(localStorage.getItem('userData'));
+        setCertificateData(course);
 
         // Fetch all instructors
         const instructorsResponse = await axios.get('/api/instructors');
         const instructors = instructorsResponse.data.data || instructorsResponse.data;
         setAllInstructors(instructors);
-        console.log('All instructors:', instructors);
 
-        // Extract instructor ID from course (supporting various fields and types)
+        // Match instructor
         let instructorId = null;
         if (course.instructor) {
           if (typeof course.instructor === 'object') {
@@ -50,16 +78,8 @@ const CertificatePage = () => {
         } else if (Array.isArray(course.instructors) && course.instructors.length > 0) {
           const first = course.instructors[0];
           instructorId = typeof first === 'object' ? (first._id || first.id || first.$oid) : first;
-        } else if (course.instructorDetails) {
-          if (typeof course.instructorDetails === 'object') {
-            instructorId = course.instructorDetails._id || course.instructorDetails.id || course.instructorDetails.$oid;
-          } else {
-            instructorId = course.instructorDetails;
-          }
         }
-        console.log('Matching instructorId:', instructorId);
 
-        // Match instructor (robustly check all possible id fields)
         let matched = null;
         if (instructorId && instructors.length > 0) {
           matched = instructors.find(inst =>
@@ -69,24 +89,26 @@ const CertificatePage = () => {
             (inst.id && instructorId && inst.id.toString() === instructorId.toString())
           );
         }
-        // Fallback: if not matched, but course.instructor is an object, use it
         if (!matched && course.instructor && typeof course.instructor === 'object') {
           matched = course.instructor;
         }
-        console.log('Matched instructor:', matched);
         setMatchedInstructor(matched);
-        setCertificateData(course);
-        setUserData(userData);
+
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to load certificate data');
+        console.error('Error fetching data:', err);
+        setError(err.response?.data?.message || err.message || 'Failed to load certificate data');
+        if (err.message === 'No authentication token found') {
+          navigate('/loginPage');
+        }
       } finally {
         setLoading(false);
       }
     };
+
     if (courseId) {
-      fetchCertificateData();
+      fetchData();
     }
-  }, [courseId]);
+  }, [courseId, navigate]);
 
   const getLocalizedText = (obj) => {
     if (!obj) return '';
@@ -156,6 +178,8 @@ const CertificatePage = () => {
       }
     }
   };
+
+  console.log('userData:', userData);
 
   if (loading) {
     return (
@@ -244,7 +268,9 @@ const CertificatePage = () => {
 
             {/* Student Name */}
             <h2 className="text-3xl font-bold mb-8 border-b-2 border-[#00bcd4] pb-4 inline-block">
-              {userData?.firstName?.[currentLang]} {userData?.lastName?.[currentLang]}
+              {userData
+                ? `${getLocalizedText(userData.firstName)} ${getLocalizedText(userData.lastName)}`
+                : 'Student Name'}
             </h2>
 
             {/* Course Name */}

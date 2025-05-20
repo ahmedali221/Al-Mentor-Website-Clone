@@ -479,7 +479,7 @@ const CourseDetails = () => {
                 {objectives.map((obj, idx) => (
                   <li key={idx} className="flex items-start gap-3 text-lg">
                     <FaCheck className="text-[#00ffd0] mt-1 min-w-[16px]" />
-                    <span className={`${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>{getLocalizedText(obj)}</span>
+                    <span className={`${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>{getLocalizedText(obj)}</span>
                   </li>
                 ))}
               </ul>
@@ -532,9 +532,9 @@ const CourseDetails = () => {
                       <div className="flex items-center gap-3">
                         <span className="font-bold text-lg">{index + 1}.</span>
                         <div className="flex flex-col">
-                          <span className="font-bold text-lg">{getLocalizedText(lesson.title)}</span>
+                          <span className={`font-bold text-lg ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>{getLocalizedText(lesson.title)}</span>
                           {lesson.description && (
-                            <span className="text-sm text-gray-500 mt-1">
+                            <span className={`text-sm mt-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-700'}`}>
                               {getLocalizedText(lesson.description)}
                             </span>
                           )}
