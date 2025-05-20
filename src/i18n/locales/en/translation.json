@@ -77,7 +77,10 @@
     "cta": {
       "title": "Only at 199 EGP /month! Get unlimited access to all courses when you subscribe to Almentor.",
       "button": "Subscribe Now"
-    }
+    },
+  "free":"Free Courses",
+  "trend":"Trending Courses",
+  "freespan":"Free"
   },
   "courses": {
     "title": "Our Courses",
@@ -101,7 +104,10 @@
     "submit": "Submit",
     "edit": "Edit",
     "delete": "Delete",
-    "back": "Back"
+    "back": "Back",
+    "instructors": "See All Instructors",
+    "courses": "See All Courses",
+    "viewAll": "View All"
   },
   "messages": {
     "loading": "Loading...",
