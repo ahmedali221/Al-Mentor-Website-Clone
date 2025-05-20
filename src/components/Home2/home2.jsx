@@ -438,18 +438,11 @@ const Home = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
           {courses.map((course, index) => {
             const title = course.title?.[currentLang] || course.title?.en;
-            const instructor = course.instructor?.user;
-            const instructorName = instructor
-              ? `${
-                  instructor.firstName?.[currentLang] ||
-                  instructor.firstName?.en ||
-                  ""
-                } ${
-                  instructor.lastName?.[currentLang] ||
-                  instructor.lastName?.en ||
-                  ""
-                }`
-              : "Unknown Instructor";
+            const instructorProfile = course.instructorDetails?.profile || 
+            (course.instructor?.user || course.instructor || {});
+const instructorName = instructorProfile
+? `${getLocalizedText(instructorProfile.firstName)} ${getLocalizedText(instructorProfile.lastName)}`
+: 'Unknown Instructor';
             const image = course.thumbnail || "/default-course-img.png";
 
             return (
@@ -530,7 +523,7 @@ const Home = () => {
             </h1>
 
             <button
-             onClick={() => navigate('/subscrib')}
+             onClick={() => navigate('/subscribe')}
              className="bg-red-500 hover:bg-red-700 text-white px-8 py-4 my-5 rounded font-medium text-lg">
               {t("home.cta.button")}
             </button>

@@ -286,7 +286,7 @@ function Accordion({ question, answer, theme }) {
     setServerError("");
     setSuccess(false);
 
-    // Prepare form data
+
     const data = new FormData();
     Object.entries(fields).forEach(([key, value]) => data.append(key, value));
     if (sampleVideo) data.append("sampleVideo", sampleVideo);
@@ -303,7 +303,7 @@ function Accordion({ question, answer, theme }) {
         throw new Error(err.message || "Submission failed");
       }
       setSuccess(true);
-      // Optionally: clear fields, or auto-close after some seconds
+      
     } catch (err) {
       setServerError(err.message);
     } finally {
