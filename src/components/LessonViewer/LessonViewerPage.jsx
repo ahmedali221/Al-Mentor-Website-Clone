@@ -231,6 +231,8 @@ export default function EnhancedLessonViewer() {
     if (!currentLesson || !lessons) return;
     const idx = lessons.findIndex(l => l._id === currentLesson.lessonId);
     if (idx >= 0 && idx < lessons.length - 1) {
+      // Mark current lesson as watched before moving to next
+      markLessonAsWatched(currentLesson.lessonId);
       const next = lessons[idx + 1];
       setCurrentLesson({ lessonId: next._id, title: getLocalizedText(next.title) });
       showToast(`Now viewing: ${getLocalizedText(next.title)}`);
@@ -241,6 +243,8 @@ export default function EnhancedLessonViewer() {
     if (!currentLesson || !lessons) return;
     const idx = lessons.findIndex(l => l._id === currentLesson.lessonId);
     if (idx > 0) {
+      // Mark current lesson as watched before moving to previous
+      markLessonAsWatched(currentLesson.lessonId);
       const prev = lessons[idx - 1];
       setCurrentLesson({ lessonId: prev._id, title: getLocalizedText(prev.title) });
       showToast(`Now viewing: ${getLocalizedText(prev.title)}`);

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   FaClock, FaLayerGroup, FaLanguage, FaShareAlt, FaBookmark, FaChevronDown, FaChevronUp,
-  FaCheck, FaLock, FaPlay, FaCertificate, FaInfinity, FaUserCircle, FaStar, FaUser
+  FaCheck, FaLock, FaPlay, FaCertificate, FaInfinity, FaUserCircle, FaStar, FaUser, FaSearch, FaBell, FaShoppingCart, FaPlayCircle, FaSpinner, FaGraduationCap, FaHeart, FaList
 } from 'react-icons/fa';
 import { useTheme } from '../../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
@@ -906,7 +906,7 @@ const CourseDetails = () => {
                   : 'bg-[#00bcd4] hover:bg-[#0097a7] text-white'
               }`}
             >
-              <FaBookmark className={isCourseAdded(course._id) ? "text-white" : "text-white"} />
+              <FaGraduationCap className={isCourseAdded(course._id) ? "text-white" : "text-white"} />
               {isCourseAdded(course._id) ? t('Added to My Courses') : t('Add to My Courses')}
             </button>
             <button 
@@ -915,14 +915,14 @@ const CourseDetails = () => {
               }}
               className="flex items-center justify-center gap-2 py-3 rounded-lg text-lg font-bold bg-gray-600 hover:bg-gray-700 text-white transition"
             >
-              <FaBookmark className="text-white" />
+              <FaList className="text-white" />
               {t('View My Courses')}
             </button>
             <button
               onClick={() => navigate('/saved-courses')}
               className="flex items-center justify-center gap-2 py-3 rounded-lg text-lg font-bold bg-gray-500 hover:bg-gray-700 text-white transition mb-2"
             >
-              <FaBookmark className="text-white" />
+              <FaHeart className="text-white" />
               {t('View Saved Courses')}
             </button>
             <button 

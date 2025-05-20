@@ -476,6 +476,11 @@ const Courses = () => {
     }
   };
 
+  // Add plan selection handler
+  const handlePlanSelection = (planId) => {
+    setSelectedPlan(planId);
+  };
+
   return (
     <div className={`${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-black'} min-h-screen transition-colors duration-200`} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Category Hero Carousel */}
@@ -633,6 +638,9 @@ const Courses = () => {
                   onClick={() => handlePlanSelection(plan._id)}
                   className={`cursor-pointer transition-all duration-300 rounded-lg p-4 w-32 md:w-40 flex flex-col items-center relative
                     ${isSelected ? (theme === 'dark' ? 'bg-[#1e2b2b] border-2 border-[#00ffd0] shadow-lg' : 'bg-white border-2 border-[#00ffd0] shadow-lg') : (theme === 'dark' ? 'bg-[#181f1f] border-2 border-transparent' : 'bg-gray-100 border-2 border-transparent')}`}
+                  tabIndex={0}
+                  aria-pressed={isSelected}
+                  onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') handlePlanSelection(plan._id); }}
                 >
                   <p className={`text-xs mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{getLocalizedText(plan.name)}</p>
                   <div className="flex items-baseline mb-1">

@@ -26,7 +26,7 @@ const SavedCourses = () => {
       .catch(() => setAllCourses([]));
   }, []);
 
-  // Helper function to get localized text
+  // Helper function to get localized te
   const getLocalizedText = (obj) => {
     if (!obj) return '';
     if (typeof obj === 'string') return obj;
@@ -56,7 +56,11 @@ const SavedCourses = () => {
               const lessonsCount = course.lessonsCount || '';
               const language = getLocalizedText(course.language);
               return (
-                <div key={course._id} className={`flex flex-col md:flex-row rounded-2xl overflow-hidden shadow-lg ${theme === 'dark' ? 'bg-[#232323]' : 'bg-white'} transition-all`}>
+                <div
+                  key={course._id}
+                  className={`flex flex-col md:flex-row rounded-2xl overflow-hidden shadow-lg ${theme === 'dark' ? 'bg-[#232323]' : 'bg-white'} transition-all cursor-pointer relative`}
+                  onClick={() => navigate(`/courses/${course._id}`)}
+                >
                   <div className="md:w-2/5 w-full h-64 md:h-auto flex-shrink-0 relative">
                     <img src={image} alt={title} className="w-full h-full object-cover" />
                   </div>
@@ -77,8 +81,18 @@ const SavedCourses = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="absolute top-6 right-6">
-                    <FaBookmark className="text-white bg-black bg-opacity-30 rounded-full p-2 w-10 h-10" />
+                  <div className="absolute top-6 right-6 z-10">
+                    <FaBookmark
+                      className="text-white bg-black bg-opacity-30 rounded-full p-2 w-10 h-10 cursor-pointer"
+                      onClick={e => {
+                        e.stopPropagation();
+                        setSavedCourses(prev => {
+                          const updated = prev.filter(id => id !== course._id);
+                          localStorage.setItem('savedCourses', JSON.stringify(updated));
+                          return updated;
+                        });
+                      }}
+                    />
                   </div>
                 </div>
               );
