@@ -160,7 +160,6 @@ const Courses = () => {
         // If no topic selected, fetch all courses
         try {
           const response = await axios.get('/api/courses');
-          console.log('All courses response:', response.data);
           setFilteredPicks(response.data);
         } catch (err) {
           console.error('Error fetching courses:', err);
@@ -173,33 +172,18 @@ const Courses = () => {
         setTopicCoursesLoading(true);
         // Get courses for the selected topic
         const topicResponse = await axios.get(`/api/topics/${selectedTopic}`);
-        console.log('Topic response:', topicResponse.data);
 
         // Get all courses and filter by topic
         const coursesResponse = await axios.get('/api/courses');
-        console.log('Courses response:', coursesResponse.data);
-
-        // Debug the first course structure
-        if (coursesResponse.data.length > 0) {
-          console.log('First course structure:', coursesResponse.data[0]);
-        }
 
         // Filter courses based on topic
         const coursesWithTopic = coursesResponse.data.filter(course => {
           // Check if course has category field that matches topic's category
           const courseCategory = course.category?._id || course.category;
           const topicCategory = topicResponse.data.category;
-
-          console.log('Comparing categories:', {
-            courseCategory,
-            topicCategory,
-            matches: courseCategory === topicCategory
-          });
-
           return courseCategory === topicCategory;
         });
 
-        console.log('Filtered courses:', coursesWithTopic);
         setFilteredPicks(coursesWithTopic);
       } catch (err) {
         console.error('Error filtering courses by topic:', err);
@@ -270,9 +254,9 @@ const Courses = () => {
     prevArrow: <CustomPrevArrow />,
     nextArrow: <CustomNextArrow />,
     responsive: [
-      { breakpoint: 1024, settings: { slidesToShow: 3 } },
-      { breakpoint: 768, settings: { slidesToShow: 2 } },
-      { breakpoint: 480, settings: { slidesToShow: 1 } },
+      { breakpoint: 1280, settings: { slidesToShow: 3 } },
+      { breakpoint: 1024, settings: { slidesToShow: 2 } },
+      { breakpoint: 640, settings: { slidesToShow: 1 } },
     ],
   };
 
@@ -281,10 +265,11 @@ const Courses = () => {
     ...sliderSettings,
     slidesToShow: 6,
     responsive: [
-      { breakpoint: 1280, settings: { slidesToShow: 5 } },
-      { breakpoint: 1024, settings: { slidesToShow: 4 } },
-      { breakpoint: 768, settings: { slidesToShow: 3 } },
-      { breakpoint: 480, settings: { slidesToShow: 2 } },
+      { breakpoint: 1536, settings: { slidesToShow: 5 } },
+      { breakpoint: 1280, settings: { slidesToShow: 4 } },
+      { breakpoint: 1024, settings: { slidesToShow: 3 } },
+      { breakpoint: 768, settings: { slidesToShow: 2 } },
+      { breakpoint: 640, settings: { slidesToShow: 1 } },
     ],
   };
 
@@ -299,8 +284,10 @@ const Courses = () => {
     prevArrow: <CustomPrevArrow />,
     nextArrow: <CustomNextArrow />,
     responsive: [
+      { breakpoint: 1280, settings: { slidesToShow: 2, rows: 2 } },
       { breakpoint: 1024, settings: { slidesToShow: 1, rows: 2 } },
       { breakpoint: 768, settings: { slidesToShow: 1, rows: 1 } },
+      { breakpoint: 640, settings: { slidesToShow: 1, rows: 1 } },
     ],
   };
 
@@ -314,7 +301,7 @@ const Courses = () => {
         return obj[currentLang] || obj.en || obj.ar || '';
       }
       // Handle other object types
-    return obj[currentLang] || obj.en || '';
+      return obj[currentLang] || obj.en || '';
     }
     return '';
   };
@@ -341,41 +328,39 @@ const Courses = () => {
 
     return (
       <div
-        className="course-card mx-1 relative mt-10 cursor-pointer"
+        className={`course-card mx-2 relative rounded-xl overflow-hidden transform transition-all duration-300 hover:scale-105 cursor-pointer shadow-lg ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'}`}
         onClick={() => navigate(`/courses/${course._id}`)}
       >
-        <div className={`rounded overflow-hidden ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'} shadow-lg mt-10`}>
-          <div className="relative">
-            <img src={image} alt={title} className="w-full h-40 object-cover" />
-            {isNew && (
-              <span className="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-1 rounded">
-                New
-              </span>
-            )}
-          </div>
-          <div className="p-3 mt-10">
-            <h3 className={`text-base font-semibold mb-1 h-12 overflow-hidden ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{title}</h3>
-            <p className={`text-base font-medium mt-1 ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>{instructorName}</p>
-            <div className="flex justify-between items-center mt-2">
-              <div className="flex items-center">
-                <span className="text-yellow-500 mr-1">★★★★★</span>
-              </div>
-              <button
-                className={`bg-transparent border-none p-0 ml-2`}
-                onClick={e => {
-                  e.stopPropagation();
-                  toggleSaveCourse(course._id);
-                }}
-              >
-                <FaBookmark className={
-                  savedCourses.includes(course._id)
-                    ? 'text-red-600'
-                    : theme === 'dark'
-                      ? 'text-white'
-                      : 'text-gray-700'
-                } />
-              </button>
+        <div className="relative">
+          <img src={image} alt={title} className="w-full h-40 object-cover" />
+          {isNew && (
+            <span className="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-1 rounded">
+              New
+            </span>
+          )}
+        </div>
+        <div className="p-4">
+          <h3 className={`text-base font-semibold mb-2 h-12 line-clamp-2 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{title}</h3>
+          <p className={`text-sm font-medium mb-2 ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>{instructorName}</p>
+          <div className="flex justify-between items-center">
+            <div className="flex items-center">
+              <span className="text-yellow-500 mr-1 text-sm">★★★★★</span>
             </div>
+            <button
+              className="bg-transparent border-none p-0"
+              onClick={e => {
+                e.stopPropagation();
+                toggleSaveCourse(course._id);
+              }}
+            >
+              <FaBookmark className={
+                savedCourses.includes(course._id)
+                  ? 'text-red-600'
+                  : theme === 'dark'
+                    ? 'text-white'
+                    : 'text-gray-700'
+              } />
+            </button>
           </div>
         </div>
       </div>
@@ -391,61 +376,19 @@ const Courses = () => {
     const title = instructor.professionalTitle?.[currentLang] || instructor.professionalTitle?.en || instructor.professionalTitle || '';
     const image = profile.profilePicture || '/default-profile.png';
 
-    console.log('InstructorCard instructor:', instructor);
-
     return (
       <div className="px-4 min-h-72 flex flex-col items-center justify-start">
-        <div className={`w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden shadow transition-all duration-200 ${
+        <div className={`w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden shadow transition-all duration-300 hover:scale-105 ${
           theme === 'dark' ? 'shadow-gray-800' : 'shadow-gray-200'
         }`}>
           <img src={image} alt={name} className="w-full h-full object-cover" />
         </div>
         <h3 className={`text-lg font-semibold mt-4 text-center ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{name}</h3>
-        <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} text-sm text-center`}>
+        <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} text-sm text-center mt-1`}>
           {title}
         </p>
       </div>
     );
-  };
-
-  // Category card
-  const CategoryCard = ({ title, image }) => {
-    return (
-      <div className="mx-1">
-        <div className="relative rounded overflow-hidden">
-          <img src={image} alt={title} className="w-full h-28 object-cover" />
-          <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-            <h3 className="text-white text-center font-semibold">{title}</h3>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Category data
-  const categoryData = [
-    { title: "Business & Professional Skills", image: "https://via.placeholder.com/280x160" },
-    { title: "Technology & Innovation", image: "https://via.placeholder.com/280x160" },
-    { title: "Marketing", image: "https://via.placeholder.com/280x160" },
-    { title: "Lifestyle", image: "https://via.placeholder.com/280x160" },
-    { title: "Education & Academics", image: "https://via.placeholder.com/280x160" },
-    { title: "Family & Relationships", image: "https://via.placeholder.com/280x160" },
-    { title: "Arts, Design & Media", image: "https://via.placeholder.com/280x160" }
-  ];
-
-  const handlePlanSelection = (planId) => {
-    setSelectedPlan(planId);
-  };
-
-  const handleSubscribe = async () => {
-    if (!selectedPlan) return;
-
-    try {
-      // Navigate to subscription page with selected plan
-      navigate(`/subscription/${selectedPlan}`);
-    } catch (err) {
-      console.error('Error handling subscription:', err);
-    }
   };
 
   // Category Hero Card (for the top section)
@@ -454,17 +397,17 @@ const Courses = () => {
     const image = category.thumbnailImgUrl || 'https://placehold.co/400x300';
     return (
       <div
-        className="relative cursor-pointer rounded-xl overflow-hidden group h-[340px] flex items-end transition-all duration-300 shadow-lg"
-        style={{ minWidth: 320, maxWidth: 400 }}
+        className="relative cursor-pointer rounded-xl overflow-hidden group h-60 sm:h-72 md:h-80 flex items-end transition-all duration-300 shadow-lg hover:shadow-xl"
         onClick={() => navigate(`/categories/${category._id}`)}
       >
         <img
           src={image}
           alt={title}
-          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
-        <div className="relative z-10 p-6 w-full flex items-end justify-center h-full">
-          <h3 className="text-white text-2xl font-bold text-center drop-shadow-lg" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.7)' }}>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+        <div className="relative z-10 p-6 w-full flex items-end justify-center">
+          <h3 className="text-white text-xl sm:text-2xl font-bold text-center drop-shadow-lg" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.7)' }}>
             {title}
           </h3>
         </div>
@@ -485,26 +428,26 @@ const Courses = () => {
     const isNew = course.isNew || false;
     return (
       <div
-        className={`flex ${theme === 'dark' ? 'bg-[#181f1f] hover:bg-[#232b2b]' : 'bg-white hover:bg-gray-100'} transition rounded-2xl overflow-hidden shadow-lg min-h-[160px] max-h-[200px] w-full cursor-pointer`}
+        className={`flex rounded-2xl overflow-hidden shadow-lg transform transition-all duration-300 hover:shadow-xl hover:scale-102 cursor-pointer
+        ${theme === 'dark' ? 'bg-[#181f1f] hover:bg-[#232b2b]' : 'bg-white hover:bg-gray-50'}`}
         onClick={() => navigate(`/courses/${course._id}`)}
       >
-        <div className="relative min-w-[260px] max-w-[300px] h-[180px] flex-shrink-0 border-2 border-gray-700 shadow-xl">
+        <div className="relative w-2/5 md:w-1/3 h-40 flex-shrink-0">
           <img
             src={image}
             alt={title}
             className="w-full h-full object-cover"
-            style={{ borderRadius: '16px 0 0 16px' }}
           />
           {isNew && (
             <span className="absolute top-2 left-2 bg-[#ff5722] text-white text-xs px-2 py-1 rounded">New</span>
           )}
         </div>
-        <div className="flex flex-col justify-center p-6 flex-1 min-w-0">
-          <h3 className={`text-lg font-bold mb-2 truncate ${theme === 'dark' ? 'text-white' : 'text-black'}`} title={title}>{title}</h3>
+        <div className="flex flex-col justify-center p-3 sm:p-4 flex-1 min-w-0">
+          <h3 className={`text-base sm:text-lg font-bold mb-1 sm:mb-2 line-clamp-2 ${theme === 'dark' ? 'text-white' : 'text-black'}`} title={title}>{title}</h3>
           <div className="flex items-center justify-between mt-1">
-            <p className={`text-base font-medium truncate ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>{instructorName}</p>
+            <p className={`text-sm sm:text-base font-medium truncate ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>{instructorName}</p>
             <button
-              className={`bg-transparent border-none p-0 ml-2`}
+              className="bg-transparent border-none p-0 ml-2"
               onClick={e => {
                 e.stopPropagation();
                 toggleSaveCourse(course._id);
@@ -524,15 +467,20 @@ const Courses = () => {
     );
   };
 
-  console.log('newlyReleased:', newlyReleased);
+  const handleSubscribe = async () => {
+    if (!selectedPlan) return;
+    try {
+      navigate(`/subscription/${selectedPlan}`);
+    } catch (err) {
+      console.error('Error handling subscription:', err);
+    }
+  };
 
   return (
-    <div className={`${theme === 'dark' ? 'bg-[#121212] text-white' : 'bg-white text-black'} min-h-screen transition-colors duration-200`} dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className={`${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-black'} min-h-screen transition-colors duration-200`} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Category Hero Carousel */}
-      <section className="py-12 px-6 mt-10">
-        <h2 className={`text-3xl font-bold mb-8 text-right ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
-          {t('Course Categories')}
-        </h2>
+      <section className="py-8 md:py-12 px-2 sm:px-4 md:px-8">
+        <h2 className={`text-2xl md:text-3xl font-bold mb-6 md:mb-8 ${isRTL ? 'text-right' : 'text-left'} ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Course Categories')}</h2>
         <div className="relative">
           <Slider {...categorySliderSettings}>
             {categories.map((category) => (
@@ -545,10 +493,10 @@ const Courses = () => {
       </section>
 
       {/* Course List Section */}
-      <section id="course-list-section" className="py-6 px-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Picks')}</h2>
-          <div className="flex items-center">
+      <section id="course-list-section" className="py-8 md:py-12 px-2 sm:px-4 md:px-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+          <h2 className={`text-xl md:text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Picks')}</h2>
+          <div className="flex items-center w-full md:w-auto overflow-x-auto scrollbar-hide">
             {topicLoading ? (
               <div className="flex items-center gap-2">
                 <FaSpinner className="animate-spin" />
@@ -557,43 +505,36 @@ const Courses = () => {
             ) : topicError ? (
               <div className="text-red-500 text-sm">{topicError}</div>
             ) : (
-              <div className="flex items-center overflow-x-auto scrollbar-hide">
+              <div className="flex items-center gap-2 pb-2">
                 {topics.map((topic, index) => (
                   <React.Fragment key={topic._id}>
                     <button
                       onClick={() => handleTopicClick(topic._id)}
-                      className={`
-                        text-sm mx-3 whitespace-nowrap transition-colors duration-200
+                      className={`whitespace-nowrap px-3 py-1 rounded-full transition-colors duration-300
                         ${selectedTopic === topic._id 
-                          ? 'text-[#00ffd0] font-semibold' 
-                          : theme === 'dark' ? 'text-white hover:text-gray-300' : 'text-gray-800 hover:text-gray-600'}
+                          ? 'bg-[#00ffd0] text-black font-semibold' 
+                          : theme === 'dark' 
+                            ? 'text-white hover:bg-gray-800' 
+                            : 'text-gray-800 hover:bg-gray-100'}
                       `}
                     >
                       {getLocalizedText(topic.name)}
                     </button>
-                    {index < topics.length - 1 && (
-                      <div className={`border-r ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'} h-4`} />
-                    )}
                   </React.Fragment>
                 ))}
               </div>
             )}
           </div>
         </div>
-
         {topicCoursesLoading ? (
-          <div className="flex justify-center items-center py-8">
-            <FaSpinner className="animate-spin text-2xl text-[#00ffd0]" />
+          <div className="flex justify-center items-center py-12">
+            <FaSpinner className="animate-spin text-3xl text-[#00ffd0]" />
           </div>
         ) : filteredPicks.length === 0 ? (
-          <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-            {selectedTopic 
-              ? t('home.courses.noCoursesForTopic')
-              : t('home.courses.noCoursesAvailable')}
-          </div>
+          <div className={`text-center py-12 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{selectedTopic ? t('home.courses.noCoursesForTopic') : t('home.courses.noCoursesAvailable')}</div>
         ) : (
           filteredPicks.length < 4 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredPicks.map((course, idx) => (
                 <CourseCard key={idx} course={course} />
               ))}
@@ -609,14 +550,14 @@ const Courses = () => {
       </section>
 
       {/* Trending Courses */}
-      <section className="py-6 px-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Trending Courses')}</h2>
+      <section className="py-8 md:py-12 px-2 sm:px-4 md:px-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+          <h2 className={`text-xl md:text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Trending Courses')}</h2>
           <button 
             onClick={() => navigate('/all-courses')} 
-            className={`${theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors duration-200`}
+            className={`${theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors duration-200 flex items-center gap-1`}
           >
-            {t('View all')}
+            {t('View all')} <span className="ml-1">&rarr;</span>
           </button>
         </div>
         <Slider {...sliderSettings}>
@@ -625,9 +566,9 @@ const Courses = () => {
       </section>
 
       {/* Newly Released */}
-      <section className="py-6 px-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Newly Released')}</h2>
+      <section className="py-8 md:py-12 px-2 sm:px-4 md:px-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+          <h2 className={`text-xl md:text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Newly Released')}</h2>
           <button 
             onClick={() => navigate('/all-courses')} 
             className={`${theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors duration-200 flex items-center gap-1`}
@@ -635,33 +576,29 @@ const Courses = () => {
             {t('View all')} <span className="ml-1">&rarr;</span>
           </button>
         </div>
-        <Slider {...newlyReleasedSliderSettings} className="newly-released-slider">
-          {getFiltered(newlyReleased).map((course, idx) => (
-            <div key={idx} className="px-3 py-3">
-              <NewlyReleasedCard course={course} />
-            </div>
-          ))}
-        </Slider>
+        <div className="newly-released-slider">
+          <Slider {...newlyReleasedSliderSettings}>
+            {getFiltered(newlyReleased).map((course, idx) => (
+              <div key={idx} className="p-2">
+                <NewlyReleasedCard course={course} />
+              </div>
+            ))}
+          </Slider>
+        </div>
       </section>
 
       {/* Subscription Section */}
-      <section className={`py-8 px-6 ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-gray-100'} my-8 rounded-xl max-w-6xl mx-auto flex items-center justify-between relative overflow-visible transition-colors duration-200`}>
+      <section className={`${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-gray-100'} rounded-xl p-6 md:p-10 my-8 max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 transition-colors duration-200`}>
         {/* Left: Title, subtitle, button */}
-        <div className="flex-1 min-w-[260px]">
-          <h2 className={`text-lg md:text-xl font-bold mb-1 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Subscribe for a great price')}</h2>
-          <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} mb-4 text-sm md:text-base`}>
-            {t('And get access to all almentor courses whenever you like')}
-          </p>
+        <div className="flex-1 min-w-[260px] mb-6 md:mb-0">
+          <h2 className={`text-lg md:text-xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Subscribe for a great price')}</h2>
+          <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} mb-4 text-sm md:text-base`}>{t('And get access to all almentor courses whenever you like')}</p>
           <button
             onClick={handleSubscribe}
             disabled={!selectedPlan || subscriptionLoading}
-            className={
-              `px-4 py-2 rounded border transition font-semibold text-base
-              ${theme === 'dark'
-                ? 'bg-transparent border-gray-400 text-white hover:bg-gray-800'
-                : 'bg-transparent border-gray-400 text-black hover:bg-gray-200'}
-              ${(!selectedPlan || subscriptionLoading) ? 'opacity-50 cursor-not-allowed' : ''}`
-            }
+            className={`px-6 py-3 rounded-lg border-2 transition font-semibold text-base
+              ${theme === 'dark' ? 'bg-transparent border-[#00ffd0] text-[#00ffd0] hover:bg-[#00ffd0]/10' : 'bg-transparent border-[#00ffd0] text-black hover:bg-[#00ffd0]/10'}
+              ${(!selectedPlan || subscriptionLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             {subscriptionLoading ? (
               <span className="flex items-center gap-2">
@@ -673,21 +610,16 @@ const Courses = () => {
             )}
           </button>
         </div>
-
         {/* Center: Plans */}
-        <div className="flex-1 flex justify-center items-center gap-2 md:gap-4">
+        <div className="flex-1 flex flex-wrap justify-center gap-4">
           {subscriptionLoading ? (
             <div className="flex items-center justify-center w-full py-8">
               <FaSpinner className="animate-spin text-2xl text-[#00ffd0]" />
             </div>
           ) : subscriptionError ? (
-            <div className="text-red-500 text-center w-full">
-              {subscriptionError}
-            </div>
+            <div className="text-red-500 text-center w-full">{subscriptionError}</div>
           ) : subscriptionPlans.length === 0 ? (
-            <div className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} text-center w-full`}>
-              {t('No subscription plans available')}
-            </div>
+            <div className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} text-center w-full`}>{t('No subscription plans available')}</div>
           ) : (
             subscriptionPlans.map((plan) => {
               const isSelected = selectedPlan === plan._id;
@@ -695,18 +627,12 @@ const Courses = () => {
               const oldPrice = typeof plan.oldPrice === 'object' ? plan.oldPrice.amount : plan.oldPrice;
               const currency = typeof plan.price === 'object' ? plan.price.currency : plan.currency || 'EGP';
               const period = plan.period || 'mo';
-
               return (
                 <div
                   key={plan._id}
                   onClick={() => handlePlanSelection(plan._id)}
-                  className={
-                    `cursor-pointer transition rounded-lg p-4 w-32 md:w-40 flex flex-col items-center relative
-                    ${isSelected
-                      ? (theme === 'dark' ? 'bg-[#1e2b2b] border-2 border-[#00ffd0] shadow-lg' : 'bg-white border-2 border-[#00ffd0] shadow-lg')
-                      : (theme === 'dark' ? 'bg-[#181f1f] border-2 border-transparent' : 'bg-gray-100 border-2 border-transparent')}
-                    `
-                  }
+                  className={`cursor-pointer transition-all duration-300 rounded-lg p-4 w-32 md:w-40 flex flex-col items-center relative
+                    ${isSelected ? (theme === 'dark' ? 'bg-[#1e2b2b] border-2 border-[#00ffd0] shadow-lg' : 'bg-white border-2 border-[#00ffd0] shadow-lg') : (theme === 'dark' ? 'bg-[#181f1f] border-2 border-transparent' : 'bg-gray-100 border-2 border-transparent')}`}
                 >
                   <p className={`text-xs mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{getLocalizedText(plan.name)}</p>
                   <div className="flex items-baseline mb-1">
@@ -718,9 +644,7 @@ const Courses = () => {
                   </div>
                   <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{getLocalizedText(plan.description)}</p>
                   {plan.isBestValue && isSelected && (
-                    <span className="absolute top-2 right-2 bg-[#00ffd0] text-black text-[10px] font-bold px-2 py-0.5 rounded-full">
-                      {t('Best Value')}
-                    </span>
+                    <span className="absolute top-2 right-2 bg-[#00ffd0] text-black text-[10px] font-bold px-2 py-0.5 rounded-full">{t('Best Value')}</span>
                   )}
                 </div>
               );
@@ -730,7 +654,7 @@ const Courses = () => {
       </section>
 
       {/* Instructors Section */}
-      <section className="py-10 px-6 mx-auto mt-6">
+      <section className="py-8 md:py-12 px-2 sm:px-4 md:px-8">
         <h2 className={`text-2xl font-bold mb-6 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Our Instructors')}</h2>
         <div className="max-w-6xl mx-auto">
           <Slider {...sliderSettings}>
@@ -742,11 +666,7 @@ const Courses = () => {
         <div className="text-center mt-8">
           <button 
             onClick={() => navigate('/instructors')}
-            className={`rounded px-6 py-2 border transition-all duration-200 ${
-              theme === 'dark'
-                ? 'border-white text-white hover:bg-white hover:text-black'
-                : 'border-black text-black hover:bg-black hover:text-white'
-            }`}
+            className={`rounded px-6 py-2 border transition-all duration-200 ${theme === 'dark' ? 'border-white text-white hover:bg-white hover:text-black' : 'border-black text-black hover:bg-black hover:text-white'}`}
           >
             {t('See all instructors')}
           </button>
@@ -754,6 +674,6 @@ const Courses = () => {
       </section>
     </div>
   );
-}
+};
 
 export default Courses;
