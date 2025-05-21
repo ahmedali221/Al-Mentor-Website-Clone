@@ -146,6 +146,21 @@
     "orderSummary": {
       "price": "Price",
       "total": "Total"
+    },
+    "success": {
+      "title": "Payment Successful!",
+      "message": "Your subscription has been activated successfully."
+    },
+    "error": {
+      "title": "Payment Error",
+      "message": "An error occurred while processing your payment. Please try again.",
+      "unauthorized": "The payment could not be authorized. Please try again or use a different payment method.",
+      "insufficient": "Insufficient funds. Please check your balance and try again."
+    },
+    "processing": "Processing payment...",
+    "cancelled": {
+      "title": "Payment Cancelled",
+      "message": "Payment process was cancelled successfully"
     }
   },
   "subscription": {

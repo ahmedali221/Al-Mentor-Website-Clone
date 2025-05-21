@@ -109,7 +109,7 @@ const Footer = () => {
                 to="/ai-chat"
                 className="mb-2 p-2 rounded-full shadow-lg  transition-all duration-200 hover:scale-110"
               >
-                <img src="public/vecteezy_chatbot-support-service_53135090.png" alt="AI Icon" className="w-17 h-17" />
+                <img src="/vecteezy_chatbot-support-service_53135090.png" alt="AI Icon" className="w-17 h-17" />
               </Link>
               {/* Support Button */}
               <button

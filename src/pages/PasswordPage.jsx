@@ -4,12 +4,14 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
+import { useUser } from '../context/UserContext';
 
 function PasswordPage() {
     const navigate = useNavigate();
     const location = useLocation();
     const { t, i18n } = useTranslation();
     const { theme } = useTheme();
+    const { login } = useUser();
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     
@@ -24,17 +26,15 @@ function PasswordPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('/api/auth/login', {
+            await login({
                 email: location.state.email,
                 password
             });
-            if (response.data.token) {
-                localStorage.setItem('token', response.data.token);
-                console.log("Login successful, token saved");
-                
-                navigate('/home');
+            
+            if (location.state?.planId) {
+                navigate(`/payment/${location.state.planId}`);
             } else {
-                setError(t('auth.loginFailed', 'Login failed: No token received'));
+                navigate('/');
             }
         } catch (err) {
             console.error("Login failed:", err.response?.data || err.message);
