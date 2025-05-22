@@ -168,6 +168,7 @@
     "subtitle": "Choose a plan and get unlimited access to the best learning content in the Arab world for the best price",
     "duration": "Duration: {{value}} {{unit}}",
     "selectPlan": "Select plan",
+    "subscribe": "Subscribe",
     "features": "What Every Plan Gets You",
     "feature1": "Unlimited access to all courses",
     "feature1Desc": "Enjoy unlimited access to all our courses. Learn at your own pace and explore new subjects anytime",
@@ -177,7 +178,12 @@
     "feature3Desc": "Learn on any device. Our platform works smoothly across laptops, tablets, and smartphones",
     "feature4": "Download to watch offline",
     "feature4Desc": "Download courses to watch offline. Learn wherever you are, even without an internet connection",
-    "paymentMethods": "Pay in various ways — Cancel anytime"
+    "paymentMethods": "Pay in various ways — Cancel anytime",
+    "units": {
+      "months": "months",
+      "years": "years",
+      "days": "days"
+    }
   },
   "ai": {
     "chat": {

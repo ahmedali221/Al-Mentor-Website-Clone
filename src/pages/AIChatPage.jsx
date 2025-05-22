@@ -375,7 +375,7 @@ const AIChatPage = () => {
                   value={userInput}
                   onChange={(e) => setUserInput(e.target.value)}
                   placeholder={t('ai.chat.placeholder', 'Type your message...')}
-                  className={`w-full pl-12 pr-10 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 transition-all duration-200 ${
+                  className={`w-full pl-12 pr-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 transition-all duration-200 ${
                     theme === 'dark'
                       ? 'bg-[#1e2338]/80 text-white placeholder-gray-400 focus:ring-red-500/50 border border-gray-700 focus:border-red-500/50'
                       : 'bg-gray-50 text-gray-900 placeholder-gray-500 focus:ring-red-500/30 border border-gray-200 focus:border-red-400'
@@ -448,25 +448,11 @@ const AIChatPage = () => {
                     <span className="text-xs truncate max-w-[100px]">{selectedFile.name}</span>
                   </div>
                 )}
-
-                <button
-                  type="submit"
-                  disabled={isLoading || (!userInput.trim() && !selectedFile)}
-                  className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-lg transition-all duration-200 ${
-                    isLoading || (!userInput.trim() && !selectedFile)
-                      ? theme === 'dark' ? 'bg-gray-700 text-gray-500' : 'bg-gray-200 text-gray-400'
-                      : theme === 'dark' 
-                        ? 'bg-gradient-to-r from-red-500 to-red-700 text-white hover:from-red-600 hover:to-red-800' 
-                        : 'bg-gradient-to-r from-red-500 to-red-700 text-white hover:from-red-600 hover:to-red-800'
-                  }`}
-                >
-                  <IoSend className={`text-base ${isRTL ? 'transform rotate-180' : ''}`} />
-                </button>
               </div>
               <button
                 type="submit"
                 disabled={isLoading || (!userInput.trim() && !selectedFile)}
-                className={`hidden sm:flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                className={`flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                   isLoading || (!userInput.trim() && !selectedFile)
                     ? theme === 'dark' ? 'bg-gray-700 text-gray-500' : 'bg-gray-200 text-gray-400'
                     : theme === 'dark' 
@@ -474,7 +460,7 @@ const AIChatPage = () => {
                       : 'bg-gradient-to-r from-red-500 to-red-700 text-white hover:from-red-600 hover:to-red-800'
                 }`}
               >
-                <span className="hidden md:inline">{t('ai.chat.send', 'Send')}</span>
+                <span>{t('ai.chat.send', 'Send')}</span>
                 <FiSend className={`text-base ${isRTL ? 'transform rotate-180' : ''}`} />
               </button>
             </form>

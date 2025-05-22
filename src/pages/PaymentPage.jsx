@@ -92,19 +92,36 @@ function PaymentPage() {
       });
 
       if (response.data) {
+        try {
+          await axios.post(
+            "http://localhost:5000/api/user-subscriptions/user",
+            {
+              userId: user._id,
+              subscriptionId: planId
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+        } catch (subscriptionErr) {
+          console.error(t("messages.error"), subscriptionErr);
+        }
+
         // Show success message
         await Swal.fire({
           icon: "success",
           title: t("payment.success.title"),
           text: t("payment.success.message"),
-          confirmButtonText: "OK",
+          confirmButtonText: t("buttons.submit"),
         });
         
         // Redirect to home page after successful payment
         navigate("/");
       }
     } catch (err) {
-      console.error("Error sending payment:", err);
+      console.error(t("messages.error"), err);
       console.log("err.response:", err.response);
       Swal.close();
       
@@ -129,7 +146,7 @@ function PaymentPage() {
         icon: "error",
         title: t("payment.error.title"),
         text: errorMessage,
-        confirmButtonText: "OK",
+        confirmButtonText: t("buttons.submit"),
       });
     }
    };
@@ -341,7 +358,7 @@ function PaymentPage() {
                             <div className='w-2.5 h-2.5 rounded-full bg-red-500' />
                           )}
                         </div>
-                        <span className='text-white'>{method.label}</span>
+                        <span className={theme === "dark" ? "text-white" : "text-gray-900"}>{method.label}</span>
                       </div>
                       <div className='flex items-center gap-3'>
                         {method.icons.map((icon, index) => (
@@ -395,9 +412,9 @@ function PaymentPage() {
                         planDetails.name}
                     </h2>
                     <p className='text-gray-500 text-sm mt-1'>
-                      {t("payment.planDuration", {
+                      {t("subscription.duration", {
                         value: planDetails.duration?.value,
-                        unit: planDetails.duration?.unit.toLowerCase(),
+                        unit: t(`subscription.units.${planDetails.duration?.unit.toLowerCase()}`)
                       })}
                     </p>
                   </div>
@@ -411,7 +428,7 @@ function PaymentPage() {
 
               {/* Order Summary */}
               <div className='space-y-3'>
-                <div className='flex justify-between text-gray-300'>
+                <div className={`flex justify-between ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
                   <span>{t("payment.orderSummary.price")}</span>
                   <span>
                     {planDetails.price?.amount} {planDetails.price?.currency}
@@ -419,8 +436,8 @@ function PaymentPage() {
                 </div>
 
                 {/* Total */}
-                <div className='pt-3 border-t border-gray-700'>
-                  <div className='flex justify-between font-semibold mb-2'>
+                <div className={`pt-3 border-t ${theme === "dark" ? "border-gray-700" : "border-gray-200"}`}>
+                  <div className={`flex justify-between font-semibold mb-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
                     <span>{t("payment.orderSummary.total")}</span>
                     <span>
                       {planDetails.price?.amount} {planDetails.price?.currency}
@@ -431,7 +448,7 @@ function PaymentPage() {
 
               {/* Proceed Button */}
               <button className='w-full mt-6 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors duration-200'>
-                {t("payment.buttons.proceed")}
+                {t("subscription.subscribe")}
               </button>
             </div>
           </div>
@@ -446,15 +463,15 @@ function PaymentPage() {
             background: "#fff", borderRadius: 10, padding: 32, minWidth: 320, textAlign: "center", boxShadow: "0 2px 16px #0002"
           }}>
             <h2 style={{ color: "#2196f3", fontSize: 48, margin: 0 }}>ⓘ</h2>
-            <h2 style={{ margin: "16px 0 8px" }}>Payment Cancelled</h2>
-            <p style={{ marginBottom: 24 }}>Payment process was cancelled successfully</p>
+            <h2 style={{ margin: "16px 0 8px" }}>{t("payment.cancelled.title")}</h2>
+            <p style={{ marginBottom: 24 }}>{t("payment.cancelled.message")}</p>
             <button
               style={{
                 background: "#7c5dfa", color: "#fff", border: "none", borderRadius: 6, padding: "10px 32px", fontSize: 18, cursor: "pointer"
               }}
               onClick={() => setShowCancelled(false)}
             >
-              OK
+              {t("buttons.submit")}
             </button>
           </div>
         </div>
