@@ -9,6 +9,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { FaSearch, FaBell, FaShoppingCart, FaUserCircle, FaBookmark, FaPlayCircle, FaSpinner } from 'react-icons/fa';
 import { Route } from 'react-router-dom';
 import CourseDetailsPage from '../CourseDetails/CourseDetails';
+import { useAuth } from '../../context/AuthContext';
+import { toast } from 'react-toastify';
 
 const Courses = () => {
   const { t, i18n } = useTranslation();
@@ -17,6 +19,7 @@ const Courses = () => {
   const currentLang = i18n.language;
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [instructors, setInstructors] = useState([]);
   const [allCourses, setAllCourses] = useState([]);
@@ -36,11 +39,8 @@ const Courses = () => {
   const [subscriptionLoading, setSubscriptionLoading] = useState(true);
   const [subscriptionError, setSubscriptionError] = useState(null);
 
-  const [savedCourses, setSavedCourses] = useState(() => {
-    // Load from localStorage or start with empty array
-    const saved = localStorage.getItem('savedCourses');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [savedCourses, setSavedCourses] = useState([]);
+  const [savingCourse, setSavingCourse] = useState(false);
 
   const [topics, setTopics] = useState([]);
   const [selectedTopic, setSelectedTopic] = useState(null);
@@ -55,15 +55,86 @@ const Courses = () => {
   });
 
   useEffect(() => {
-    localStorage.setItem('savedCourses', JSON.stringify(savedCourses));
-  }, [savedCourses]);
+    const fetchSavedCourses = async () => {
+      if (!user) return;
+      
+      try {
+        const response = await fetch(`http://localhost:5000/api/saved-courses/user/${user._id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        
+        if (!response.ok) throw new Error('Failed to fetch saved courses');
+        
+        const data = await response.json();
+        setSavedCourses(data.map(item => item.courseId._id));
+      } catch (err) {
+        toast.error(t('Failed to fetch saved courses'));
+      }
+    };
 
-  const toggleSaveCourse = (courseId) => {
-    setSavedCourses(prev =>
-      prev.includes(courseId)
-        ? prev.filter(id => id !== courseId)
-        : [...prev, courseId]
-    );
+    fetchSavedCourses();
+  }, [user, t]);
+
+  const toggleSaveCourse = async (courseId, e) => {
+    e.stopPropagation();
+    
+    if (!user) {
+      navigate('/loginPage');
+      return;
+    }
+
+    if (savingCourse) return;
+
+    try {
+      setSavingCourse(true);
+      const isCurrentlySaved = savedCourses.includes(courseId);
+
+      if (isCurrentlySaved) {
+        // Unsave course
+        const response = await fetch(`http://localhost:5000/api/saved-courses/${user._id}/${courseId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        if (!response.ok) throw new Error('Failed to unsave course');
+
+        setSavedCourses(prev => prev.filter(id => id !== courseId));
+        toast.success(t('Course removed from saved courses'));
+      } else {
+        // Save course
+        const response = await fetch('http://localhost:5000/api/saved-courses', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify({
+            userId: user._id,
+            courseId: courseId,
+            savedAt: new Date().toISOString()
+          })
+        });
+
+        if (!response.ok) {
+          if (response.status === 409) {
+            toast.info(t('Course is already in your saved courses'));
+            return;
+          }
+          throw new Error('Failed to save course');
+        }
+
+        setSavedCourses(prev => [...prev, courseId]);
+        toast.success(t('Course added to saved courses'));
+      }
+    } catch (err) {
+      toast.error(err.message || t('Failed to update saved courses'));
+    } finally {
+      setSavingCourse(false);
+    }
   };
 
   useEffect(() => {
@@ -361,11 +432,9 @@ const Courses = () => {
                 <span className="text-yellow-500 mr-1">★★★★★</span>
               </div>
               <button
-                className={`bg-transparent border-none p-0 ml-2`}
-                onClick={e => {
-                  e.stopPropagation();
-                  toggleSaveCourse(course._id);
-                }}
+                className={`bg-transparent border-none p-0 ml-2 ${savingCourse ? 'opacity-50 cursor-not-allowed' : ''}`}
+                onClick={e => toggleSaveCourse(course._id, e)}
+                disabled={savingCourse}
               >
                 <FaBookmark className={savedCourses.includes(course._id) ? "text-red-600" : "text-white"} />
               </button>
@@ -498,11 +567,9 @@ const Courses = () => {
           <p className={`text-base font-medium mt-1 truncate ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>{instructorName}</p>
           <div className="flex items-center justify-between">
             <button
-              className={`bg-transparent border-none p-0 ml-2`}
-              onClick={e => {
-                e.stopPropagation();
-                toggleSaveCourse(course._id);
-              }}
+              className={`bg-transparent border-none p-0 ml-2 ${savingCourse ? 'opacity-50 cursor-not-allowed' : ''}`}
+              onClick={e => toggleSaveCourse(course._id, e)}
+              disabled={savingCourse}
             >
               <FaBookmark className={savedCourses.includes(course._id) ? "text-red-600" : "text-white"} />
             </button>

@@ -4,12 +4,14 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 
 function PasswordPage() {
     const navigate = useNavigate();
     const location = useLocation();
     const { t, i18n } = useTranslation();
     const { theme } = useTheme();
+    const { setUser } = useAuth();
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     
@@ -24,17 +26,46 @@ function PasswordPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            console.log("Attempting login with email:", location.state.email);
             const response = await axios.post('/api/auth/login', {
                 email: location.state.email,
                 password
             });
+
+            console.log("Server response:", response.data);
+
             if (response.data.token) {
+                // Save token
                 localStorage.setItem('token', response.data.token);
-                console.log("Login successful, token saved");
                 
+                // If user data is not in the response, fetch it using the token
+                if (!response.data.user) {
+                    console.log("No user data in response, fetching user data...");
+                    try {
+                        const userResponse = await axios.get('/api/auth/me', {
+                            headers: { Authorization: `Bearer ${response.data.token}` }
+                        });
+                        console.log("Fetched user data:", userResponse.data);
+                        const userData = userResponse.data;
+                        localStorage.setItem('user', JSON.stringify(userData));
+                        setUser(userData);
+                    } catch (userErr) {
+                        console.error("Error fetching user data:", userErr);
+                        setError(t('auth.fetchUserFailed', 'Login successful but failed to fetch user data'));
+                        return;
+                    }
+                } else {
+                    // Save user data from login response
+                    console.log("Saving user data from login response:", response.data.user);
+                    localStorage.setItem('user', JSON.stringify(response.data.user));
+                    setUser(response.data.user);
+                }
+                
+                console.log("Login successful, navigating to home...");
                 navigate('/home');
             } else {
-                setError(t('auth.loginFailed', 'Login failed: No token received'));
+                console.error("Login failed: No token in response");
+                setError(t('auth.loginFailed', 'Login failed: Invalid response from server'));
             }
         } catch (err) {
             console.error("Login failed:", err.response?.data || err.message);

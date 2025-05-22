@@ -7,6 +7,7 @@ import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Route } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../context/AuthContext';
 
 // Course Context
 const CourseContext = createContext();
@@ -43,6 +44,11 @@ export default function EnhancedLessonViewer() {
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [isCourseCompleted, setIsCourseCompleted] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [savedCourses, setSavedCourses] = useState([]);
+  const [savingCourse, setSavingCourse] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [isCourseSaved, setIsCourseSaved] = useState(false);
   
   // Fetch course data
   useEffect(() => {
@@ -50,10 +56,8 @@ export default function EnhancedLessonViewer() {
       try {
         setLoading(true);
         const response = await axios.get(`/api/courses/${courseId}`);
-        console.log('Fetched course data:', response.data);
         setCourseData(response.data);
         
-        // Set first lesson as current if none selected
         if (response.data.lessons && response.data.lessons.length > 0) {
           setCurrentLesson({ 
             lessonId: response.data.lessons[0]._id, 
@@ -78,10 +82,9 @@ export default function EnhancedLessonViewer() {
       try {
         setLessonsLoading(true);
         const response = await axios.get(`/api/lessons/course/${courseId}`);
-        console.log('Fetched lessons:', response.data);
         setLessons(response.data);
       } catch (err) {
-        console.error('Failed to load lessons:', err);
+        setError('Failed to load lessons');
       } finally {
         setLessonsLoading(false);
       }
@@ -114,6 +117,24 @@ export default function EnhancedLessonViewer() {
   useEffect(() => {
     localStorage.setItem(`course_${courseId}_notes`, JSON.stringify(notes));
   }, [notes, courseId]);
+  
+  // Fetch saved courses when component mounts
+  useEffect(() => {
+    if (user) {
+      fetchSavedCourses();
+    }
+  }, [user]);
+  
+  const fetchSavedCourses = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/saved-courses/user/${user._id}`);
+      if (!response.ok) throw new Error('Failed to fetch saved courses');
+      const data = await response.json();
+      setSavedCourses(data.map(item => item.courseId._id));
+    } catch (err) {
+      console.error('Error fetching saved courses:', err);
+    }
+  };
   
   // Toast message helper
   const showToast = (message) => {
@@ -207,7 +228,6 @@ export default function EnhancedLessonViewer() {
   
   // Helper for localization
   const getLocalizedText = (obj) => {
-    console.log('Localizing text:', obj);
     if (!obj) return '';
     if (typeof obj === 'string') return obj;
     if (obj && typeof obj === 'object') {
@@ -278,6 +298,106 @@ export default function EnhancedLessonViewer() {
     return Math.round((watchedCount / lessons.length) * 100);
   };
   
+  // Toggle save course
+  const toggleSaveCourse = async (e) => {
+    if (e) e.stopPropagation();
+    if (!user) {
+      navigate('/loginPage');
+      return;
+    }
+
+    try {
+      setSavingCourse(true);
+      
+      const response = await fetch(`http://localhost:5000/api/saved-courses/${user._id}/${courseId}`, {
+        method: isSaved ? 'DELETE' : 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) throw new Error('Failed to update saved course');
+
+      setIsSaved(!isSaved);
+      showToast(isSaved ? 'Course removed from saved courses' : 'Course added to saved courses');
+    } catch (err) {
+      console.error('Error updating saved course:', err);
+      showToast('Failed to update saved course');
+    } finally {
+      setSavingCourse(false);
+    }
+  };
+  
+  // Check if course is already saved
+  useEffect(() => {
+    const checkIfCourseSaved = async () => {
+      if (!user || !courseId) return;
+      
+      try {
+        // Get all saved courses for the user
+        const response = await fetch(`http://localhost:5000/api/saved-courses/user/${user._id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          // Check if current course is in the saved courses
+          const isSaved = data.some(savedCourse => savedCourse.courseId._id === courseId);
+          setIsCourseSaved(isSaved);
+        }
+      } catch (err) {
+        // Silent fail - just don't update the saved state
+      }
+    };
+
+    checkIfCourseSaved();
+  }, [user, courseId]);
+  
+  // Add course to saved courses
+  const handleAddToMyCourses = async () => {
+    if (!user) {
+      navigate('/loginPage');
+      return;
+    }
+
+    try {
+      setSavingCourse(true);
+      
+      const response = await fetch('http://localhost:5000/api/saved-courses', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          userId: user._id,
+          courseId: courseId,
+          savedAt: new Date().toISOString()
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 409) {
+          showToast('Course is already in your saved courses');
+          setIsCourseSaved(true);
+          return;
+        }
+        throw new Error(data.message || 'Failed to save course');
+      }
+
+      setIsCourseSaved(true);
+      showToast('Course added to your saved courses successfully');
+    } catch (err) {
+      showToast(err.message || 'Failed to save course');
+    } finally {
+      setSavingCourse(false);
+    }
+  };
+
   // Context value
   const contextValue = {
     courseData,
@@ -299,7 +419,9 @@ export default function EnhancedLessonViewer() {
     watchedLessons,
     markLessonAsWatched,
     calculateLessonProgress,
-    calculateCourseProgress
+    calculateCourseProgress,
+    savedCourses,
+    toggleSaveCourse
   };
   
   // Check if all lessons are watched
@@ -310,15 +432,8 @@ export default function EnhancedLessonViewer() {
     // Show completion modal if course is completed
     if (allLessonsWatched && !showCompletionModal) {
       setShowCompletionModal(true);
-      
-      // Save completed course to localStorage
-      const completedCourses = JSON.parse(localStorage.getItem('completedCourses') || '[]');
-      if (!completedCourses.includes(courseId)) {
-        completedCourses.push(courseId);
-        localStorage.setItem('completedCourses', JSON.stringify(completedCourses));
-      }
     }
-  }, [watchedLessons, lessons, courseId, showCompletionModal]);
+  }, [watchedLessons, lessons, showCompletionModal]);
   
   // Handle getting certificate
   const handleGetCertificate = () => {
@@ -411,7 +526,7 @@ export default function EnhancedLessonViewer() {
               <Menu size={20} />
             </button>
             <h1 className="text-xl font-bold">
-              {typeof courseData.title === 'object' ? courseData.title.en : courseData.title}
+              {getLocalizedText(courseData?.title)}
             </h1>
           </div>
           <div className="flex items-center space-x-4">
@@ -424,6 +539,29 @@ export default function EnhancedLessonViewer() {
                 <span>Get Certificate</span>
               </button>
             )}
+            <button 
+              onClick={handleAddToMyCourses}
+              disabled={savingCourse || isCourseSaved}
+              className={`
+                flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors
+                ${isCourseSaved 
+                  ? 'bg-gray-600 text-gray-300 cursor-not-allowed' 
+                  : savingCourse
+                    ? 'bg-gray-600 text-gray-300 cursor-not-allowed'
+                    : 'bg-[#ff3a30] hover:bg-[#ff1a1a] text-white'
+                }
+              `}
+            >
+              <Bookmark size={20} className={isCourseSaved ? "fill-current" : ""} />
+              <span>
+                {savingCourse 
+                  ? 'Saving...' 
+                  : isCourseSaved 
+                    ? 'Added to my courses' 
+                    : 'Add to my courses'
+                }
+              </span>
+            </button>
             <button className="text-gray-400 hover:text-white transition-colors">
               <Share size={20} />
             </button>

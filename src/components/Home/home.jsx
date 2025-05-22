@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Slider from 'react-slick';
 import './home.css';
 import { RiArrowDropLeftLine, RiArrowDropRightLine } from "react-icons/ri";
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../context/ThemeContext';
-import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
+  const navigate = useNavigate();
   const isRTL = i18n.language === 'ar';
   const currentLang = i18n.language;
-  const navigate = useNavigate();
 
   const [instructors, setInstructors] = useState([]);
   const [allCourses, setAllCourses] = useState([]);
@@ -109,13 +109,14 @@ const Home = () => {
     <div className={`${theme === 'dark' ? 'bg-[#121212] text-white' : 'bg-white text-black'} min-h-screen transition-colors duration-200`} dir={isRTL ? 'rtl' : 'ltr'}>
       
       {/* Banner Section */}
-      <main className="relative flex items-start justify-start min-h-screen px-6 pt-32" style={{
-        backgroundImage: `url(/banner.webp)`,
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: '50% 90%',
-        marginTop: '3rem',
-      }}>
+      <main className="relative flex items-start justify-start min-h-screen px-6 pt-32"
+        style={{
+          backgroundImage: `url(/banner.webp)`,
+          backgroundSize: 'cover',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: '50% 90%',
+          marginTop: '3rem',
+        }}>
         <div className="absolute inset-0 bg-black opacity-10"></div>
         <div className="banner-shadow"></div>
         <div className={`relative z-20 px-5 py-30 max-w-2xl text-white leading-none font-semibold text-xl ${isRTL ? 'mr-10' : 'ml-10'}`}>
@@ -137,7 +138,7 @@ const Home = () => {
         <div className="flex justify-center gap-3 mb-8 flex-wrap max-w-4xl mx-auto text-2xl">
           <button
             onClick={() => handleCategoryClick(null)}
-            className={`px-4 py-2 rounded transition-colors duration-200 font-semibold
+            className={`px-4 py-2 rounded font-semibold transition-colors duration-200
               ${!selectedCategory
                 ? 'bg-red-600 text-white'
                 : theme === 'dark'

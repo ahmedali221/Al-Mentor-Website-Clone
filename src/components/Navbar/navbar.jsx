@@ -6,16 +6,21 @@ import { CiSearch } from 'react-icons/ci';
 import { useTranslation } from 'react-i18next';
 import { changeLanguage } from '../../i18n/config';
 import { useTheme } from '../../context/ThemeContext';
+import { FaUserCircle } from "react-icons/fa";
+import { useAuth } from '../../context/AuthContext';
 import './navbar.css';
 
 const Navbar = () => {
   const { t, i18n } = useTranslation();
   const { theme, toggleTheme } = useTheme();
-  const isRTL = i18n.language === 'ar';
-  const isLoggedIn = !!localStorage.getItem('token');
+  const { user, setUser } = useAuth();
   const navigate = useNavigate();
+  const isRTL = i18n.language === 'ar';
+  const isLoggedIn = !!user;
+  const currentLang = i18n.language;
 
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const [isUserDropdownVisible, setIsUserDropdownVisible] = useState(false);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categoryCourses, setCategoryCourses] = useState([]);
@@ -27,12 +32,30 @@ const Navbar = () => {
   const searchInputRef = useRef(null);
   const searchDropdownRef = useRef(null);
 
+  const handleUserDropdownEnter = () => setIsUserDropdownVisible(true);
+  const handleUserDropdownLeave = () => setIsUserDropdownVisible(false);
+  const handleDropdownEnter = () => setIsDropdownVisible(true);
+  const handleDropdownLeave = () => setIsDropdownVisible(false);
+
   const toggleLanguage = () => {
     const newLang = i18n.language === 'en' ? 'ar' : 'en';
     changeLanguage(newLang);
   };
 
-  // FETCH CATEGORIES
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/loginPage');
+    handleUserDropdownLeave();
+  };
+
+  const getLocalizedName = (nameObj) => {
+    if (!nameObj) return '';
+    if (typeof nameObj === 'string') return nameObj;
+    return nameObj[currentLang] || nameObj.en || '';
+  };
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -49,7 +72,6 @@ const Navbar = () => {
     fetchCategories();
   }, []);
 
-  // FETCH ALL COURSES ONCE
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -64,7 +86,6 @@ const Navbar = () => {
     fetchCourses();
   }, []);
 
-  // FETCH INSTRUCTORS
   useEffect(() => {
     const fetchInstructors = async () => {
       try {
@@ -80,7 +101,22 @@ const Navbar = () => {
     fetchInstructors();
   }, []);
 
-  // FILTER COURSES BY CATEGORY ON HOVER
+  useEffect(() => {
+    const savedUser = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
+    
+    if (token && savedUser && !user) {
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        setUser(parsedUser);
+      } catch (error) {
+        console.error('Error parsing saved user:', error);
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+      }
+    }
+  }, [user, setUser]);
+
   const handleCategoryHover = (categoryId) => {
     setSelectedCategory(categoryId);
     const filteredCourses = allCourses.filter(course =>
@@ -91,10 +127,6 @@ const Navbar = () => {
     setCategoryCourses(filteredCourses);
   };
 
-  const handleDropdownEnter = () => setIsDropdownVisible(true);
-  const handleDropdownLeave = () => setIsDropdownVisible(false);
-
-  // Unified search handler
   useEffect(() => {
     if (!searchQuery.trim()) {
       setSearchResults({ courses: [], instructors: [] });
@@ -102,7 +134,6 @@ const Navbar = () => {
       return;
     }
     const q = searchQuery.trim().toLowerCase();
-    // Filter courses
     const matchedCourses = allCourses.filter(course => {
       const lang = i18n.language;
       const title = typeof course.title === 'object'
@@ -110,7 +141,6 @@ const Navbar = () => {
         : course.title || '';
       return title.toLowerCase().includes(q);
     });
-    // Filter instructors
     const matchedInstructors = instructors.filter(inst => {
       const profile = inst.profile || inst.user || inst;
       const firstName = profile.firstName?.[i18n.language] || profile.firstName?.en || profile.firstName || '';
@@ -122,14 +152,14 @@ const Navbar = () => {
     setShowSearchDropdown(true);
   }, [searchQuery, allCourses, instructors, i18n.language]);
 
-  // Hide dropdown on outside click
   useEffect(() => {
     function handleClickOutside(event) {
       if (
         searchDropdownRef.current &&
         !searchDropdownRef.current.contains(event.target) &&
         searchInputRef.current &&
-        !searchInputRef.current.contains(event.target)
+        !searchInputRef.current.contains(event.target) &&
+        searchDropdownRef.current
       ) {
         setShowSearchDropdown(false);
       }
@@ -140,7 +170,7 @@ const Navbar = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     }
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showSearchDropdown]);
+  }, [showSearchDropdown, searchDropdownRef, searchInputRef]);
 
   return (
     <nav
@@ -149,16 +179,22 @@ const Navbar = () => {
       }`}
     >
       <div className={`flex items-center justify-start gap-12 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
-        {/* Logo */}
         <div className="flex items-center text-3xl ml-4">
-          <img src="/logo.jpeg" alt="Almentor Logo" className={`h-12 w-auto ${isRTL ? 'ml-2' : 'mr-2'}`} />
-          <a href="/" className="text-3xl font-semibold">
-            Almentor
-          </a>
+          <Link 
+            to={isLoggedIn ? "/home" : "/"} 
+            className="flex items-center space-x-2"
+            onClick={() => {
+              if (isLoggedIn && window.location.pathname === '/') {
+                navigate('/home');
+              }
+            }}
+          >
+            <img src="/logo.jpeg" alt="Almentor Logo" className={`h-12 w-auto ${isRTL ? 'ml-2' : 'mr-2'}`} />
+            <span className="text-3xl font-semibold">Almentor</span>
+          </Link>
         </div>
 
-        {/* Navigation */}
-        <ul className={`flex items-center ml-1 ${isRTL ? 'space-x-reverse space-x-6' : 'space-x-6'} text-3xl font-medium`}>
+        <ul className={`flex items-center ml-1 ${isRTL ? 'space-x-reverse space-x-6' : 'space-x-6'} text-1xl font-medium`}>
           <li className="relative">
             <button
               onMouseEnter={handleDropdownEnter}
@@ -168,7 +204,6 @@ const Navbar = () => {
               <RiArrowDropDownLine className="text-5xl mt-3" />
             </button>
 
-            {/* Dropdown */}
             {isDropdownVisible && (
               <div
                 className="absolute top-[80px] left-0 flex w-[800px] bg-white shadow-xl rounded-lg z-50 transition-all duration-300"
@@ -185,7 +220,7 @@ const Navbar = () => {
                         onMouseEnter={() => handleCategoryHover(category._id)}
                         className="py-2 px-2 hover:bg-gray-100 cursor-pointer text-gray-800 text-sm font-medium rounded-md transition"
                       >
-                        {category.name[i18n.language] || category.name.en}
+                        {getLocalizedName(category.name)}
                       </li>
                     ))}
                   </ul>
@@ -212,17 +247,9 @@ const Navbar = () => {
                             ? course.title[lang] || course.title.en || 'Untitled Course'
                             : course.title || 'Untitled Course';
 
-                        // Find instructor from instructors list
-                        const instructorObj = instructors.find(inst => inst._id === (typeof course.instructor === 'object' ? course.instructor._id : course.instructor));
-                        let instructorName = 'Unknown Instructor';
-
-                        if (instructorObj && instructorObj.profile) {
-                          instructorName = `${instructorObj.profile.firstName?.[lang] || instructorObj.profile.firstName?.en || ''} ${instructorObj.profile.lastName?.[lang] || instructorObj.profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
-                        } else if (course.instructor && typeof course.instructor === 'object') {
-                          // Fallback to embedded instructor data
-                          const profile = course.instructor.profile || course.instructor.user || course.instructor;
-                          instructorName = `${profile.firstName?.[lang] || profile.firstName?.en || ''} ${profile.lastName?.[lang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
-                        }
+                        const profile = course.instructor?.profile || course.instructor?.user || course.instructor || {};
+                        const instructorName =
+                          `${profile.firstName?.[lang] || profile.firstName?.en || ''} ${profile.lastName?.[lang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
 
                         return (
                           <li
@@ -281,9 +308,7 @@ const Navbar = () => {
           </li>
         </ul>
 
-        {/* Right Side: Search + Theme + Language + Auth */}
         <div className={`flex items-center ml-auto ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
-          {/* Search */}
           <div className="relative">
             <input
               type="text"
@@ -299,11 +324,10 @@ const Navbar = () => {
             <button className={`absolute top-1/2 transform -translate-y-1/2 ${isRTL ? 'left-4' : 'right-4'} text-gray-400 hover:text-red-500`}>
               <CiSearch size={25} />
             </button>
-            {/* Search Dropdown */}
             {showSearchDropdown && (
               <div
                 ref={searchDropdownRef}
-                className={`absolute left-0 mt-2 w-[360px] max-h-96 overflow-y-auto rounded-md shadow-lg z-50 ${theme === 'dark' ? 'bg-[#232323] text-white' : 'bg-white text-black'}`}
+                className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 w-[360px] max-h-96 overflow-y-auto rounded-md shadow-lg z-50 ${theme === 'dark' ? 'bg-[#232323] text-white' : 'bg-white text-black'}`}
                 style={{ direction: isRTL ? 'rtl' : 'ltr' }}
               >
                 {searchResults.courses.length === 0 && searchResults.instructors.length === 0 ? (
@@ -366,7 +390,6 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Theme + Language Switch */}
           <div className="flex items-center space-x-2">
             <button
               onClick={toggleTheme}
@@ -385,23 +408,145 @@ const Navbar = () => {
             </button>
           </div>
 
-          {/* Auth Buttons */}
           {isLoggedIn ? (
-            <button
-              onClick={() => {
-                localStorage.removeItem('token');
-                window.location.href = '/loginPage';
-              }}
-              className="bg-red-600 text-white px-4 py-1.5 rounded hover:bg-red-700 text-sm"
+            <div
+              className="relative"
+              onMouseEnter={handleUserDropdownEnter}
+              onMouseLeave={handleUserDropdownLeave}
             >
-              Logout
-            </button>
+              <button className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
+                {user?.profilePicture ? (
+                  <img
+                    src={user.profilePicture}
+                    alt={getLocalizedName(user.firstName)}
+                    className={`h-10 w-10 rounded-full object-cover border-2 ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}
+                  />
+                ) : (
+                  <FaUserCircle className={`text-4xl ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
+                )}
+              </button>
+
+              {isUserDropdownVisible && (
+                <div className={`absolute top-full right-0 mt-2 w-72 rounded-lg shadow-xl z-50 overflow-hidden ${
+                  theme === 'dark' ? 'bg-[#1a1a1a] border border-gray-700' : 'bg-white border border-gray-200'
+                }`}>
+                  <div className={`p-4 border-b ${theme === 'dark' ? 'bg-[#232323] border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                    <p className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      {user?.firstName ? getLocalizedName(user.firstName) : ''} {user?.lastName ? getLocalizedName(user.lastName) : ''}
+                    </p>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} truncate`}>
+                      {user?.email || ''}
+                    </p>
+                    <Link
+                      to="/subscribe"
+                      className="mt-3 block w-full text-center bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors"
+                      onClick={handleUserDropdownLeave}
+                    >
+                      {t('profile.subscribe')}
+                    </Link>
+                  </div>
+
+                  <div className="py-2">
+                    <Link
+                      to="/my-progress"
+                      className={`flex items-center px-4 py-2 transition-colors ${
+                        theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                      }`}
+                      onClick={handleUserDropdownLeave}
+                    >
+                      <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                      {t('profile.myProgress')}
+                    </Link>
+
+                    <Link
+                      to="/saved-courses"
+                      className={`flex items-center px-4 py-2 transition-colors ${
+                        theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                      }`}
+                      onClick={handleUserDropdownLeave}
+                    >
+                      <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5h14v14H5z" />
+                      </svg>
+                      {t('profile.savedCourses')}
+                    </Link>
+
+                    <Link
+                      to="/certificates"
+                      className={`flex items-center px-4 py-2 transition-colors ${
+                        theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                      }`}
+                      onClick={handleUserDropdownLeave}
+                    >
+                      <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v8m-4-4h8" />
+                      </svg>
+                      {t('profile.certificates')}
+                    </Link>
+
+                    <Link
+                      to="/profile"
+                      className={`flex items-center px-4 py-2 transition-colors ${
+                        theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                      }`}
+                      onClick={handleUserDropdownLeave}
+                    >
+                      <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      {t('profile.accountSettings')}
+                    </Link>
+
+                    <Link
+                      to="/become-instructor"
+                      className={`flex items-center px-4 py-2 transition-colors ${
+                        theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                      }`}
+                      onClick={handleUserDropdownLeave}
+                    >
+                      <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      {t('profile.becomeInstructor')}
+                    </Link>
+
+                    <button
+                      onClick={handleLogout}
+                      className={`w-full flex items-center px-4 py-2 transition-colors ${
+                        theme === 'dark' ? 'text-red-400 hover:bg-[#232323] hover:text-red-300' : 'text-red-500 hover:bg-red-50'
+                      }`}
+                    >
+                      <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-red-400' : 'text-red-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                      {t('logout')}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           ) : (
             <>
-              <Link to="/loginPage" className={`text-sm ${theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-black'}`}>
+              <Link 
+                to="/loginPage" 
+                className={`text-sm transition-colors ${
+                  theme === 'dark' 
+                    ? 'text-gray-300 hover:text-white' 
+                    : 'text-gray-600 hover:text-black'
+                }`}
+              >
                 {t('common.login')}
               </Link>
-              <Link to="/signup" className="bg-red-500 text-white px-4 py-1.5 rounded hover:bg-red-600 text-sm">
+              <Link 
+                to="/signup" 
+                className={`bg-red-500 text-white px-4 py-1.5 rounded transition-colors ${
+                  theme === 'dark' 
+                    ? 'hover:bg-red-600' 
+                    : 'hover:bg-red-600'
+                } text-sm`}
+              >
                 {t('common.signup')}
               </Link>
             </>
