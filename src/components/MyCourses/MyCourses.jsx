@@ -48,10 +48,10 @@ const MyCourses = () => {
 
   if (myCourses.length === 0) {
     return (
-      <div className={`min-h-[60vh] flex items-center justify-center ${theme === 'dark' ? 'bg-[#0d232b] text-white' : 'bg-white text-black'}`}>
+      <div className={`min-h-[60vh] flex items-center justify-center py-12  ${theme === 'dark' ? 'bg-[#0d232b] text-white' : 'bg-white text-black'}`}>
         <div className="text-center">
-          <FaBookmark className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-          <h2 className="text-2xl font-bold mb-2">{t('No Saved Courses')}</h2>
+          <FaBookmark className="w-16 h-16 mx-auto mb-4 text-gray-400 " />
+          <h2 className="text-2xl font-bold mb-2 mt-5">{t('No Saved Courses')}</h2>
           <p className="text-gray-500 mb-4">{t('You haven\'t saved any courses yet.')}</p>
           <button
             onClick={handleBrowseCourses}
@@ -65,9 +65,9 @@ const MyCourses = () => {
   }
 
   return (
-    <div className={`min-h-[60vh] py-12 px-4 md:px-8 ${theme === 'dark' ? 'bg-[#0d232b] text-white' : 'bg-white text-black'}`}>
+    <div className={`min-h-[60vh] py-12 mt-12 px-4 md:px-8 ${theme === 'dark' ? 'bg-[#0d232b] text-white' : 'bg-white text-black'}`}>
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between items-center mb-10">
           <h1 className="text-3xl font-bold">{t('My Courses')}</h1>
           <div className="flex gap-4">
             <span className="bg-[#00bcd4] text-white px-4 py-2 rounded-full">

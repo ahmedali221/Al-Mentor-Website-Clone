@@ -145,7 +145,7 @@ const Home = () => {
                 ? 'bg-gray-800 text-white hover:bg-gray-700'
                 : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
           >
-            {t('Featured Courses')}
+            {t('home.courses.featuredCourses')}
           </button>
 
           {categories.map((category) => (
@@ -166,7 +166,7 @@ const Home = () => {
 
         {/* Courses Grid */}
         {loadingCourses ? (
-          <p className={`text-center text-xl my-10 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{t('Loading Courses')}...</p>
+          <p className={`text-center text-xl my-10 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{t('home.courses.loadingCourses')}...</p>
         ) : errorCourses ? (
           <p className="text-center text-red-500 my-10">{t('Failed to load courses')}: {errorCourses}</p>
         ) : (
@@ -217,7 +217,7 @@ const Home = () => {
                 : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
             }`}
           >
-            {t('See all courses')}
+            {t('navigation.courses')}
           </button>
         </div>
       </section>
@@ -229,7 +229,7 @@ const Home = () => {
         </h2>
 
         {loadingInstructors ? (
-          <p className={`text-center text-xl my-10 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{t('Loading Instructors')}...</p>
+          <p className={`text-center text-xl my-10 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{t('home.instructors.loadingInstructors')}...</p>
         ) : errorInstructors ? (
           <p className="text-center text-red-500 my-10">{t('Failed to load instructors')}: {errorInstructors}</p>
         ) : (
@@ -276,7 +276,7 @@ const Home = () => {
                 : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
             }`}
           >
-            {t('See all instructors')}
+            {t('navigation.instructors')}
           </button>
         </div>
       </section>

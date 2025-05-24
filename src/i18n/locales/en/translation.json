@@ -53,6 +53,9 @@
     },
     "courses": {
       "title": "Explore inspiring courses online",
+      "featuredCourses": "Featured Courses",
+      "loadingCourses": "Loading Courses",
+      "seeAllCourses": "See all courses",
       "categories": {
         "featured": "Featured Courses",
         "business": "Business & Professional Skills",
@@ -72,7 +75,9 @@
       "title2": "How To Become an Instructor?",
       "subtitle": "Join our community of instructors and share your knowledge with the world.",
       "button": "Apply Now",
-      "about": "About Mentor"
+      "about": "About Mentor",
+      "loadingInstructors": "Loading Instructors",
+      "seeAllInstructors": "See all instructors"
     },
     "cta": {
       "title": "Only at 199 EGP /month! Get unlimited access to all courses when you subscribe to Almentor.",
@@ -120,6 +125,41 @@
   "subscriptionCTA": {
     "label": "Subscribe now to get unlimited access to all courses.",
     "button": "Subscribe Now"
+  },
+  "lessonViewer": {
+    "course": "Course",
+    "starred": "Starred",
+    "notes": "Notes",
+    "lessons": "Lessons",
+    "complete": "complete",
+    "loadingLessons": "Loading lessons...",
+    "noLessons": "No lessons available",
+    "starredLessons": "Starred Lessons",
+    "noStarredLessons": "No starred lessons yet.",
+    "myNotes": "My Notes",
+    "editNote": "Edit your note...",
+    "writeNote": "Write a new note...",
+    "updateNote": "Update Note",
+    "cancel": "Cancel",
+    "saveNote": "Save Note",
+    "edit": "Edit",
+    "delete": "Delete",
+    "noNotes": "No notes for this lesson yet. Add your first note above!",
+    "videoNotSupported": "Your browser does not support the video tag.",
+    "videoPlaceholder": "Video placeholder",
+    "previousLesson": "Previous Lesson",
+    "nextLesson": "Next Lesson",
+    "description": "Description",
+    "resources": "Resources",
+    "cheatSheet": "Web Fundamentals Cheat Sheet",
+    "interactiveDemo": "Interactive HTTP Demo",
+    "externalWebsite": "External Website",
+    "favorited": "Favorited",
+    "addToFavorites": "Add to favorites",
+    "congratulations": "Congratulations!",
+    "courseCompleted": "You have successfully completed the course \"{{courseName}}\"",
+    "getCertificate": "Get Your Certificate",
+    "close": "Close"
   },
   "becomeInstructor": {
     "header": {
@@ -173,7 +213,7 @@
         },
         "processAfterSending": {
           "question": "What is the process after sending the sample video?",
-          "answer": "After sending the sample video, you will go through the following steps: The content team will review the sample video and provide you with feedback, whether it’s (Accepted, Rejected or Requires edits). If the sample video requires edits, you will be requested to consider those edits and provide a final sample. Once the sample video is approved, you will shoot the whole course following the same quality of the approved sample video. By completing the course, you will send us the following required files. (Course outline and mentor profile in both English and Arabic, High-quality photo with solid background)"
+          "answer": "After sending the sample video, you will go through the following steps: The content team will review the sample video and provide you with feedback, whether it's (Accepted, Rejected or Requires edits). If the sample video requires edits, you will be requested to consider those edits and provide a final sample. Once the sample video is approved, you will shoot the whole course following the same quality of the approved sample video. By completing the course, you will send us the following required files. (Course outline and mentor profile in both English and Arabic, High-quality photo with solid background)"
         },
         "reviewSignContract": {
           "question": "When can I review and sign the contract?",
@@ -192,7 +232,7 @@
           "answer": "a. In the event that the number of enrollments is equal or less than 1,000 (one thousand) enrollments, you will have a 30% revenue share. b. In the event that the number of enrollments is between 1,001 (One Thousand and One) and 3,000 (Three Thousand) enrollments, you will have a 50% revenue share. c. In the event that the number of enrollments is 3,001 and higher, you will have a 75% revenue share."
         },
         "editingThroughCamtasia": {
-          "question": "Should the content be edited only through “Camtasia”?",
+          "question": "Should the content be edited only through \"Camtasia\"?",
           "answer": "Camtasia is a recommended tool, but you are free to use any other tool with high-quality production."
         },
         "mediaServicesEditingPhase": {
@@ -200,19 +240,18 @@
           "answer": "We can recommend our media partners (Studios) to help with the shooting and editing."
         },
         "coursesAllowed": {
-          "question": "How many courses I’m allowed to produce through your platform?",
+          "question": "How many courses I'm allowed to produce through your platform?",
           "answer": "There is no limit to the number of courses produced per mentor as long the course is approved."
         },
         "referInstructor": {
           "question": "Can I refer another instructor to you?",
-          "answer": "Currently, the Selfie model doesn’t include talks; however, we will direct the relevant team to assist with this matter."
+          "answer": "Currently, the Selfie model doesn't include talks; however, we will direct the relevant team to assist with this matter."
         },
         "updateCourse": {
           "question": "Can I do any updates to my course after release (add more lectures, material)?",
           "answer": "You can definitely request to update your course anytime to maintain a rich and up-to-date content."
         }
       }
-  
     }
   },
   "close": "Close modal",
@@ -239,8 +278,7 @@
     "cv": "CV (Company profile for companies)",
     "submit": "Submit"
   },
-  
-"home2": {
+  "home2": {
     "banner": {
       "title": "Home page banner Start your learning journey today!",
       "subtitle": "Choose from subscription plans starting from 199 EGP/ month (Billed yearly)",
@@ -248,21 +286,20 @@
     },
     "programs": {
       "title": "Explore Our Programs",
-      "subtitle":"Discover grouped courses designed to build essential skills."
-      },
-      "courses": {
-        "title": "Start with free courses"
-      }
+      "subtitle": "Discover grouped courses designed to build essential skills."
     },
-
-   "profile": {
+    "courses": {
+      "title": "Start with free courses"
+    }
+  },
+  "profile": {
     "subscribe": "Subscribe",
-  "myCourses": "My Courses",
-  "myProgress": "My Progress",
-  "savedCourses": "Saved Courses",
-  "certificates": "Certificates",
-  "accountSettings": "Account Settings",
-  "becomeInstructor": "Become Instructor"
+    "myCourses": "My Courses",
+    "myProgress": "My Progress",
+    "savedCourses": "Saved Courses",
+    "certificates": "Certificates",
+    "accountSettings": "Account Settings",
+    "becomeInstructor": "Become Instructor"
+  }
 }
 
-}

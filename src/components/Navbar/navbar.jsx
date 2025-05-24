@@ -31,11 +31,21 @@ const Navbar = () => {
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const searchInputRef = useRef(null);
   const searchDropdownRef = useRef(null);
+  const userDropdownRef = useRef(null);
 
   const handleUserDropdownEnter = () => setIsUserDropdownVisible(true);
-  const handleUserDropdownLeave = () => setIsUserDropdownVisible(false);
+  const handleUserDropdownLeave = (e) => {
+    if (userDropdownRef.current && userDropdownRef.current.contains(e.relatedTarget)) {
+      return;
+    }
+    setIsUserDropdownVisible(false);
+  };
+
   const handleDropdownEnter = () => setIsDropdownVisible(true);
   const handleDropdownLeave = () => setIsDropdownVisible(false);
+
+  const handleDropdownMenuEnter = () => setIsUserDropdownVisible(true);
+  const handleDropdownMenuLeave = () => setIsUserDropdownVisible(false);
 
   const toggleLanguage = () => {
     const newLang = i18n.language === 'en' ? 'ar' : 'en';
@@ -92,6 +102,17 @@ const Navbar = () => {
         const res = await fetch('http://localhost:5000/api/instructors');
         if (!res.ok) throw new Error('Failed to fetch instructors');
         const data = await res.json();
+        console.log('=== INSTRUCTOR DATA DEBUG ===');
+        console.log('Full API Response:', data);
+        if (data.data && data.data.length > 0) {
+          console.log('First Instructor Example:', data.data[0]);
+          console.log('First Instructor Profile:', data.data[0].profile);
+          console.log('First Instructor Name Structure:', {
+            firstName: data.data[0].profile?.firstName,
+            lastName: data.data[0].profile?.lastName
+          });
+        }
+        console.log('========================');
         setInstructors(data.data || []);
       } catch (err) {
         console.error('Error fetching instructors:', err);
@@ -142,12 +163,20 @@ const Navbar = () => {
       return title.toLowerCase().includes(q);
     });
     const matchedInstructors = instructors.filter(inst => {
-      const profile = inst.profile || inst.user || inst;
-      const firstName = profile.firstName?.[i18n.language] || profile.firstName?.en || profile.firstName || '';
-      const lastName = profile.lastName?.[i18n.language] || profile.lastName?.en || profile.lastName || '';
-      const fullName = `${firstName} ${lastName}`.trim();
-      return fullName.toLowerCase().includes(q);
+      const lang = i18n.language;
+      let instructorName = 'Unknown Instructor';
+
+      if (inst && inst.profile) {
+        instructorName = `${inst.profile.firstName?.[lang] || inst.profile.firstName?.en || ''} ${inst.profile.lastName?.[lang] || inst.profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
+      } else if (inst && typeof inst === 'object') {
+        // Fallback to direct instructor data
+        const profile = inst.profile || inst.user || inst;
+        instructorName = `${profile.firstName?.[lang] || profile.firstName?.en || ''} ${profile.lastName?.[lang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
+      }
+
+      return instructorName.toLowerCase().includes(q);
     });
+    console.log('Matched instructors:', matchedInstructors);
     setSearchResults({ courses: matchedCourses, instructors: matchedInstructors });
     setShowSearchDropdown(true);
   }, [searchQuery, allCourses, instructors, i18n.language]);
@@ -201,7 +230,7 @@ const Navbar = () => {
               className="hover:text-red-500 flex items-center focus:outline-none"
             >
               {t('navigation.courses')}
-              <RiArrowDropDownLine className="text-5xl mt-3" />
+              <RiArrowDropDownLine className="text-3xl mt-1" />
             </button>
 
             {isDropdownVisible && (
@@ -247,9 +276,30 @@ const Navbar = () => {
                             ? course.title[lang] || course.title.en || 'Untitled Course'
                             : course.title || 'Untitled Course';
 
-                        const profile = course.instructor?.profile || course.instructor?.user || course.instructor || {};
-                        const instructorName =
-                          `${profile.firstName?.[lang] || profile.firstName?.en || ''} ${profile.lastName?.[lang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
+                        // Find instructor from instructors list
+                        const instructorObj = instructors.find(inst => {
+                          if (typeof course.instructor === 'object') {
+                            return inst._id === course.instructor._id;
+                          }
+                          return inst._id === course.instructor;
+                        });
+
+                        let instructorName = 'Unknown Instructor';
+                        let instructorImage = '/default-profile.png';
+
+                        if (instructorObj && instructorObj.profile) {
+                          const firstName = instructorObj.profile.firstName?.[lang] || instructorObj.profile.firstName?.en || '';
+                          const lastName = instructorObj.profile.lastName?.[lang] || instructorObj.profile.lastName?.en || '';
+                          instructorName = `${firstName} ${lastName}`.trim() || 'Unknown Instructor';
+                          instructorImage = instructorObj.profile.profilePicture || '/default-profile.png';
+                        } else if (course.instructor && typeof course.instructor === 'object') {
+                          // Fallback to embedded instructor data
+                          const profile = course.instructor.profile || course.instructor.user || course.instructor;
+                          const firstName = profile.firstName?.[lang] || profile.firstName?.en || '';
+                          const lastName = profile.lastName?.[lang] || profile.lastName?.en || '';
+                          instructorName = `${firstName} ${lastName}`.trim() || 'Unknown Instructor';
+                          instructorImage = profile.profilePicture || '/default-profile.png';
+                        }
 
                         return (
                           <li
@@ -363,10 +413,19 @@ const Navbar = () => {
                       <div>
                         <div className="px-4 pt-3 pb-1 text-xs font-bold uppercase text-gray-500">{t('Instructors')}</div>
                         {searchResults.instructors.map(inst => {
-                          const profile = inst.profile || inst.user || inst;
-                          const firstName = profile.firstName?.[i18n.language] || profile.firstName?.en || profile.firstName || '';
-                          const lastName = profile.lastName?.[i18n.language] || profile.lastName?.en || profile.lastName || '';
-                          const fullName = `${firstName} ${lastName}`.trim();
+                          const lang = i18n.language;
+                          let instructorName = 'Unknown Instructor';
+                          let instructorImage = '/default-profile.png';
+
+                          if (inst && inst.profile) {
+                            instructorName = `${inst.profile.firstName?.[lang] || inst.profile.firstName?.en || ''} ${inst.profile.lastName?.[lang] || inst.profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
+                            instructorImage = inst.profile.profilePicture || '/default-profile.png';
+                          } else if (inst && typeof inst === 'object') {
+                            const profile = inst.profile || inst.user || inst;
+                            instructorName = `${profile.firstName?.[lang] || profile.firstName?.en || ''} ${profile.lastName?.[lang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
+                            instructorImage = profile.profilePicture || '/default-profile.png';
+                          }
+
                           return (
                             <div
                               key={inst._id}
@@ -377,8 +436,8 @@ const Navbar = () => {
                                 navigate(`/instructors/${inst._id}`);
                               }}
                             >
-                              <img src={profile.profilePicture || '/default-profile.png'} alt={fullName} className="w-10 h-10 object-cover rounded-full" />
-                              <span className="font-medium">{fullName}</span>
+                              <img src={instructorImage} alt={instructorName} className="w-10 h-10 object-cover rounded-full" />
+                              <span className="font-medium">{instructorName}</span>
                             </div>
                           );
                         })}
@@ -414,7 +473,7 @@ const Navbar = () => {
               onMouseEnter={handleUserDropdownEnter}
               onMouseLeave={handleUserDropdownLeave}
             >
-              <button className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
+              <button className="flex items-center space-x-2 hover:opacity-80 transition-opacity p-2">
                 {user?.profilePicture ? (
                   <img
                     src={user.profilePicture}
@@ -427,9 +486,14 @@ const Navbar = () => {
               </button>
 
               {isUserDropdownVisible && (
-                <div className={`absolute top-full right-0 mt-2 w-72 rounded-lg shadow-xl z-50 overflow-hidden ${
-                  theme === 'dark' ? 'bg-[#1a1a1a] border border-gray-700' : 'bg-white border border-gray-200'
-                }`}>
+                <div 
+                  ref={userDropdownRef}
+                  onMouseEnter={handleDropdownMenuEnter}
+                  onMouseLeave={handleDropdownMenuLeave}
+                  className={`absolute top-full right-0 mt-2 w-72 rounded-lg shadow-xl z-50 overflow-hidden ${
+                    theme === 'dark' ? 'bg-[#1a1a1a] border border-gray-700' : 'bg-white border border-gray-200'
+                  }`}
+                >
                   <div className={`p-4 border-b ${theme === 'dark' ? 'bg-[#232323] border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
                     <p className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                       {user?.firstName ? getLocalizedName(user.firstName) : ''} {user?.lastName ? getLocalizedName(user.lastName) : ''}

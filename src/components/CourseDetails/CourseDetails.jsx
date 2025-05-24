@@ -2,16 +2,23 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   FaClock, FaLayerGroup, FaLanguage, FaShareAlt, FaBookmark, FaChevronDown, FaChevronUp,
-  FaCheck, FaLock, FaPlay, FaCertificate, FaInfinity, FaUserCircle, FaStar, FaUser
+  FaCheck, FaLock, FaPlay, FaCertificate, FaInfinity, FaUserCircle, FaStar, FaUser, FaSearch, FaBell, FaShoppingCart, FaPlayCircle, FaSpinner, FaGraduationCap, FaHeart, FaList
 } from 'react-icons/fa';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useTheme } from '../../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
-import { useAuth } from '../../context/AuthContext';
-// import { toast } from 'react-toastify';
+import { useMyCourses } from '../../context/MyCoursesContext';
 
+function getUserIdFromToken() {
+  const token = localStorage.getItem('token');
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.userId;
+  } catch (e) {
+    return null;
+  }
+}
 
 const CourseDetails = () => {
   const { id } = useParams();
@@ -19,12 +26,14 @@ const CourseDetails = () => {
   const { t, i18n } = useTranslation();
   const currentLang = i18n.language;
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { myCourses, addCourse, removeCourse, isCourseAdded } = useMyCourses();
 
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isCourseSaved, setIsCourseSaved] = useState(false);
-  const [savingCourse, setSavingCourse] = useState(false);
+  const [savedCourses, setSavedCourses] = useState(() => {
+    const saved = localStorage.getItem('savedCourses');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [expandedSections, setExpandedSections] = useState({});
   const [instructorDetails, setInstructorDetails] = useState([]);
   const [lessons, setLessons] = useState([]);
@@ -66,98 +75,14 @@ const CourseDetails = () => {
     if (!obj) return '';
     if (typeof obj === 'string') return obj;
     if (obj && typeof obj === 'object') {
+      // Handle translation objects with en/ar keys
       if (obj.en || obj.ar) {
         return obj[currentLang] || obj.en || obj.ar || '';
       }
+      // Handle other object types
       return obj[currentLang] || obj.en || '';
     }
     return '';
-  };
-
-  // Check if course is saved
-  useEffect(() => {
-    const checkIfCourseSaved = async () => {
-      if (!user || !id) return;
-      
-      try {
-        const response = await fetch(`http://localhost:5000/api/saved-courses/user/${user._id}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          const isSaved = data.some(savedCourse => savedCourse.courseId._id === id);
-          setIsCourseSaved(isSaved);
-        }
-      } catch (err) {
-        // Silent fail
-      }
-    };
-
-    checkIfCourseSaved();
-  }, [user, id]);
-
-  const toggleSaveCourse = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    if (!user) {
-      navigate('/loginPage');
-      return;
-    }
-
-    if (savingCourse) return;
-
-    try {
-      setSavingCourse(true);
-      
-      if (isCourseSaved) {
-        // Unsave course
-        const response = await fetch(`http://localhost:5000/api/saved-courses/${user._id}/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-
-        if (!response.ok) throw new Error('Failed to unsave course');
-
-        setIsCourseSaved(false);
-        toast.success(t('Course removed from saved courses'));
-      } else {
-        // Save course
-        const response = await fetch('http://localhost:5000/api/saved-courses', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          body: JSON.stringify({
-            userId: user._id,
-            courseId: id,
-            savedAt: new Date().toISOString()
-          })
-        });
-
-        if (!response.ok) {
-          if (response.status === 409) {
-            toast.info(t('Course is already in your saved courses'));
-            setIsCourseSaved(true);
-            return;
-          }
-          throw new Error('Failed to save course');
-        }
-
-        setIsCourseSaved(true);
-        toast.success(t('Course added to saved courses'));
-      }
-    } catch (err) {
-      toast.error(err.message || t('Failed to update saved courses'));
-    } finally {
-      setSavingCourse(false);
-    }
   };
 
   // Now you can safely use getLocalizedText
@@ -165,6 +90,17 @@ const CourseDetails = () => {
   const maxDescriptionLength = 220;
   const isLongDescription = description.length > maxDescriptionLength;
   const displayedDescription = showFullDescription ? description : description.slice(0, maxDescriptionLength);
+
+  // Save/unsave logic
+  const toggleSaveCourse = (courseId) => {
+    setSavedCourses(prev => {
+      const updated = prev.includes(courseId)
+        ? prev.filter(id => id !== courseId)
+        : [...prev, courseId];
+      localStorage.setItem('savedCourses', JSON.stringify(updated));
+      return updated;
+    });
+  };
 
   // Toggle section expansion
   const toggleSection = (sectionId) => {
@@ -180,7 +116,10 @@ const CourseDetails = () => {
       .then(res => {
         setCourse(res.data);
         setLoading(false);
-  
+        console.log('Fetched course:', res.data);
+        console.log('course.instructors:', res.data.instructors);
+        console.log('course.instructorDetails:', res.data.instructorDetails);
+        console.log('course.instructor:', res.data.instructor);
       })
       .catch(() => setLoading(false));
   }, [id]);
@@ -224,7 +163,10 @@ const CourseDetails = () => {
     const matched = allInstructors.filter(inst => courseInstructorIds.includes(inst._id));
     setInstructorDetails(matched);
 
-  
+    console.log("Fetched instructorDetails:", matched);
+    console.log("Course instructors:", course?.instructors);
+    console.log("Course instructorDetails:", course?.instructorDetails);
+    console.log("Course instructor:", course?.instructor);
   }, [course, allInstructors]);
 
   // Update lessons fetching
@@ -246,34 +188,6 @@ const CourseDetails = () => {
     fetchLessons();
   }, [course, id]);
 
-  // Fetch course ratings
-  useEffect(() => {
-    if (!course) return;
-    
-    const fetchRatings = async () => {
-      try {
-        // Try to fetch ratings from the server
-        const response = await axios.get(`http://localhost:5000/api/courses/${id}/ratings`);
-        if (response.data) {
-          setCourseRating(response.data);
-        }
-      } catch (error) {
-        // If server request fails, use local storage data
-        const savedRatings = localStorage.getItem(`course_${id}_ratings`);
-        if (savedRatings) {
-          const data = JSON.parse(savedRatings);
-          setCourseRating({
-            average: data.average || 0,
-            totalRatings: data.totalRatings || 0,
-            ratings: data.ratings || []
-          });
-        }
-      }
-    };
-
-    fetchRatings();
-  }, [course, id]);
-
   // Update rating functions
   const handleRatingSubmit = async (rating) => {
     setIsSubmitting(true);
@@ -284,15 +198,8 @@ const CourseDetails = () => {
       const newRating = {
         rating,
         timestamp: new Date().toISOString(),
-        userId: user?._id || 'anonymous'
+        userId: 'current-user' // Replace with actual user ID
       };
-
-      // Try to save rating to server
-      try {
-        await axios.post(`http://localhost:5000/api/courses/${id}/ratings`, newRating);
-      } catch (error) {
-        // If server request fails, just update local storage
-      }
 
       // Update course rating state
       setCourseRating(prev => {
@@ -316,31 +223,93 @@ const CourseDetails = () => {
       setUserRating(rating);
       setRatingMessage(t('Thank you for your rating!'));
       
+      // Clear success message after 3 seconds
       setTimeout(() => {
         setRatingMessage('');
       }, 3000);
     } catch (error) {
+      console.error('Error submitting rating:', error);
       setRatingMessage(t('Failed to submit rating. Please try again.'));
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  // Fetch course ratings
+  useEffect(() => {
+    if (!course) return;
+    
+    const fetchRatings = async () => {
+      try {
+        const response = await axios.get(`/api/courses/${id}/ratings`);
+        setCourseRating(response.data);
+      } catch (error) {
+        if (error.response && error.response.status === 404) {
+          // No ratings found, treat as empty
+          setCourseRating({ average: 0, totalRatings: 0, ratings: [] });
+        } else {
+          console.error('Error fetching ratings:', error);
+        }
+      }
+    };
+
+    fetchRatings();
+  }, [course, id]);
+
   // Add comment handling functions
-  const handleCommentSubmit = (e) => {
+  const handleCommentSubmit = async (e) => {
     e.preventDefault();
     if (!newComment.trim()) return;
 
     setIsSubmittingComment(true);
     
     try {
+      // Get token and check authentication
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      // Extract userId from token
+      const userId = getUserIdFromToken();
+      if (!userId) {
+        throw new Error('No user ID found in token');
+      }
+
+      // Fetch user data
+      const userResponse = await axios.get(`/api/users/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const userData = userResponse.data;
+
+      // Robustly extract name and avatar
+      let firstName = '';
+      let lastName = '';
+      let avatar = '';
+      if (userData.profile) {
+        firstName = getLocalizedText(userData.profile.firstName) || '';
+        lastName = getLocalizedText(userData.profile.lastName) || '';
+        avatar = userData.profile.profilePicture || '';
+      } else {
+        firstName = getLocalizedText(userData.firstName) || '';
+        lastName = getLocalizedText(userData.lastName) || '';
+        avatar = userData.profilePicture || '';
+      }
+      if (!firstName && !lastName) {
+        firstName = t('User');
+      }
+      if (!avatar) {
+        avatar = '/default-avatar.png';
+      }
+
       const comment = {
         id: Date.now(),
         text: newComment.trim(),
         timestamp: new Date().toISOString(),
         user: {
-          name: 'Current User', // Replace with actual user name
-          avatar: '/default-avatar.png' // Replace with actual user avatar
+          id: userId,
+          name: `${firstName} ${lastName}`.trim(),
+          avatar: avatar
         }
       };
 
@@ -348,8 +317,14 @@ const CourseDetails = () => {
       setComments(updatedComments);
       localStorage.setItem(`course_${id}_comments`, JSON.stringify(updatedComments));
       setNewComment('');
+      showToast(t('messages.success'));
     } catch (error) {
       console.error('Error submitting comment:', error);
+      if (error.message === 'No authentication token found') {
+        navigate('/loginPage');
+      } else {
+        showToast(t('messages.error'));
+      }
     } finally {
       setIsSubmittingComment(false);
     }
@@ -402,7 +377,12 @@ const CourseDetails = () => {
     
     let courseInstructorIds = [];
     
+    // Debug log the course data with full details
+    console.log('Full course data:', JSON.stringify(course, null, 2));
+
+    // Try all possible instructor data structures
     if (course.instructor) {
+      console.log('Found instructor field:', course.instructor);
       if (typeof course.instructor === 'object') {
         if (course.instructor.$oid) {
           courseInstructorIds = [course.instructor.$oid];
@@ -414,7 +394,9 @@ const CourseDetails = () => {
       }
     }
 
+    // If no instructor found in instructor field, try instructors array
     if (courseInstructorIds.length === 0 && Array.isArray(course.instructors)) {
+      console.log('Found instructors array:', course.instructors);
       courseInstructorIds = course.instructors.map(inst => {
         if (typeof inst === 'object') {
           return inst.$oid || inst._id || inst;
@@ -423,7 +405,9 @@ const CourseDetails = () => {
       });
     }
 
+    // If still no instructor found, try instructorDetails
     if (courseInstructorIds.length === 0 && course.instructorDetails) {
+      console.log('Found instructorDetails:', course.instructorDetails);
       if (typeof course.instructorDetails === 'object') {
         courseInstructorIds = [course.instructorDetails.$oid || course.instructorDetails._id || course.instructorDetails];
       } else {
@@ -431,11 +415,29 @@ const CourseDetails = () => {
       }
     }
 
-    if (courseInstructorIds.length === 0 && allInstructors.length > 0) {
-      courseInstructorIds = [allInstructors[0]._id];
+    // If still no instructor found, try to get a default instructor
+    if (courseInstructorIds.length === 0) {
+      console.log('No instructor found in course data, using default instructor');
+      // Use the first available instructor as a fallback
+      if (allInstructors.length > 0) {
+        courseInstructorIds = [allInstructors[0]._id];
+      }
     }
 
+    // Debug log the extracted IDs
+    console.log('Extracted instructor IDs:', courseInstructorIds);
+    console.log('Available instructor IDs:', allInstructors.map(i => i._id));
+
+    // Find matching instructors from allInstructors
     const matched = allInstructors.filter(inst => courseInstructorIds.includes(inst._id));
+    
+    if (!matched.length) {
+      console.warn('No instructor found for course. Course instructor IDs:', courseInstructorIds);
+      console.warn('Available instructor IDs:', allInstructors.map(i => i._id));
+    } else {
+      console.log('Found matching instructor:', matched[0]);
+    }
+    
     return matched;
   };
 
@@ -496,7 +498,7 @@ const CourseDetails = () => {
   };
 
   return (
-    <div className={`w-full min-h-[60vh] py-12 px-2 md:px-8 flex flex-col items-center mt-10 ${theme === 'dark' ? 'bg-gradient-to-b from-[#0d232b] to-[#121212]' : 'bg-gradient-to-b from-[#eaf6fa] to-[#fff]'}`}>
+    <div className={`w-full min-h-[60vh] py-12 px-2 md:px-8 flex flex-col items-center mt-24 ${theme === 'dark' ? 'bg-gradient-to-b from-[#0d232b] to-[#121212]' : 'bg-gradient-to-b from-[#eaf6fa] to-[#fff]'}`}>
       <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         {/* Main Content (Left 2/3) */}
         <div className="col-span-2 flex flex-col gap-10">
@@ -893,12 +895,12 @@ const CourseDetails = () => {
                   >
                     <div className="flex items-start gap-4">
                       <div className="flex-shrink-0">
-                        <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
                           {comment.user.avatar ? (
                             <img 
                               src={comment.user.avatar} 
                               alt={comment.user.name}
-                              className="w-full h-full rounded-full object-cover"
+                              className="w-full h-full object-cover"
                             />
                           ) : (
                             <FaUser className="w-6 h-6 text-gray-500" />
@@ -907,9 +909,15 @@ const CourseDetails = () => {
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-2">
-                          <h4 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{comment.user.name}</h4>
+                          <h4 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+                            {comment.user.name}
+                          </h4>
                           <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}> 
-                            {new Date(comment.timestamp).toLocaleDateString()}
+                            {new Date(comment.timestamp).toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            })}
                           </span>
                         </div>
                         <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -944,23 +952,28 @@ const CourseDetails = () => {
               {t('Subscribe Now')}
             </button>
             <button
-              onClick={toggleSaveCourse}
-              disabled={savingCourse}
+              onClick={() => {
+                if (isCourseAdded(course._id)) {
+                  removeCourse(course._id);
+                } else {
+                  addCourse({
+                    _id: course._id,
+                    title: course.title,
+                    thumbnail: course.thumbnail,
+                    duration: formattedDuration,
+                    level: level,
+                    instructor: instructors[0]?.profile?.firstName + ' ' + instructors[0]?.profile?.lastName
+                  });
+                }
+              }}
               className={`flex items-center justify-center gap-2 py-3 rounded-lg text-lg font-bold transition ${
-                isCourseSaved
+                isCourseAdded(course._id)
                   ? 'bg-green-600 hover:bg-green-700 text-white'
-                  : savingCourse
-                    ? 'bg-gray-600 text-gray-300 cursor-not-allowed'
-                    : 'bg-[#00bcd4] hover:bg-[#0097a7] text-white'
+                  : 'bg-[#00bcd4] hover:bg-[#0097a7] text-white'
               }`}
             >
-              <FaBookmark className={isCourseSaved ? "text-white" : "text-white"} />
-              {savingCourse 
-                ? t('Saving...') 
-                : isCourseSaved 
-                  ? t('Added to My Courses') 
-                  : t('Add to My Courses')
-              }
+              <FaGraduationCap className={isCourseAdded(course._id) ? "text-white" : "text-white"} />
+              {isCourseAdded(course._id) ? t('Added to My Courses') : t('Add to My Courses')}
             </button>
             <button 
               onClick={() => {
@@ -968,14 +981,14 @@ const CourseDetails = () => {
               }}
               className="flex items-center justify-center gap-2 py-3 rounded-lg text-lg font-bold bg-gray-600 hover:bg-gray-700 text-white transition"
             >
-              <FaBookmark className="text-white" />
+              <FaList className="text-white" />
               {t('View My Courses')}
             </button>
             <button
               onClick={() => navigate('/saved-courses')}
               className="flex items-center justify-center gap-2 py-3 rounded-lg text-lg font-bold bg-gray-500 hover:bg-gray-700 text-white transition mb-2"
             >
-              <FaBookmark className="text-white" />
+              <FaHeart className="text-white" />
               {t('View Saved Courses')}
             </button>
             <button 

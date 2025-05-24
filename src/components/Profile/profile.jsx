@@ -9,16 +9,14 @@ const Profile = () => {
   const { i18n } = useTranslation();
   const currentLang = i18n.language;
 
-  // Utility to get localized name
   const getLocalizedName = (nameObj) => {
     if (!nameObj) return '';
     if (typeof nameObj === 'string') return nameObj;
     return nameObj[currentLang] || nameObj.en || '';
   };
 
-  // State management
   const [name, setName] = useState(user ? `${getLocalizedName(user.firstName)} ${getLocalizedName(user.lastName)}`.trim() : '');
-  const [gender, setGender] = useState('Male');
+  const [gender, setGender] = useState('Female');
   const [dateOfBirth, setDateOfBirth] = useState({ day: '', month: '', year: '' });
   const [activeSection, setActiveSection] = useState('Personal Information');
   const [email, setEmail] = useState(user ? user.email : '');

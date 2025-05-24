@@ -17,35 +17,12 @@ function BecomeInstructor() {
 
   return (
     <div className={`${theme === 'dark' ? 'bg-[#121212]' : 'bg-white'} w-full min-h-screen`}>
-      <LanguageSwitcher />
       <Header theme={theme} onApplyClick={() => setIsModalOpen(true)} />
       <CourseProduction theme={theme} />
       <InstructorResources theme={theme} onApplyClick={() => setIsModalOpen(true)}  />
       <RevenueSection theme={theme} onApplyClick={() => setIsModalOpen(true)} />
       <AccordionSection theme={theme} />
       {isModalOpen && <MentorApplicationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />}
-    </div>
-  );
-}
-
-function LanguageSwitcher() {
-  const { i18n } = useTranslation();
-  const changeLanguage = (lng) => i18n.changeLanguage(lng);
-
-  return (
-    <div className="p-4 flex justify-end gap-4 bg-white">
-      <button
-        onClick={() => changeLanguage('en')}
-        className={`px-3 py-1 rounded ${i18n.language === 'en' ? 'bg-red-500 text-white' : 'bg-gray-200'}`}
-      >
-        English
-      </button>
-      <button
-        onClick={() => changeLanguage('ar')}
-        className={`px-3 py-1 rounded ${i18n.language === 'ar' ? 'bg-red-500 text-white' : 'bg-gray-200'}`}
-      >
-        عربي
-      </button>
     </div>
   );
 }
@@ -249,7 +226,7 @@ function MentorApplicationModal({ isOpen, onClose }) {
         videoNotSupported: "Your browser does not support the video tag."
       },
       mentorForm: {
-        // ... existing translations ...
+      
       }
     },
     ar: {
