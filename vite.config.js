@@ -6,7 +6,6 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     host: "localhost",
-    port: 3000,
     open: true,
     strictPort: true,
     proxy: {

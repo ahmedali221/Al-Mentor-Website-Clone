@@ -6,6 +6,7 @@ import { CiSearch } from 'react-icons/ci';
 import { useTranslation } from 'react-i18next';
 import { changeLanguage } from '../../i18n/config';
 import { useTheme } from '../../context/ThemeContext';
+import { useUser } from '../../context/UserContext';
 import { FaUserCircle } from "react-icons/fa";
 import { useAuth } from '../../context/AuthContext';
 import './navbar.css';
@@ -125,7 +126,7 @@ const Navbar = () => {
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
     const token = localStorage.getItem('token');
-    
+
     if (token && savedUser && !user) {
       try {
         const parsedUser = JSON.parse(savedUser);
@@ -203,14 +204,13 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 px-4 py-4 z-50 shadow transition-all duration-300 text-lg font-medium ${
-        theme === 'dark' ? 'bg-[#1a1a1a] text-white' : 'bg-white text-black'
-      }`}
+      className={`fixed top-0 left-0 right-0 px-4 py-4 z-50 shadow transition-all duration-300 text-lg font-medium ${theme === 'dark' ? 'bg-[#1a1a1a] text-white' : 'bg-white text-black'
+        }`}
     >
       <div className={`flex items-center justify-start gap-12 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
         <div className="flex items-center text-3xl ml-4">
-          <Link 
-            to={isLoggedIn ? "/home" : "/"} 
+          <Link
+            to={isLoggedIn ? "/home" : "/"}
             className="flex items-center space-x-2"
             onClick={() => {
               if (isLoggedIn && window.location.pathname === '/') {
@@ -347,11 +347,10 @@ const Navbar = () => {
 
           <li>
             <button
-              className={`rounded px-6 text-2xl py-2 border-2 transition ${
-                theme === 'dark'
+              className={`rounded px-6 text-2xl py-2 border-2 transition ${theme === 'dark'
                   ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
                   : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
-              }`}
+                }`}
             >
               Subscribe
             </button>
@@ -486,13 +485,12 @@ const Navbar = () => {
               </button>
 
               {isUserDropdownVisible && (
-                <div 
+                <div
                   ref={userDropdownRef}
                   onMouseEnter={handleDropdownMenuEnter}
                   onMouseLeave={handleDropdownMenuLeave}
-                  className={`absolute top-full right-0 mt-2 w-72 rounded-lg shadow-xl z-50 overflow-hidden ${
-                    theme === 'dark' ? 'bg-[#1a1a1a] border border-gray-700' : 'bg-white border border-gray-200'
-                  }`}
+                  className={`absolute top-full right-0 mt-2 w-72 rounded-lg shadow-xl z-50 overflow-hidden ${theme === 'dark' ? 'bg-[#1a1a1a] border border-gray-700' : 'bg-white border border-gray-200'
+                    }`}
                 >
                   <div className={`p-4 border-b ${theme === 'dark' ? 'bg-[#232323] border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
                     <p className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -513,9 +511,8 @@ const Navbar = () => {
                   <div className="py-2">
                     <Link
                       to="/my-progress"
-                      className={`flex items-center px-4 py-2 transition-colors ${
-                        theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
-                      }`}
+                      className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                        }`}
                       onClick={handleUserDropdownLeave}
                     >
                       <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -526,9 +523,8 @@ const Navbar = () => {
 
                     <Link
                       to="/saved-courses"
-                      className={`flex items-center px-4 py-2 transition-colors ${
-                        theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
-                      }`}
+                      className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                        }`}
                       onClick={handleUserDropdownLeave}
                     >
                       <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -539,9 +535,8 @@ const Navbar = () => {
 
                     <Link
                       to="/certificates"
-                      className={`flex items-center px-4 py-2 transition-colors ${
-                        theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
-                      }`}
+                      className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                        }`}
                       onClick={handleUserDropdownLeave}
                     >
                       <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -552,9 +547,8 @@ const Navbar = () => {
 
                     <Link
                       to="/profile"
-                      className={`flex items-center px-4 py-2 transition-colors ${
-                        theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
-                      }`}
+                      className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                        }`}
                       onClick={handleUserDropdownLeave}
                     >
                       <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -565,9 +559,8 @@ const Navbar = () => {
 
                     <Link
                       to="/become-instructor"
-                      className={`flex items-center px-4 py-2 transition-colors ${
-                        theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
-                      }`}
+                      className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                        }`}
                       onClick={handleUserDropdownLeave}
                     >
                       <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -578,9 +571,8 @@ const Navbar = () => {
 
                     <button
                       onClick={handleLogout}
-                      className={`w-full flex items-center px-4 py-2 transition-colors ${
-                        theme === 'dark' ? 'text-red-400 hover:bg-[#232323] hover:text-red-300' : 'text-red-500 hover:bg-red-50'
-                      }`}
+                      className={`w-full flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'text-red-400 hover:bg-[#232323] hover:text-red-300' : 'text-red-500 hover:bg-red-50'
+                        }`}
                     >
                       <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-red-400' : 'text-red-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -593,27 +585,25 @@ const Navbar = () => {
             </div>
           ) : (
             <>
-              <Link 
-                to="/loginPage" 
-                className={`text-sm transition-colors ${
-                  theme === 'dark' 
-                    ? 'text-gray-300 hover:text-white' 
+              <Link
+                to="/loginPage"
+                className={`text-sm transition-colors ${theme === 'dark'
+                    ? 'text-gray-300 hover:text-white'
                     : 'text-gray-600 hover:text-black'
-                }`}
+                  }`}
               >
                 {t('common.login')}
               </Link>
-              <Link 
-                to="/signup" 
-                className={`bg-red-500 text-white px-4 py-1.5 rounded transition-colors ${
-                  theme === 'dark' 
-                    ? 'hover:bg-red-600' 
+              <Link
+                to="/signup"
+                className={`bg-red-500 text-white px-4 py-1.5 rounded transition-colors ${theme === 'dark'
+                    ? 'hover:bg-red-600'
                     : 'hover:bg-red-600'
-                } text-sm`}
+                  } text-sm`}
               >
                 {t('common.signup')}
               </Link>
-            </>
+            </div>
           )}
         </div>
       </div>

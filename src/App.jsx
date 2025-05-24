@@ -31,10 +31,13 @@ import Home2 from './components/Home2/home2';
 import ProgramDetailPage from './pages/ProgramDetailPage';
 import InstructorDetails from './pages/InstructorsDetails';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import ProtectedRoute from "./routes/ProtectedRoute"; 
+import ProtectedRoute from "./routes/ProtectedRoute";
+import Subscribe from "./pages/Subscribe";
+import PaymentPage from "./pages/PaymentPage";
+import AIChatPage from "./pages/AIChatPage";
 
 function App() {
-  const { user } = useAuth(); 
+  const { user } = useAuth();
 
   return (
     <ThemeProvider>
@@ -65,6 +68,9 @@ function App() {
                 <Route path="/instructors" element={<Instructors />} />
                 <Route path="/instructors/:id" element={<InstructorDetails />} />
                 <Route path="/categories/:id" element={<CategoryPage />} />
+                <Route path='/ai-chat' element={<AIChatPage />} />
+                <Route path='/subscribe' element={<Subscribe />} />
+                <Route path='/payment/:planId' element={<PaymentPage />} />
 
                 {/* Protected routes */}
                 <Route path="/courses" element={

@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
+import { useUser } from '../context/UserContext';
 
 function PasswordPage() {
     const navigate = useNavigate();
@@ -12,9 +13,10 @@ function PasswordPage() {
     const { t, i18n } = useTranslation();
     const { theme } = useTheme();
     const { setUser } = useAuth();
+    const { login } = useUser();
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    
+
     const isRTL = i18n.language === 'ar';
 
     const handleChange = (e) => {
@@ -27,7 +29,7 @@ function PasswordPage() {
         e.preventDefault();
         try {
             console.log("Attempting login with email:", location.state.email);
-            const response = await axios.post('/api/auth/login', {
+            await login({
                 email: location.state.email,
                 password
             });
@@ -37,7 +39,7 @@ function PasswordPage() {
             if (response.data.token) {
                 // Save token
                 localStorage.setItem('token', response.data.token);
-                
+
                 // If user data is not in the response, fetch it using the token
                 if (!response.data.user) {
                     console.log("No user data in response, fetching user data...");
@@ -60,12 +62,13 @@ function PasswordPage() {
                     localStorage.setItem('user', JSON.stringify(response.data.user));
                     setUser(response.data.user);
                 }
-                
+
                 console.log("Login successful, navigating to home...");
                 navigate('/home');
             } else {
                 console.error("Login failed: No token in response");
                 setError(t('auth.loginFailed', 'Login failed: Invalid response from server'));
+                navigate('/');
             }
         } catch (err) {
             console.error("Login failed:", err.response?.data || err.message);

@@ -1,20 +1,21 @@
 import React from 'react';
 import { useTheme } from '../../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  
+
   return (
     <footer className={`${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-gray-100'} ${theme === 'dark' ? 'text-white' : 'text-gray-800'} mt-auto`}>
       {/* Main footer content */}
       <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-4 gap-10">
         {/* Column 1 */}
         <div className="flex flex-col space-y-4">
-         <div className={`${theme === 'dark' ? 'bg-white' : 'bg-black'} p-3 rounded-md w-max`}>
-  <img src="/logo.jpeg" alt="Logo" className="w-8 h-8" />
-</div>
+          <div className={`${theme === 'dark' ? 'bg-white' : 'bg-black'} p-3 rounded-md w-max`}>
+            <img src="/logo.jpeg" alt="Logo" className="w-8 h-8" />
+          </div>
 
           <a href="#" className="hover:underline">{t('footer.blog', 'Blog')}</a>
           <a href="#" className="hover:underline">{t('footer.about', 'About')}</a>
@@ -89,36 +90,46 @@ const Footer = () => {
             </a>
             <a href="#" aria-label="Facebook" className={`${theme === 'dark' ? 'text-white' : 'text-gray-700'} hover:text-blue-600 text-xl font-bold`}>
               <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
-                <path d="M22.675 0h-21.35C.6 0 0 .6 0 1.35v21.3c0 .75.6 1.35 1.325 1.35h11.495v-9.294H9.632v-3.622h3.183V8.413c0-3.156 1.926-4.875 4.735-4.875 1.34 0 2.49.099 2.828.144v3.288H17.42c-1.58 0-1.888.754-1.888 1.858v2.436h3.77l-.49 3.622h-3.28V24h6.426c.725 0 1.325-.6 1.325-1.35V1.35c0-.75-.6-1.35-1.325-1.35z"/>
+                <path d="M22.675 0h-21.35C.6 0 0 .6 0 1.35v21.3c0 .75.6 1.35 1.325 1.35h11.495v-9.294H9.632v-3.622h3.183V8.413c0-3.156 1.926-4.875 4.735-4.875 1.34 0 2.49.099 2.828.144v3.288H17.42c-1.58 0-1.888.754-1.888 1.858v2.436h3.77l-.49 3.622h-3.28V24h6.426c.725 0 1.325-.6 1.325-1.35V1.35c0-.75-.6-1.35-1.325-1.35z" />
               </svg>
             </a>
             <a href="#" aria-label="Instagram" className={`${theme === 'dark' ? 'text-white' : 'text-gray-700'} hover:text-pink-600 text-xl font-bold`}>
               <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
-                <path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5a4.25 4.25 0 0 0 4.25-4.25v-8.5A4.25 4.25 0 0 0 16.25 3.5h-8.5zm4.25 3.5a4.75 4.75 0 1 1 0 9.5 4.75 4.75 0 0 1 0-9.5zm0 1.5a3.25 3.25 0 1 0 0 6.5 3.25 3.25 0 0 0 0-6.5zm5.5-.73a1.23 1.23 0 1 1-2.46 0 1.23 1.23 0 0 1 2.46 0z"/>
+                <path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5a4.25 4.25 0 0 0 4.25-4.25v-8.5A4.25 4.25 0 0 0 16.25 3.5h-8.5zm4.25 3.5a4.75 4.75 0 1 1 0 9.5 4.75 4.75 0 0 1 0-9.5zm0 1.5a3.25 3.25 0 1 0 0 6.5 3.25 3.25 0 0 0 0-6.5zm5.5-.73a1.23 1.23 0 1 1-2.46 0 1.23 1.23 0 0 1 2.46 0z" />
               </svg>
             </a>
 
-            {/* Support Button */}
-            <button
-              type="button"
-              className="fixed bottom-6 right-6 z-50 bg-[#3f8e9b] hover:bg-[#4b9fb1] text-white font-semibold px-6 py-2 rounded-full flex items-center space-x-2 shadow-lg"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
+            {/* Support Button with AI Icon */}
+            <div className="fixed bottom-6 right-6 z-50 flex flex-col items-center">
+              {/* AI Icon */}
+              <Link
+                to="/ai-chat"
+                className="mb-2 p-2 rounded-full shadow-lg  transition-all duration-200 hover:scale-110"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M8 10h.01M12 14a2 2 0 10-4 0 2 2 0 004 0zM12 20h.01M18 10h.01M16.5 15a7.5 7.5 0 11-9 0"
-                />
-              </svg>
-              <span className="font-bold">{t('footer.support', 'Support')}</span>
-            </button>
+                <img src="/vecteezy_chatbot-support-service_53135090.png" alt="AI Icon" className="w-17 h-17" />
+              </Link>
+              {/* Support Button */}
+              <button
+                type="button"
+                className="bg-[#3f8e9b] hover:bg-[#4b9fb1] text-white font-semibold px-6 py-2 rounded-full flex items-center space-x-2 shadow-lg"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M8 10h.01M12 14a2 2 0 10-4 0 2 2 0 004 0zM12 20h.01M18 10h.01M16.5 15a7.5 7.5 0 11-9 0"
+                  />
+                </svg>
+                <span className="font-bold">{t('footer.support', 'Support')}</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
