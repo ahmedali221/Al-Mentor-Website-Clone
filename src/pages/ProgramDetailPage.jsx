@@ -243,8 +243,8 @@ function ProgramDetailPage() {
             {instructors.map((instructor, index) => (
               <div key={index} className="flex items-center gap-6">
                 <div className="flex-shrink-0">
-                  <img 
-                    src={instructor?.user?.profilePicture || '/placeholder-avatar.jpg'} 
+                  <img
+                    src={instructor?.user?.profilePicture || '/placeholder-avatar.jpg'}
                     alt={`${instructor?.user?.firstName?.[currentLanguage] || ''} ${instructor?.user?.lastName?.[currentLanguage] || ''}`}
                     className="w-24 h-24 rounded-full object-cover"
                   />

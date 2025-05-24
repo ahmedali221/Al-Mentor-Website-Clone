@@ -4,7 +4,6 @@ import LoginPage from './pages/LoginPage';
 import PasswordPage from './pages/PasswordPage';
 import Navbar from './components/Navbar/navbar';
 import Footer from './components/Footer/footer';
-import BecomeInstructor from './pages/becomeInstructor';
 import SignupPage from './pages/SignupPage';
 import SignEmail from './pages/SignEmail';
 import Home from './components/Home/home';
@@ -23,6 +22,7 @@ import LessonViewerPage from './components/LessonViewer/LessonViewerPage';
 import { CourseProvider } from './components/LessonViewer/CourseContext';
 import MyCourses from './components/MyCourses/MyCourses';
 import CertificatePage from './components/Certificate/CertificatePage';
+import ProgramDetailPage from './pages/ProgramDetailPage';
 
 function App() {
   return (
@@ -35,6 +35,7 @@ function App() {
               <Routes>
                 <Route path="/loginPage" element={<LoginPage />} />
                 <Route path="/programs" element={<ProgramsPage />} />
+                <Route path="/programs/:id" element={<ProgramDetailPage />} />
                 <Route path='/instructors' element={<Instructors />} />
                 <Route path="/" element={<Home />} />
                 <Route path="/signup-Email" element={<SignEmail />} />
@@ -46,7 +47,8 @@ function App() {
                 <Route path="/all-courses" element={<AllCourses />} />
                 <Route path="/lesson-viewer/:courseId" element={<LessonViewerPage />} />
                 <Route path="/my-courses" element={<MyCourses />} />
-                <Route path="/certificate/:courseId" element={<CertificatePage />} />              </Routes>
+                <Route path="/certificate/:courseId" element={<CertificatePage />} />
+              </Routes>
             </div>
             <Footer />
           </CourseProvider>
