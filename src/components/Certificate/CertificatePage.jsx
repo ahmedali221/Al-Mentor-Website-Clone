@@ -7,60 +7,108 @@ import { Award, Download, Share, Printer } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
+function getUserIdFromToken() {
+  const token = localStorage.getItem('token');
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.userId;
+  } catch (e) {
+    return null;
+  }
+}
+
 const CertificatePage = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   const currentLang = i18n.language;
+  const isRTL = i18n.language === 'ar';
   const [certificateData, setCertificateData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userData, setUserData] = useState(null);
-  const [instructorData, setInstructorData] = useState(null);
+  const [allInstructors, setAllInstructors] = useState([]);
+  const [matchedInstructor, setMatchedInstructor] = useState(null);
 
   useEffect(() => {
-    const fetchCertificateData = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        // Fetch course data
-        const courseResponse = await axios.get(`/api/courses/${courseId}`);
-        
-        // Fetch user data from localStorage or context
-        const userData = JSON.parse(localStorage.getItem('userData'));
-        
-        // Fetch instructor data
-        let instructorId;
-        if (courseResponse.data.instructor) {
-          if (typeof courseResponse.data.instructor === 'object') {
-            instructorId = courseResponse.data.instructor._id || courseResponse.data.instructor.$oid;
-          } else {
-            instructorId = courseResponse.data.instructor;
-          }
+        setError(null);
+
+        // Get token and check authentication
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('No authentication token found');
         }
 
-        if (instructorId) {
-          try {
-            const instructorResponse = await axios.get(`/api/instructors/${instructorId}`);
-            setInstructorData(instructorResponse.data);
-          } catch (err) {
-            console.error('Error fetching instructor data:', err);
-          }
+        // Extract userId from token
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const userId = payload.userId;
+        if (!userId) {
+          throw new Error('No user ID found in token');
         }
-        
-        setCertificateData(courseResponse.data);
-        setUserData(userData);
+
+        // Fetch user data
+        const userResponse = await axios.get(`/api/users/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setUserData(userResponse.data);
+
+        // Fetch course data
+        const courseResponse = await axios.get(`/api/courses/${courseId}`);
+        const course = courseResponse.data;
+        setCertificateData(course);
+
+        // Fetch all instructors
+        const instructorsResponse = await axios.get('/api/instructors');
+        const instructors = instructorsResponse.data.data || instructorsResponse.data;
+        setAllInstructors(instructors);
+
+        // Match instructor
+        let instructorId = null;
+        if (course.instructor) {
+          if (typeof course.instructor === 'object') {
+            instructorId = course.instructor._id || course.instructor.id || course.instructor.$oid;
+          } else {
+            instructorId = course.instructor;
+          }
+        } else if (Array.isArray(course.instructors) && course.instructors.length > 0) {
+          const first = course.instructors[0];
+          instructorId = typeof first === 'object' ? (first._id || first.id || first.$oid) : first;
+        }
+
+        let matched = null;
+        if (instructorId && instructors.length > 0) {
+          matched = instructors.find(inst =>
+            inst._id === instructorId ||
+            inst.id === instructorId ||
+            (inst._id && instructorId && inst._id.toString() === instructorId.toString()) ||
+            (inst.id && instructorId && inst.id.toString() === instructorId.toString())
+          );
+        }
+        if (!matched && course.instructor && typeof course.instructor === 'object') {
+          matched = course.instructor;
+        }
+        setMatchedInstructor(matched);
+
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to load certificate data');
+        console.error('Error fetching data:', err);
+        setError(err.response?.data?.message || err.message || 'Failed to load certificate data');
+        if (err.message === 'No authentication token found') {
+          navigate('/loginPage');
+        }
       } finally {
         setLoading(false);
       }
     };
 
     if (courseId) {
-      fetchCertificateData();
+      fetchData();
     }
-  }, [courseId]);
+  }, [courseId, navigate]);
 
   const getLocalizedText = (obj) => {
     if (!obj) return '';
@@ -68,14 +116,16 @@ const CertificatePage = () => {
     return obj[currentLang] || obj.en || obj.ar || '';
   };
 
+  // Debug instructor data structure
+  console.log('instructorData:', matchedInstructor);
+
   const getInstructorName = () => {
-    if (!instructorData) return 'Course Instructor';
-    
-    const firstName = getLocalizedText(instructorData.user?.firstName);
-    const lastName = getLocalizedText(instructorData.user?.lastName);
-    const title = getLocalizedText(instructorData.professionalTitle);
-    
-    return `${firstName} ${lastName}${title ? ` - ${title}` : ''}`;
+    if (!matchedInstructor) return t('Unknown Instructor');
+    const profile = matchedInstructor.profile || matchedInstructor.user || matchedInstructor;
+    const firstName = getLocalizedText(profile.firstName);
+    const lastName = getLocalizedText(profile.lastName);
+    const title = getLocalizedText(matchedInstructor.professionalTitle);
+    return `${firstName} ${lastName}${title ? ` - ${title}` : ''}`.trim() || t('Unknown Instructor');
   };
 
   const handleDownloadPDF = async () => {
@@ -128,6 +178,8 @@ const CertificatePage = () => {
       }
     }
   };
+
+  console.log('userData:', userData);
 
   if (loading) {
     return (
@@ -205,7 +257,7 @@ const CertificatePage = () => {
           <div className="relative p-12 text-center">
             {/* Logo */}
             <div className="mb-8">
-              <img src="/logo.png" alt="Al-Mentor" className="h-16 mx-auto" />
+              <img src="/logo.jpeg" alt="Almentor Logo" className={`h-12 w-auto ${isRTL ? 'ml-2' : 'mr-2'}`} />
             </div>
 
             {/* Title */}
@@ -216,7 +268,9 @@ const CertificatePage = () => {
 
             {/* Student Name */}
             <h2 className="text-3xl font-bold mb-8 border-b-2 border-[#00bcd4] pb-4 inline-block">
-              {userData?.firstName?.[currentLang]} {userData?.lastName?.[currentLang]}
+              {userData
+                ? `${getLocalizedText(userData.firstName)} ${getLocalizedText(userData.lastName)}`
+                : 'Student Name'}
             </h2>
 
             {/* Course Name */}
@@ -233,6 +287,17 @@ const CertificatePage = () => {
                 day: 'numeric'
               })}
             </p>
+
+            {/* Instructor Name */}
+            <div className="mt-4 text-lg font-semibold text-[#00bcd4]">
+              {getInstructorName()}
+            </div>
+
+            {!matchedInstructor && (
+              <div className="mt-4 text-lg font-semibold text-red-500">
+                No instructor assigned for this course.
+              </div>
+            )}
 
             {/* Signature */}
             <div className="mt-12 flex justify-between items-end">

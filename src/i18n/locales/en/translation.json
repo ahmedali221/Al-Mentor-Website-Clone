@@ -53,6 +53,9 @@
     },
     "courses": {
       "title": "Explore inspiring courses online",
+      "featuredCourses": "Featured Courses",
+      "loadingCourses": "Loading Courses",
+      "seeAllCourses": "See all courses",
       "categories": {
         "featured": "Featured Courses",
         "business": "Business & Professional Skills",
@@ -72,7 +75,9 @@
       "title2": "How To Become an Instructor?",
       "subtitle": "Join our community of instructors and share your knowledge with the world.",
       "button": "Apply Now",
-      "about": "About Mentor"
+      "about": "About Mentor",
+      "loadingInstructors": "Loading Instructors",
+      "seeAllInstructors": "See all instructors"
     },
     "cta": {
       "title": "Only at 199 EGP /month! Get unlimited access to all courses when you subscribe to Almentor.",
@@ -104,6 +109,11 @@
     "back": "Back"
   },
   "messages": {
+    "failedToFetchSavedCourses": "Failed to fetch saved courses. Please try again later.",
+    "courseAddedToSaved": "Course added to saved courses",
+    "courseRemovedFromSaved": "Course removed from saved courses",
+    "courseAlreadySaved": "Course is already saved",
+    "failedToUpdateSavedCourses": "Failed to update saved courses",
     "loading": "Loading...",
     "error": "An error occurred",
     "success": "Success!",
@@ -120,5 +130,181 @@
   "subscriptionCTA": {
     "label": "Subscribe now to get unlimited access to all courses.",
     "button": "Subscribe Now"
+  },
+  "lessonViewer": {
+    "course": "Course",
+    "starred": "Starred",
+    "notes": "Notes",
+    "lessons": "Lessons",
+    "complete": "complete",
+    "loadingLessons": "Loading lessons...",
+    "noLessons": "No lessons available",
+    "starredLessons": "Starred Lessons",
+    "noStarredLessons": "No starred lessons yet.",
+    "myNotes": "My Notes",
+    "editNote": "Edit your note...",
+    "writeNote": "Write a new note...",
+    "updateNote": "Update Note",
+    "cancel": "Cancel",
+    "saveNote": "Save Note",
+    "edit": "Edit",
+    "delete": "Delete",
+    "noNotes": "No notes for this lesson yet. Add your first note above!",
+    "videoNotSupported": "Your browser does not support the video tag.",
+    "videoPlaceholder": "Video placeholder",
+    "previousLesson": "Previous Lesson",
+    "nextLesson": "Next Lesson",
+    "description": "Description",
+    "resources": "Resources",
+    "cheatSheet": "Web Fundamentals Cheat Sheet",
+    "interactiveDemo": "Interactive HTTP Demo",
+    "externalWebsite": "External Website",
+    "favorited": "Favorited",
+    "addToFavorites": "Add to favorites",
+    "congratulations": "Congratulations!",
+    "courseCompleted": "You have successfully completed the course \"{{courseName}}\"",
+    "getCertificate": "Get Your Certificate",
+    "close": "Close"
+  },
+  "becomeInstructor": {
+    "header": {
+      "title": "Inspire Learners Across The World.",
+      "description": "Creating an exceptional learning experience.",
+      "applyButton": "Apply as Instructor"
+    },
+    "benefits": {
+      "competitiveRevenueShare": {
+        "title": "Competitive Revenue Share",
+        "description": "We offer competitive profit-sharing models based on your video production choice."
+      },
+      "helpSupport": {
+        "title": "Help & Support",
+        "description": "Get the guidance you need during your course creation journey."
+      },
+      "worldwideExposure": {
+        "title": "Worldwide Exposure",
+        "description": "Reach more audiences across the world, anywhere and anytime."
+      }
+    },
+    "courseProduction": {
+      "title": "Produce Your Own Course",
+      "steps": [
+        "Prepare your content.",
+        "Shoot your course.",
+        "Submit content for review."
+      ]
+    },
+    "instructorResources": {
+      "title": "Become an instructor and get free instructional resources.",
+      "description": "Learn from our experts the course creation guidelines and production techniques.",
+      "applyButton": "Apply As Instructor"
+    },
+    "revenueSection": {
+      "title": "The richer the content, the more revenues you will make.",
+      "description": "Rich content is your gateway to achieve the desired exposure, which will increase your revenue share.",
+      "applyButton": "Apply As Instructor"
+    },
+    "accordionSection": {
+      "title": "How can we help you?",
+      "description": "See if our FAQs help you know more about our service",
+      "faqs": {
+        "sampleVideoInclude": {
+          "question": "What should the sample video include?",
+          "answer": "The sample video is a 3 to 5 mins video; you should represent the course content and ideas through this video. To be given full feedback, you will need to appear talking and some slide insertions or visual presentations following our guidelines."
+        },
+        "feedbackSampleVideo": {
+          "question": "When should I expect to get feedback on my sample video?",
+          "answer": "The content team will review the sample video and get back to you with feedback within 5 working days."
+        },
+        "processAfterSending": {
+          "question": "What is the process after sending the sample video?",
+          "answer": "After sending the sample video, you will go through the following steps: The content team will review the sample video and provide you with feedback, whether it's (Accepted, Rejected or Requires edits). If the sample video requires edits, you will be requested to consider those edits and provide a final sample. Once the sample video is approved, you will shoot the whole course following the same quality of the approved sample video. By completing the course, you will send us the following required files. (Course outline and mentor profile in both English and Arabic, High-quality photo with solid background)"
+        },
+        "reviewSignContract": {
+          "question": "When can I review and sign the contract?",
+          "answer": "Once you complete the course, we will share the contract to check and sign; you will receive a signed copy from our end."
+        },
+        "reviewContractEarlier": {
+          "question": "Can I request to review the contract at an earlier stage?",
+          "answer": "We can share a draft of the contract to view with you, and if you have any questions, our acquisitions team will be glad to assist."
+        },
+        "appearInCourse": {
+          "question": "Should I appear in the whole course, or can I use a screencast model with voice over?",
+          "answer": "It depends on the course content; if the course is practical, relying more on visual presentations and tools, you can produce the course using the screencast model."
+        },
+        "revenueShare": {
+          "question": "How do I get paid? What is the revenue share for the self-produced courses?",
+          "answer": "a. In the event that the number of enrollments is equal or less than 1,000 (one thousand) enrollments, you will have a 30% revenue share. b. In the event that the number of enrollments is between 1,001 (One Thousand and One) and 3,000 (Three Thousand) enrollments, you will have a 50% revenue share. c. In the event that the number of enrollments is 3,001 and higher, you will have a 75% revenue share."
+        },
+        "editingThroughCamtasia": {
+          "question": "Should the content be edited only through \"Camtasia\"?",
+          "answer": "Camtasia is a recommended tool, but you are free to use any other tool with high-quality production."
+        },
+        "mediaServicesEditingPhase": {
+          "question": "Do you provide media services? Can you assist with the editing phase?",
+          "answer": "We can recommend our media partners (Studios) to help with the shooting and editing."
+        },
+        "coursesAllowed": {
+          "question": "How many courses I'm allowed to produce through your platform?",
+          "answer": "There is no limit to the number of courses produced per mentor as long the course is approved."
+        },
+        "referInstructor": {
+          "question": "Can I refer another instructor to you?",
+          "answer": "Currently, the Selfie model doesn't include talks; however, we will direct the relevant team to assist with this matter."
+        },
+        "updateCourse": {
+          "question": "Can I do any updates to my course after release (add more lectures, material)?",
+          "answer": "You can definitely request to update your course anytime to maintain a rich and up-to-date content."
+        }
+      }
+    }
+  },
+  "close": "Close modal",
+  "logo_alt": "almentor logo",
+  "mentorForm": {
+    "title": "Apply as a Mentor",
+    "subtitle": "Please tell us more about yourself and how we can reach you:",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "phone": "Mobile phone number",
+    "email": "Email",
+    "nationality": "Nationality",
+    "countryOfResidence": "Country of Residence",
+    "chooseCountry": "Please Select",
+    "egypt": "Egypt",
+    "uae": "UAE",
+    "saudiArabia": "Saudi Arabia",
+    "yearsExperience": "How many years of experience do you have in the field of training?",
+    "linkedin": "LinkedIn Profile",
+    "facebook": "Facebook Page",
+    "company": "Company (if applying as partner)",
+    "topics": "What are the topics that you would like to introduce on the platform?",
+    "sampleVideo": "Sample video of you",
+    "cv": "CV (Company profile for companies)",
+    "submit": "Submit"
+  },
+  "home2": {
+    "banner": {
+      "title": "Home page banner Start your learning journey today!",
+      "subtitle": "Choose from subscription plans starting from 199 EGP/ month (Billed yearly)",
+      "subscribeButton": "Subscribe Now"
+    },
+    "programs": {
+      "title": "Explore Our Programs",
+      "subtitle": "Discover grouped courses designed to build essential skills."
+    },
+    "courses": {
+      "title": "Start with free courses"
+    }
+  },
+  "profile": {
+    "subscribe": "Subscribe",
+    "myCourses": "My Courses",
+    "myProgress": "My Progress",
+    "savedCourses": "Saved Courses",
+    "certificates": "Certificates",
+    "accountSettings": "Account Settings",
+    "becomeInstructor": "Become Instructor"
   }
 }
+

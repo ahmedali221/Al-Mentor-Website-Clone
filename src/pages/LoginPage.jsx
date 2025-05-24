@@ -3,16 +3,17 @@ import Custom_Input_Field from '../components/custom_Input_Field'
 import { useState } from 'react'
 import SocialLoginButton from '../components/SocialLoginButton'
 import { FaFacebook, FaGoogle } from 'react-icons/fa'
-
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../context/ThemeContext'
+import { useAuth } from '../context/AuthContext'
 
 function LoginPage() {
     const navigate = useNavigate();
     const { t, i18n } = useTranslation();
     const { theme } = useTheme();
+    const { user } = useAuth();
     const [email, setEmail] = useState("");
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(true);
@@ -36,12 +37,20 @@ function LoginPage() {
             })
             .catch(() => {
                 localStorage.removeItem('token');
+                localStorage.removeItem('user');
                 setIsLoading(false);
             });
         } else {
             setIsLoading(false);
         }
     }, [navigate]);
+
+    // If user is already authenticated, redirect to home
+    useEffect(() => {
+        if (user) {
+            navigate('/home');
+        }
+    }, [user, navigate]);
 
     if (isLoading) {
         return <div className={`flex justify-center items-center min-h-screen ${theme === 'dark' ? 'bg-[#1A1A1A] text-white' : 'bg-gray-50 text-gray-900'}`}>
@@ -54,6 +63,7 @@ function LoginPage() {
             setEmail(e.target.value)
         } 
     }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
