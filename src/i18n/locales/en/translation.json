@@ -6,7 +6,16 @@
     "logout": "Logout",
     "search": "Search courses, topics, instructors...",
     "menu": "Menu",
-    "language": "Language"
+    "language": "Language",
+    "continue": "Continue",
+    "minutes": "Minutes",
+    "category": "Category",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "submit": "Submit",
+    "back": "Back"
   },
   "navigation": {
     "home": "Home",
@@ -92,8 +101,12 @@
       "completed": "Completed",
       "inProgress": "In Progress"
     },
+    "skills": "Skills You Will Gain",
     "noCoursesAvailable": "No courses available.",
-    "skills": "Skills You Will Gain"
+    "noResults": "No results found",
+    "readMore": "Read more",
+    "readLess": "Read less",
+    "included": "Included Courses"
   },
   "buttons": {
     "save": "Save",
@@ -101,12 +114,63 @@
     "submit": "Submit",
     "edit": "Edit",
     "delete": "Delete",
-    "back": "Back"
+    "back": "Back",
+    "continue": "Continue",
+    "subscribeNow": "Subscribe Now"
   },
   "messages": {
     "loading": "Loading...",
     "error": "An error occurred",
     "success": "Success!",
+    "noResults": "No results found",
+    "readMore": "Read more",
+    "readLess": "Read less"
+  },
+  "auth": {
+    "welcomeBack": "Welcome back!",
+    "welcomeToAlmentor": "Welcome to Almentor!",
+    "welcomeMessage": "Welcome to Almentor!",
+    "createAccount": "Create your account",
+    "signupAndLearn": "Sign up and start learning",
+    "signupSubtitle": "Sign up and start learning",
+    "loginWithFacebook": "Login with Facebook",
+    "loginWithGoogle": "Login with Google",
+    "enterEmail": "Enter your email",
+    "emailPlaceholder": "Type your email...",
+    "enterPassword": "Enter password",
+    "passwordPlaceholder": "Type your password...",
+    "passwordCreatePlaceholder": "Create a password",
+    "fullNameEn": "Full Name (English)",
+    "fullNameEnPlaceholder": "Enter your full name in English",
+    "fullNameAr": "Full Name (Arabic)",
+    "fullNameArPlaceholder": "Enter your full name in Arabic",
+    "username": "Username",
+    "usernamePlaceholder": "Choose a username",
+    "email": "Email",
+    "emailInputPlaceholder": "Enter your email",
+    "password": "Password",
+    "passwordInputPlaceholder": "Create a password",
+    "termsAgreement": "By signing up, I agree to the",
+    "termsAndConditions": "Terms & Conditions",
+    "and": "and",
+    "privacyPolicy": "Privacy Policy",
+    "haveAccount": "Already have an account?",
+    "noAccount": "Don't have an account?",
+    "minutes": "Minutes",
+    "facebook": "Facebook",
+    "google": "Google",
+    "emailVerified": "Email verified! Please enter your password.",
+    "continue": "Continue with"
+  },
+  "programs": {
+    "subtitle": "Structured learning for deeper mastery",
+    "description": "Take your learning to the next level with Almentor Programs—carefully curated course series designed to help you build your skills step by step, gradually guiding you toward your goals.",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "mentors": "Experts",
+    "learners": "Learners",
+    "lectures": "Lectures",
+    "aboutUs": "About this program",
     "noResults": "No results found",
     "readMore": "Read more",
     "readLess": "Read less"
@@ -151,13 +215,13 @@
       "title": "Payment Successful!",
       "message": "Your subscription has been activated successfully."
     },
+    "processing": "Processing payment...",
     "error": {
       "title": "Payment Error",
       "message": "An error occurred while processing your payment. Please try again.",
       "unauthorized": "The payment could not be authorized. Please try again or use a different payment method.",
       "insufficient": "Insufficient funds. Please check your balance and try again."
     },
-    "processing": "Processing payment...",
     "cancelled": {
       "title": "Payment Cancelled",
       "message": "Payment process was cancelled successfully"
@@ -189,7 +253,21 @@
     "chat": {
       "welcome": "Welcome! How can I assist you today?",
       "placeholder": "Type your message...",
-      "send": "Send"
+      "send": "Send",
+      "newChat": "New Chat",
+      "recentChats": "Recent Chats",
+      "chat": "Chat",
+      "deleteChatConfirm": "Are you sure you want to delete this chat?",
+      "copied": "Copied!",
+      "you": "You",
+      "aiAssistant": "AI Assistant",
+      "lightMode": "Light Mode",
+      "darkMode": "Dark Mode",
+      "welcomeDesc": "Ask me anything - from quick questions to complex problems, I'm here to help.",
+      "typeMessage": "Type your message...",
+      "errorProcessing": "Sorry, there was an error processing your request.",
+      "image": "Image",
+      "document": "Document"
     }
   },
   "changePlan": "Change Plan"
