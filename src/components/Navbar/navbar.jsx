@@ -11,614 +11,603 @@ import { useAuth } from '../../context/AuthContext';
 import './navbar.css';
 
 const Navbar = () => {
-  const { t, i18n } = useTranslation();
-  const { theme, toggleTheme } = useTheme();
-  const { user, setUser } = useAuth();
-  const navigate = useNavigate();
-  const isRTL = i18n.language === 'ar';
-  const isLoggedIn = !!user;
-  const currentLang = i18n.language;
+    const { t, i18n } = useTranslation();
+    const { theme, toggleTheme } = useTheme();
+    const auth = useAuth();
+    const navigate = useNavigate();
+    const isRTL = i18n.language === 'ar';
+    const currentLang = i18n.language;
 
-  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-  const [isUserDropdownVisible, setIsUserDropdownVisible] = useState(false);
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [categoryCourses, setCategoryCourses] = useState([]);
-  const [allCourses, setAllCourses] = useState([]);
-  const [instructors, setInstructors] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState({ courses: [], instructors: [] });
-  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
-  const searchInputRef = useRef(null);
-  const searchDropdownRef = useRef(null);
-  const userDropdownRef = useRef(null);
+    const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+    const [isUserDropdownVisible, setIsUserDropdownVisible] = useState(false);
+    const [categories, setCategories] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [categoryCourses, setCategoryCourses] = useState([]);
+    const [allCourses, setAllCourses] = useState([]);
+    const [instructors, setInstructors] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState({ courses: [], instructors: [] });
+    const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+    const searchInputRef = useRef(null);
+    const searchDropdownRef = useRef(null);
+    const userDropdownRef = useRef(null);
 
-  const handleUserDropdownEnter = () => setIsUserDropdownVisible(true);
-  const handleUserDropdownLeave = (e) => {
-    if (userDropdownRef.current && userDropdownRef.current.contains(e.relatedTarget)) {
-      return;
-    }
-    setIsUserDropdownVisible(false);
-  };
+    // Initialize user state from localStorage on component mount
+    useEffect(() => {
+        const savedUser = localStorage.getItem('user');
+        const token = localStorage.getItem('token');
 
-  const handleDropdownEnter = () => setIsDropdownVisible(true);
-  const handleDropdownLeave = () => setIsDropdownVisible(false);
-
-  const handleDropdownMenuEnter = () => setIsUserDropdownVisible(true);
-  const handleDropdownMenuLeave = () => setIsUserDropdownVisible(false);
-
-  const toggleLanguage = () => {
-    const newLang = i18n.language === 'en' ? 'ar' : 'en';
-    changeLanguage(newLang);
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    navigate('/loginPage');
-    handleUserDropdownLeave();
-  };
-
-  const getLocalizedName = (nameObj) => {
-    if (!nameObj) return '';
-    if (typeof nameObj === 'string') return nameObj;
-    return nameObj[currentLang] || nameObj.en || '';
-  };
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch('http://localhost:5000/api/category');
-        if (!res.ok) throw new Error('Failed to fetch categories');
-        const data = await res.json();
-        setCategories(data.data || []);
-      } catch (err) {
-        console.error('Error fetching categories:', err);
-        setCategories([]);
-      }
-    };
-
-    fetchCategories();
-  }, []);
-
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const res = await fetch('http://localhost:5000/api/courses');
-        if (!res.ok) throw new Error('Failed to fetch courses');
-        const data = await res.json();
-        setAllCourses(data.data || data);
-      } catch (err) {
-        setAllCourses([]);
-      }
-    };
-    fetchCourses();
-  }, []);
-
-  useEffect(() => {
-    const fetchInstructors = async () => {
-      try {
-        const res = await fetch('http://localhost:5000/api/instructors');
-        if (!res.ok) throw new Error('Failed to fetch instructors');
-        const data = await res.json();
-        console.log('=== INSTRUCTOR DATA DEBUG ===');
-        console.log('Full API Response:', data);
-        if (data.data && data.data.length > 0) {
-          console.log('First Instructor Example:', data.data[0]);
-          console.log('First Instructor Profile:', data.data[0].profile);
-          console.log('First Instructor Name Structure:', {
-            firstName: data.data[0].profile?.firstName,
-            lastName: data.data[0].profile?.lastName
-          });
+        if (token && savedUser && !auth.user) {
+            try {
+                const parsedUser = JSON.parse(savedUser);
+                auth.setUser(parsedUser);
+            } catch (error) {
+                console.error('Error parsing saved user:', error);
+                localStorage.removeItem('user');
+                localStorage.removeItem('token');
+            }
         }
-        console.log('========================');
-        setInstructors(data.data || []);
-      } catch (err) {
-        console.error('Error fetching instructors:', err);
-        setInstructors([]);
-      }
+    }, [auth]);
+
+    const handleUserDropdownEnter = () => setIsUserDropdownVisible(true);
+    const handleUserDropdownLeave = (e) => {
+        if (userDropdownRef.current && userDropdownRef.current.contains(e.relatedTarget)) {
+            return;
+        }
+        setIsUserDropdownVisible(false);
     };
-    fetchInstructors();
-  }, []);
 
-  useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    const token = localStorage.getItem('token');
-    
-    if (token && savedUser && !user) {
-      try {
-        const parsedUser = JSON.parse(savedUser);
-        setUser(parsedUser);
-      } catch (error) {
-        console.error('Error parsing saved user:', error);
-        localStorage.removeItem('user');
+    const handleDropdownEnter = () => setIsDropdownVisible(true);
+    const handleDropdownLeave = () => setIsDropdownVisible(false);
+
+    const handleDropdownMenuEnter = () => setIsUserDropdownVisible(true);
+    const handleDropdownMenuLeave = () => setIsUserDropdownVisible(false);
+
+    const toggleLanguage = () => {
+        const newLang = i18n.language === 'en' ? 'ar' : 'en';
+        changeLanguage(newLang);
+    };
+
+    const handleLogout = () => {
+        auth.setUser(null);
         localStorage.removeItem('token');
-      }
-    }
-  }, [user, setUser]);
+        localStorage.removeItem('user');
+        navigate('/loginPage');
+        handleUserDropdownLeave();
+    };
 
-  const handleCategoryHover = (categoryId) => {
-    setSelectedCategory(categoryId);
-    const filteredCourses = allCourses.filter(course =>
-      course.category === categoryId ||
-      course.category?._id === categoryId ||
-      course.category?.toString() === categoryId
-    );
-    setCategoryCourses(filteredCourses);
-  };
+    const getLocalizedName = (nameObj) => {
+        if (!nameObj) return '';
+        if (typeof nameObj === 'string') return nameObj;
+        return nameObj[currentLang] || nameObj.en || '';
+    };
 
-  useEffect(() => {
-    if (!searchQuery.trim()) {
-      setSearchResults({ courses: [], instructors: [] });
-      setShowSearchDropdown(false);
-      return;
-    }
-    const q = searchQuery.trim().toLowerCase();
-    const matchedCourses = allCourses.filter(course => {
-      const lang = i18n.language;
-      const title = typeof course.title === 'object'
-        ? course.title[lang] || course.title.en || ''
-        : course.title || '';
-      return title.toLowerCase().includes(q);
-    });
-    const matchedInstructors = instructors.filter(inst => {
-      const lang = i18n.language;
-      let instructorName = 'Unknown Instructor';
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const res = await fetch('http://localhost:5000/api/category');
+                if (!res.ok) throw new Error('Failed to fetch categories');
+                const data = await res.json();
+                setCategories(data.data || []);
+            } catch (err) {
+                console.error('Error fetching categories:', err);
+                setCategories([]);
+            }
+        };
 
-      if (inst && inst.profile) {
-        instructorName = `${inst.profile.firstName?.[lang] || inst.profile.firstName?.en || ''} ${inst.profile.lastName?.[lang] || inst.profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
-      } else if (inst && typeof inst === 'object') {
-        // Fallback to direct instructor data
-        const profile = inst.profile || inst.user || inst;
-        instructorName = `${profile.firstName?.[lang] || profile.firstName?.en || ''} ${profile.lastName?.[lang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
-      }
+        fetchCategories();
+    }, []);
 
-      return instructorName.toLowerCase().includes(q);
-    });
-    console.log('Matched instructors:', matchedInstructors);
-    setSearchResults({ courses: matchedCourses, instructors: matchedInstructors });
-    setShowSearchDropdown(true);
-  }, [searchQuery, allCourses, instructors, i18n.language]);
+    useEffect(() => {
+        const fetchCourses = async () => {
+            try {
+                const res = await fetch('http://localhost:5000/api/courses');
+                if (!res.ok) throw new Error('Failed to fetch courses');
+                const data = await res.json();
+                setAllCourses(data.data || data);
+            } catch (err) {
+                setAllCourses([]);
+            }
+        };
+        fetchCourses();
+    }, []);
 
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (
-        searchDropdownRef.current &&
-        !searchDropdownRef.current.contains(event.target) &&
-        searchInputRef.current &&
-        !searchInputRef.current.contains(event.target) &&
-        searchDropdownRef.current
-      ) {
-        setShowSearchDropdown(false);
-      }
-    }
-    if (showSearchDropdown) {
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showSearchDropdown, searchDropdownRef, searchInputRef]);
+    useEffect(() => {
+        const fetchInstructors = async () => {
+            try {
+                const res = await fetch('http://localhost:5000/api/instructors');
+                if (!res.ok) throw new Error('Failed to fetch instructors');
+                const data = await res.json();
+                console.log('=== INSTRUCTOR DATA DEBUG ===');
+                console.log('Full API Response:', data);
+                if (data.data && data.data.length > 0) {
+                    console.log('First Instructor Example:', data.data[0]);
+                    console.log('First Instructor Profile:', data.data[0].profile);
+                    console.log('First Instructor Name Structure:', {
+                        firstName: data.data[0].profile?.firstName,
+                        lastName: data.data[0].profile?.lastName
+                    });
+                }
+                console.log('========================');
+                setInstructors(data.data || []);
+            } catch (err) {
+                console.error('Error fetching instructors:', err);
+                setInstructors([]);
+            }
+        };
+        fetchInstructors();
+    }, []);
 
-  return (
-    <nav
-      className={`fixed top-0 left-0 right-0 px-4 py-4 z-50 shadow transition-all duration-300 text-lg font-medium ${
-        theme === 'dark' ? 'bg-[#1a1a1a] text-white' : 'bg-white text-black'
-      }`}
-    >
-      <div className={`flex items-center justify-start gap-12 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
-        <div className="flex items-center text-3xl ml-4">
-          <Link 
-            to={isLoggedIn ? "/home" : "/"} 
-            className="flex items-center space-x-2"
-            onClick={() => {
-              if (isLoggedIn && window.location.pathname === '/') {
-                navigate('/home');
-              }
-            }}
-          >
-            <img src="/logo.jpeg" alt="Almentor Logo" className={`h-12 w-auto ${isRTL ? 'ml-2' : 'mr-2'}`} />
-            <span className="text-3xl font-semibold">Almentor</span>
-          </Link>
-        </div>
+    const handleCategoryHover = (categoryId) => {
+        setSelectedCategory(categoryId);
+        const filteredCourses = allCourses.filter(course =>
+            course.category === categoryId ||
+            course.category?._id === categoryId ||
+            course.category?.toString() === categoryId
+        );
+        setCategoryCourses(filteredCourses);
+    };
 
-        <ul className={`flex items-center ml-1 ${isRTL ? 'space-x-reverse space-x-6' : 'space-x-6'} text-1xl font-medium`}>
-          <li className="relative">
-            <button
-              onMouseEnter={handleDropdownEnter}
-              className="hover:text-red-500 flex items-center focus:outline-none"
-            >
-              {t('navigation.courses')}
-              <RiArrowDropDownLine className="text-3xl mt-1" />
-            </button>
+    useEffect(() => {
+        if (!searchQuery.trim()) {
+            setSearchResults({ courses: [], instructors: [] });
+            setShowSearchDropdown(false);
+            return;
+        }
+        const q = searchQuery.trim().toLowerCase();
+        const matchedCourses = allCourses.filter(course => {
+            const lang = i18n.language;
+            const title = typeof course.title === 'object'
+                ? course.title[lang] || course.title.en || ''
+                : course.title || '';
+            return title.toLowerCase().includes(q);
+        });
+        const matchedInstructors = instructors.filter(inst => {
+            const lang = i18n.language;
+            let instructorName = 'Unknown Instructor';
 
-            {isDropdownVisible && (
-              <div
-                className="absolute top-[80px] left-0 flex w-[800px] bg-white shadow-xl rounded-lg z-50 transition-all duration-300"
-                onMouseEnter={handleDropdownEnter}
-                onMouseLeave={handleDropdownLeave}
-              >
-                <div className="absolute -top-2 left-6 w-4 h-4 bg-white rotate-45 shadow-md z-40"></div>
+            if (inst && inst.profile) {
+                instructorName = `${inst.profile.firstName?.[lang] || inst.profile.firstName?.en || ''} ${inst.profile.lastName?.[lang] || inst.profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
+            } else if (inst && typeof inst === 'object') {
+                // Fallback to direct instructor data
+                const profile = inst.profile || inst.user || inst;
+                instructorName = `${profile.firstName?.[lang] || profile.firstName?.en || ''} ${profile.lastName?.[lang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
+            }
 
-                <div className="w-1/2 border-r px-4 py-5">
-                  <ul>
-                    {categories.map((category) => (
-                      <li
-                        key={category._id}
-                        onMouseEnter={() => handleCategoryHover(category._id)}
-                        className="py-2 px-2 hover:bg-gray-100 cursor-pointer text-gray-800 text-sm font-medium rounded-md transition"
-                      >
-                        {getLocalizedName(category.name)}
-                      </li>
-                    ))}
-                  </ul>
+            return instructorName.toLowerCase().includes(q);
+        });
+        console.log('Matched instructors:', matchedInstructors);
+        setSearchResults({ courses: matchedCourses, instructors: matchedInstructors });
+        setShowSearchDropdown(true);
+    }, [searchQuery, allCourses, instructors, i18n.language]);
 
-                  <div className="mt-6">
-                    <Link
-                      to="/courses"
-                      className="w-full flex items-center justify-center gap-2 bg-red-500 text-white py-2 rounded-md text-sm hover:bg-red-600 transition"
-                    >
-                      Browse Courses <span className="text-lg">→</span>
-                    </Link>
-                  </div>
-                </div>
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (
+                searchDropdownRef.current &&
+                !searchDropdownRef.current.contains(event.target) &&
+                searchInputRef.current &&
+                !searchInputRef.current.contains(event.target) &&
+                searchDropdownRef.current
+            ) {
+                setShowSearchDropdown(false);
+            }
+        }
+        if (showSearchDropdown) {
+            document.addEventListener('mousedown', handleClickOutside);
+        } else {
+            document.removeEventListener('mousedown', handleClickOutside);
+        }
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [showSearchDropdown, searchDropdownRef, searchInputRef]);
 
-                <div className="w-1/2 p-5">
-                  {categoryCourses.length === 0 ? (
-                    <p className="text-gray-500">{t('common.noCourses')}</p>
-                  ) : (
-                    <ul>
-                      {categoryCourses.slice(0, 4).map((course) => {
-                        const lang = i18n.language;
-                        const title =
-                          typeof course.title === 'object'
-                            ? course.title[lang] || course.title.en || 'Untitled Course'
-                            : course.title || 'Untitled Course';
-
-                        // Find instructor from instructors list
-                        const instructorObj = instructors.find(inst => {
-                          if (typeof course.instructor === 'object') {
-                            return inst._id === course.instructor._id;
-                          }
-                          return inst._id === course.instructor;
-                        });
-
-                        let instructorName = 'Unknown Instructor';
-                        let instructorImage = '/default-profile.png';
-
-                        if (instructorObj && instructorObj.profile) {
-                          const firstName = instructorObj.profile.firstName?.[lang] || instructorObj.profile.firstName?.en || '';
-                          const lastName = instructorObj.profile.lastName?.[lang] || instructorObj.profile.lastName?.en || '';
-                          instructorName = `${firstName} ${lastName}`.trim() || 'Unknown Instructor';
-                          instructorImage = instructorObj.profile.profilePicture || '/default-profile.png';
-                        } else if (course.instructor && typeof course.instructor === 'object') {
-                          // Fallback to embedded instructor data
-                          const profile = course.instructor.profile || course.instructor.user || course.instructor;
-                          const firstName = profile.firstName?.[lang] || profile.firstName?.en || '';
-                          const lastName = profile.lastName?.[lang] || profile.lastName?.en || '';
-                          instructorName = `${firstName} ${lastName}`.trim() || 'Unknown Instructor';
-                          instructorImage = profile.profilePicture || '/default-profile.png';
-                        }
-
-                        return (
-                          <li
-                            key={course._id}
-                            className="flex items-center gap-4 mb-5 cursor-pointer hover:bg-gray-100 rounded transition"
-                            onClick={() => navigate(`/courses/${course._id}`)}
-                          >
-                            <img
-                              src={course.thumbnail || '/default-course-img.png'}
-                              alt={title}
-                              className="w-20 h-14 object-cover rounded"
-                            />
-                            <div>
-                              <h4 className="text-base font-semibold text-black text-red-600">
-                                {title}
-                              </h4>
-                              <p className="text-sm text-gray-600 dark:text-gray-400">
-                                {instructorName}
-                              </p>
-                            </div>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
-                </div>
-              </div>
-            )}
-          </li>
-
-          <li>
-            <Link to="/instructors" className="hover:text-red-500">
-              Instructors
-            </Link>
-          </li>
-
-          <li className="flex items-center">
-            <Link to="/programs" className="hover:text-red-500">
-              {t('navigation.programs')}
-            </Link>
-            <span className="ml-2 bg-red-500 text-white text-[10px] px-1 py-0.5 rounded-full">
-              NEW
-            </span>
-          </li>
-
-          <li>
-            <button
-              className={`rounded px-6 text-2xl py-2 border-2 transition ${
-                theme === 'dark'
-                  ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
-                  : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
-              }`}
-            >
-              Subscribe
-            </button>
-          </li>
-        </ul>
-
-        <div className={`flex items-center ml-auto ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
-          <div className="relative">
-            <input
-              type="text"
-              placeholder={t('common.search')}
-              className={`text-lg px-5 py-3 w-[360px] focus:outline-none focus:ring-2 placeholder-gray-500 transition-all duration-300 rounded-md
-                ${theme === 'dark' ? 'bg-[#2a2a2a] text-white focus:ring-gray-600' : 'bg-gray-200 text-gray-700 focus:ring-gray-300'}`}
-              dir={isRTL ? 'rtl' : 'ltr'}
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              onFocus={() => searchQuery && setShowSearchDropdown(true)}
-              ref={searchInputRef}
-            />
-            <button className={`absolute top-1/2 transform -translate-y-1/2 ${isRTL ? 'left-4' : 'right-4'} text-gray-400 hover:text-red-500`}>
-              <CiSearch size={25} />
-            </button>
-            {showSearchDropdown && (
-              <div
-                ref={searchDropdownRef}
-                className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 w-[360px] max-h-96 overflow-y-auto rounded-md shadow-lg z-50 ${theme === 'dark' ? 'bg-[#232323] text-white' : 'bg-white text-black'}`}
-                style={{ direction: isRTL ? 'rtl' : 'ltr' }}
-              >
-                {searchResults.courses.length === 0 && searchResults.instructors.length === 0 ? (
-                  <div className="p-4 text-center text-gray-400">{t('common.noResults') || 'No results found'}</div>
-                ) : (
-                  <>
-                    {searchResults.courses.length > 0 && (
-                      <div>
-                        <div className="px-4 pt-3 pb-1 text-xs font-bold uppercase text-gray-500">{t('Courses')}</div>
-                        {searchResults.courses.map(course => {
-                          const lang = i18n.language;
-                          const title = typeof course.title === 'object'
-                            ? course.title[lang] || course.title.en || ''
-                            : course.title || '';
-                          return (
-                            <div
-                              key={course._id}
-                              className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#333] rounded"
-                              onClick={() => {
-                                setShowSearchDropdown(false);
-                                setSearchQuery('');
-                                navigate(`/courses/${course._id}`);
-                              }}
-                            >
-                              <img src={course.thumbnail || '/default-course-img.png'} alt={title} className="w-10 h-8 object-cover rounded" />
-                              <span className="font-medium">{title}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                    {searchResults.instructors.length > 0 && (
-                      <div>
-                        <div className="px-4 pt-3 pb-1 text-xs font-bold uppercase text-gray-500">{t('Instructors')}</div>
-                        {searchResults.instructors.map(inst => {
-                          const lang = i18n.language;
-                          let instructorName = 'Unknown Instructor';
-                          let instructorImage = '/default-profile.png';
-
-                          if (inst && inst.profile) {
-                            instructorName = `${inst.profile.firstName?.[lang] || inst.profile.firstName?.en || ''} ${inst.profile.lastName?.[lang] || inst.profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
-                            instructorImage = inst.profile.profilePicture || '/default-profile.png';
-                          } else if (inst && typeof inst === 'object') {
-                            const profile = inst.profile || inst.user || inst;
-                            instructorName = `${profile.firstName?.[lang] || profile.firstName?.en || ''} ${profile.lastName?.[lang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
-                            instructorImage = profile.profilePicture || '/default-profile.png';
-                          }
-
-                          return (
-                            <div
-                              key={inst._id}
-                              className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#333] rounded"
-                              onClick={() => {
-                                setShowSearchDropdown(false);
-                                setSearchQuery('');
-                                navigate(`/instructors/${inst._id}`);
-                              }}
-                            >
-                              <img src={instructorImage} alt={instructorName} className="w-10 h-10 object-cover rounded-full" />
-                              <span className="font-medium">{instructorName}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={toggleTheme}
-              className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors
-                ${theme === 'dark' ? 'bg-gray-800 hover:bg-gray-700' : 'bg-gray-100 hover:bg-gray-200'}`}
-            >
-              {theme === 'dark' ? <FaSun className="text-yellow-400" /> : <FaMoon className="text-gray-700" />}
-            </button>
-
-            <button
-              onClick={toggleLanguage}
-              className={`w-10 h-10 rounded-full text-xl font-medium flex items-center justify-center transition-colors
-                ${theme === 'dark' ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-            >
-              {i18n.language === 'en' ? 'ع' : 'EN'}
-            </button>
-          </div>
-
-          {isLoggedIn ? (
-            <div
-              className="relative"
-              onMouseEnter={handleUserDropdownEnter}
-              onMouseLeave={handleUserDropdownLeave}
-            >
-              <button className="flex items-center space-x-2 hover:opacity-80 transition-opacity p-2">
-                {user?.profilePicture ? (
-                  <img
-                    src={user.profilePicture}
-                    alt={getLocalizedName(user.firstName)}
-                    className={`h-10 w-10 rounded-full object-cover border-2 ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}
-                  />
-                ) : (
-                  <FaUserCircle className={`text-4xl ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
-                )}
-              </button>
-
-              {isUserDropdownVisible && (
-                <div 
-                  ref={userDropdownRef}
-                  onMouseEnter={handleDropdownMenuEnter}
-                  onMouseLeave={handleDropdownMenuLeave}
-                  className={`absolute top-full right-0 mt-2 w-72 rounded-lg shadow-xl z-50 overflow-hidden ${
-                    theme === 'dark' ? 'bg-[#1a1a1a] border border-gray-700' : 'bg-white border border-gray-200'
-                  }`}
-                >
-                  <div className={`p-4 border-b ${theme === 'dark' ? 'bg-[#232323] border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
-                    <p className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      {user?.firstName ? getLocalizedName(user.firstName) : ''} {user?.lastName ? getLocalizedName(user.lastName) : ''}
-                    </p>
-                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} truncate`}>
-                      {user?.email || ''}
-                    </p>
-                    <Link
-                      to="/subscribe"
-                      className="mt-3 block w-full text-center bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors"
-                      onClick={handleUserDropdownLeave}
-                    >
-                      {t('profile.subscribe')}
-                    </Link>
-                  </div>
-
-                  <div className="py-2">
-                    <Link
-                      to="/my-progress"
-                      className={`flex items-center px-4 py-2 transition-colors ${
-                        theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
-                      }`}
-                      onClick={handleUserDropdownLeave}
-                    >
-                      <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                      {t('profile.myProgress')}
-                    </Link>
-
-                    <Link
-                      to="/saved-courses"
-                      className={`flex items-center px-4 py-2 transition-colors ${
-                        theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
-                      }`}
-                      onClick={handleUserDropdownLeave}
-                    >
-                      <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5h14v14H5z" />
-                      </svg>
-                      {t('profile.savedCourses')}
-                    </Link>
-
-                    <Link
-                      to="/certificates"
-                      className={`flex items-center px-4 py-2 transition-colors ${
-                        theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
-                      }`}
-                      onClick={handleUserDropdownLeave}
-                    >
-                      <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v8m-4-4h8" />
-                      </svg>
-                      {t('profile.certificates')}
-                    </Link>
-
-                    <Link
-                      to="/profile"
-                      className={`flex items-center px-4 py-2 transition-colors ${
-                        theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
-                      }`}
-                      onClick={handleUserDropdownLeave}
-                    >
-                      <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                      </svg>
-                      {t('profile.accountSettings')}
-                    </Link>
-
-                    <Link
-                      to="/become-instructor"
-                      className={`flex items-center px-4 py-2 transition-colors ${
-                        theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
-                      }`}
-                      onClick={handleUserDropdownLeave}
-                    >
-                      <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                      {t('profile.becomeInstructor')}
-                    </Link>
-
-                    <button
-                      onClick={handleLogout}
-                      className={`w-full flex items-center px-4 py-2 transition-colors ${
-                        theme === 'dark' ? 'text-red-400 hover:bg-[#232323] hover:text-red-300' : 'text-red-500 hover:bg-red-50'
-                      }`}
-                    >
-                      <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-red-400' : 'text-red-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                      </svg>
-                      {t('logout')}
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <>
-              <Link 
-                to="/loginPage" 
-                className={`text-sm transition-colors ${
-                  theme === 'dark' 
-                    ? 'text-gray-300 hover:text-white' 
-                    : 'text-gray-600 hover:text-black'
+    return (
+        <nav
+            className={`fixed top-0 left-0 right-0 px-4 py-4 z-50 shadow transition-all duration-300 text-lg font-medium ${theme === 'dark' ? 'bg-[#1a1a1a] text-white' : 'bg-white text-black'
                 }`}
-              >
-                {t('common.login')}
-              </Link>
-              <Link 
-                to="/signup" 
-                className={`bg-red-500 text-white px-4 py-1.5 rounded transition-colors ${
-                  theme === 'dark' 
-                    ? 'hover:bg-red-600' 
-                    : 'hover:bg-red-600'
-                } text-sm`}
-              >
-                {t('common.signup')}
-              </Link>
-            </>
-          )}
-        </div>
-      </div>
-    </nav>
-  );
+        >
+            <div className={`flex items-center justify-start gap-12 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
+                <div className="flex items-center text-3xl ml-4">
+                    <Link
+                        to={auth.isAuthenticated ? "/home" : "/"}
+                        className="flex items-center space-x-2"
+                        onClick={() => {
+                            if (auth.isAuthenticated && window.location.pathname === '/') {
+                                navigate('/home');
+                            }
+                        }}
+                    >
+                        <img src="/logo.jpeg" alt="Almentor Logo" className={`h-12 w-auto ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                        <span className="text-3xl font-semibold">Almentor</span>
+                    </Link>
+                </div>
+
+                <ul className={`flex items-center ml-1 ${isRTL ? 'space-x-reverse space-x-6' : 'space-x-6'} text-1xl font-medium`}>
+                    <li className="relative">
+                        <button
+                            onMouseEnter={handleDropdownEnter}
+                            className="hover:text-red-500 flex items-center focus:outline-none"
+                        >
+                            {t('navigation.courses')}
+                            <RiArrowDropDownLine className="text-3xl mt-1" />
+                        </button>
+
+                        {isDropdownVisible && (
+                            <div
+                                className="absolute top-[80px] left-0 flex w-[800px] bg-white shadow-xl rounded-lg z-50 transition-all duration-300"
+                                onMouseEnter={handleDropdownEnter}
+                                onMouseLeave={handleDropdownLeave}
+                            >
+                                <div className="absolute -top-2 left-6 w-4 h-4 bg-white rotate-45 shadow-md z-40"></div>
+
+                                <div className="w-1/2 border-r px-4 py-5">
+                                    <ul>
+                                        {categories.map((category) => (
+                                            <li
+                                                key={category._id}
+                                                onMouseEnter={() => handleCategoryHover(category._id)}
+                                                className="py-2 px-2 hover:bg-gray-100 cursor-pointer text-gray-800 text-sm font-medium rounded-md transition"
+                                            >
+                                                {getLocalizedName(category.name)}
+                                            </li>
+                                        ))}
+                                    </ul>
+
+                                    <div className="mt-6">
+                                        <Link
+                                            to="/courses"
+                                            className="w-full flex items-center justify-center gap-2 bg-red-500 text-white py-2 rounded-md text-sm hover:bg-red-600 transition"
+                                        >
+                                            Browse Courses <span className="text-lg">→</span>
+                                        </Link>
+                                    </div>
+                                </div>
+
+                                <div className="w-1/2 p-5">
+                                    {categoryCourses.length === 0 ? (
+                                        <p className="text-gray-500">{t('common.noCourses')}</p>
+                                    ) : (
+                                        <ul>
+                                            {categoryCourses.slice(0, 4).map((course) => {
+                                                const lang = i18n.language;
+                                                const title =
+                                                    typeof course.title === 'object'
+                                                        ? course.title[lang] || course.title.en || 'Untitled Course'
+                                                        : course.title || 'Untitled Course';
+
+                                                // Find instructor from instructors list
+                                                const instructorObj = instructors.find(inst => {
+                                                    if (typeof course.instructor === 'object') {
+                                                        return inst._id === course.instructor._id;
+                                                    }
+                                                    return inst._id === course.instructor;
+                                                });
+
+                                                let instructorName = 'Unknown Instructor';
+                                                let instructorImage = '/default-profile.png';
+
+                                                if (instructorObj && instructorObj.profile) {
+                                                    const firstName = instructorObj.profile.firstName?.[lang] || instructorObj.profile.firstName?.en || '';
+                                                    const lastName = instructorObj.profile.lastName?.[lang] || instructorObj.profile.lastName?.en || '';
+                                                    instructorName = `${firstName} ${lastName}`.trim() || 'Unknown Instructor';
+                                                    instructorImage = instructorObj.profile.profilePicture || '/default-profile.png';
+                                                } else if (course.instructor && typeof course.instructor === 'object') {
+                                                    // Fallback to embedded instructor data
+                                                    const profile = course.instructor.profile || course.instructor.user || course.instructor;
+                                                    const firstName = profile.firstName?.[lang] || profile.firstName?.en || '';
+                                                    const lastName = profile.lastName?.[lang] || profile.lastName?.en || '';
+                                                    instructorName = `${firstName} ${lastName}`.trim() || 'Unknown Instructor';
+                                                    instructorImage = profile.profilePicture || '/default-profile.png';
+                                                }
+
+                                                return (
+                                                    <li
+                                                        key={course._id}
+                                                        className="flex items-center gap-4 mb-5 cursor-pointer hover:bg-gray-100 rounded transition"
+                                                        onClick={() => navigate(`/courses/${course._id}`)}
+                                                    >
+                                                        <img
+                                                            src={course.thumbnail || '/default-course-img.png'}
+                                                            alt={title}
+                                                            className="w-20 h-14 object-cover rounded"
+                                                        />
+                                                        <div>
+                                                            <h4 className="text-base font-semibold text-black text-red-600">
+                                                                {title}
+                                                            </h4>
+                                                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                                                {instructorName}
+                                                            </p>
+                                                        </div>
+                                                    </li>
+                                                );
+                                            })}
+                                        </ul>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </li>
+
+                    <li>
+                        <Link to="/instructors" className="hover:text-red-500">
+                            Instructors
+                        </Link>
+                    </li>
+
+                    <li className="flex items-center">
+                        <Link to="/programs" className="hover:text-red-500">
+                            {t('navigation.programs')}
+                        </Link>
+                        <span className="ml-2 bg-red-500 text-white text-[10px] px-1 py-0.5 rounded-full">
+                            NEW
+                        </span>
+                    </li>
+
+                    <li>
+                        <button
+                            className={`rounded px-6 text-2xl py-2 border-2 transition ${theme === 'dark'
+                                    ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
+                                    : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
+                                }`}
+                        >
+                            Subscribe
+                        </button>
+                    </li>
+                </ul>
+
+                <div className={`flex items-center ml-auto ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
+                    <div className="relative">
+                        <input
+                            type="text"
+                            placeholder={t('common.search')}
+                            className={`text-lg px-5 py-3 w-[360px] focus:outline-none focus:ring-2 placeholder-gray-500 transition-all duration-300 rounded-md
+                ${theme === 'dark' ? 'bg-[#2a2a2a] text-white focus:ring-gray-600' : 'bg-gray-200 text-gray-700 focus:ring-gray-300'}`}
+                            dir={isRTL ? 'rtl' : 'ltr'}
+                            value={searchQuery}
+                            onChange={e => setSearchQuery(e.target.value)}
+                            onFocus={() => searchQuery && setShowSearchDropdown(true)}
+                            ref={searchInputRef}
+                        />
+                        <button className={`absolute top-1/2 transform -translate-y-1/2 ${isRTL ? 'left-4' : 'right-4'} text-gray-400 hover:text-red-500`}>
+                            <CiSearch size={25} />
+                        </button>
+                        {showSearchDropdown && (
+                            <div
+                                ref={searchDropdownRef}
+                                className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 w-[360px] max-h-96 overflow-y-auto rounded-md shadow-lg z-50 ${theme === 'dark' ? 'bg-[#232323] text-white' : 'bg-white text-black'}`}
+                                style={{ direction: isRTL ? 'rtl' : 'ltr' }}
+                            >
+                                {searchResults.courses.length === 0 && searchResults.instructors.length === 0 ? (
+                                    <div className="p-4 text-center text-gray-400">{t('common.noResults') || 'No results found'}</div>
+                                ) : (
+                                    <>
+                                        {searchResults.courses.length > 0 && (
+                                            <div>
+                                                <div className="px-4 pt-3 pb-1 text-xs font-bold uppercase text-gray-500">{t('Courses')}</div>
+                                                {searchResults.courses.map(course => {
+                                                    const lang = i18n.language;
+                                                    const title = typeof course.title === 'object'
+                                                        ? course.title[lang] || course.title.en || ''
+                                                        : course.title || '';
+                                                    return (
+                                                        <div
+                                                            key={course._id}
+                                                            className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#333] rounded"
+                                                            onClick={() => {
+                                                                setShowSearchDropdown(false);
+                                                                setSearchQuery('');
+                                                                navigate(`/courses/${course._id}`);
+                                                            }}
+                                                        >
+                                                            <img src={course.thumbnail || '/default-course-img.png'} alt={title} className="w-10 h-8 object-cover rounded" />
+                                                            <span className="font-medium">{title}</span>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+                                        {searchResults.instructors.length > 0 && (
+                                            <div>
+                                                <div className="px-4 pt-3 pb-1 text-xs font-bold uppercase text-gray-500">{t('Instructors')}</div>
+                                                {searchResults.instructors.map(inst => {
+                                                    const lang = i18n.language;
+                                                    let instructorName = 'Unknown Instructor';
+                                                    let instructorImage = '/default-profile.png';
+
+                                                    if (inst && inst.profile) {
+                                                        instructorName = `${inst.profile.firstName?.[lang] || inst.profile.firstName?.en || ''} ${inst.profile.lastName?.[lang] || inst.profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
+                                                        instructorImage = inst.profile.profilePicture || '/default-profile.png';
+                                                    } else if (inst && typeof inst === 'object') {
+                                                        const profile = inst.profile || inst.user || inst;
+                                                        instructorName = `${profile.firstName?.[lang] || profile.firstName?.en || ''} ${profile.lastName?.[lang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
+                                                        instructorImage = profile.profilePicture || '/default-profile.png';
+                                                    }
+
+                                                    return (
+                                                        <div
+                                                            key={inst._id}
+                                                            className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#333] rounded"
+                                                            onClick={() => {
+                                                                setShowSearchDropdown(false);
+                                                                setSearchQuery('');
+                                                                navigate(`/instructors/${inst._id}`);
+                                                            }}
+                                                        >
+                                                            <img src={instructorImage} alt={instructorName} className="w-10 h-10 object-cover rounded-full" />
+                                                            <span className="font-medium">{instructorName}</span>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <button
+                            onClick={toggleTheme}
+                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors
+                ${theme === 'dark' ? 'bg-gray-800 hover:bg-gray-700' : 'bg-gray-100 hover:bg-gray-200'}`}
+                        >
+                            {theme === 'dark' ? <FaSun className="text-yellow-400" /> : <FaMoon className="text-gray-700" />}
+                        </button>
+
+                        <button
+                            onClick={toggleLanguage}
+                            className={`w-10 h-10 rounded-full text-xl font-medium flex items-center justify-center transition-colors
+                ${theme === 'dark' ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                        >
+                            {i18n.language === 'en' ? 'ع' : 'EN'}
+                        </button>
+                    </div>
+
+                    {auth.isAuthenticated ? (
+                        <div
+                            className="relative"
+                            onMouseEnter={handleUserDropdownEnter}
+                            onMouseLeave={handleUserDropdownLeave}
+                        >
+                            <button className="flex items-center space-x-2 hover:opacity-80 transition-opacity p-2">
+                                {auth.user?.profilePicture ? (
+                                    <img
+                                        src={auth.user.profilePicture}
+                                        alt={getLocalizedName(auth.user.firstName)}
+                                        className={`h-10 w-10 rounded-full object-cover border-2 ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}
+                                    />
+                                ) : (
+                                    <FaUserCircle className={`text-4xl ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
+                                )}
+                            </button>
+
+                            {isUserDropdownVisible && (
+                                <div
+                                    ref={userDropdownRef}
+                                    onMouseEnter={handleDropdownMenuEnter}
+                                    onMouseLeave={handleDropdownMenuLeave}
+                                    className={`absolute top-full right-0 mt-2 w-72 rounded-lg shadow-xl z-50 overflow-hidden ${theme === 'dark' ? 'bg-[#1a1a1a] border border-gray-700' : 'bg-white border border-gray-200'
+                                        }`}
+                                >
+                                    <div className={`p-4 border-b ${theme === 'dark' ? 'bg-[#232323] border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                                        <p className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                            {auth.user?.firstName ? getLocalizedName(auth.user.firstName) : ''} {auth.user?.lastName ? getLocalizedName(auth.user.lastName) : ''}
+                                        </p>
+                                        <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} truncate`}>
+                                            {auth.user?.email || ''}
+                                        </p>
+                                        <Link
+                                            to="/subscribe"
+                                            className="mt-3 block w-full text-center bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors"
+                                            onClick={handleUserDropdownLeave}
+                                        >
+                                            {t('profile.subscribe')}
+                                        </Link>
+                                    </div>
+
+                                    <div className="py-2">
+                                        <Link
+                                            to="/my-progress"
+                                            className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                                                }`}
+                                            onClick={handleUserDropdownLeave}
+                                        >
+                                            <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                            </svg>
+                                            {t('profile.myProgress')}
+                                        </Link>
+
+                                        <Link
+                                            to="/saved-courses"
+                                            className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                                                }`}
+                                            onClick={handleUserDropdownLeave}
+                                        >
+                                            <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5h14v14H5z" />
+                                            </svg>
+                                            {t('profile.savedCourses')}
+                                        </Link>
+
+                                        <Link
+                                            to="/certificates"
+                                            className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                                                }`}
+                                            onClick={handleUserDropdownLeave}
+                                        >
+                                            <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v8m-4-4h8" />
+                                            </svg>
+                                            {t('profile.certificates')}
+                                        </Link>
+
+                                        <Link
+                                            to="/profile"
+                                            className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                                                }`}
+                                            onClick={handleUserDropdownLeave}
+                                        >
+                                            <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                            </svg>
+                                            {t('profile.accountSettings')}
+                                        </Link>
+
+                                        <Link
+                                            to="/become-instructor"
+                                            className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                                                }`}
+                                            onClick={handleUserDropdownLeave}
+                                        >
+                                            <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                            </svg>
+                                            {t('profile.becomeInstructor')}
+                                        </Link>
+
+                                        <button
+                                            onClick={handleLogout}
+                                            className={`w-full flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'text-red-400 hover:bg-[#232323] hover:text-red-300' : 'text-red-500 hover:bg-red-50'
+                                                }`}
+                                        >
+                                            <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-red-400' : 'text-red-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                            </svg>
+                                            {t('logout')}
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <>
+                            <Link
+                                to="/loginPage"
+                                className={`text-sm transition-colors ${theme === 'dark'
+                                        ? 'text-gray-300 hover:text-white'
+                                        : 'text-gray-600 hover:text-black'
+                                    }`}
+                            >
+                                {t('common.login')}
+                            </Link>
+                            <Link
+                                to="/signup"
+                                className={`bg-red-500 text-white px-4 py-1.5 rounded transition-colors ${theme === 'dark'
+                                        ? 'hover:bg-red-600'
+                                        : 'hover:bg-red-600'
+                                    } text-sm`}
+                            >
+                                {t('common.signup')}
+                            </Link>
+                        </>
+                    )}
+                </div>
+            </div>
+        </nav>
+    );
 };
 
 export default Navbar;
