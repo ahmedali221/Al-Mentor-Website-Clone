@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../context/ThemeContext";
 import { useNavigate } from "react-router-dom";
-import { useUser } from "../context/UserContext";
+import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 
 function Subscribe() {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   const navigate = useNavigate();
-  const { isAuthenticated } = useUser();
+  const { isAuthenticated } = useAuth();
   const isRTL = i18n.language === "ar";
 
   const [subscriptions, setSubscriptions] = useState([]);

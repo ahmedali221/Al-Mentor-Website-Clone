@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../context/ThemeContext";
 import { useUser } from "../context/UserContext";
+import { useAuth } from "../context/AuthContext";
 import { PhoneNumberForm, CreditCardForm } from "../components/PaymentForms";
 import axios from "axios";
 import PayPalButton from "../components/PayPalButton";
@@ -11,7 +12,7 @@ import Swal from "sweetalert2";
 function PaymentPage() {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
-  const { user, loading, logout } = useUser();
+  const { user, loading, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const { planId } = useParams();
