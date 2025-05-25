@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
-import { RiArrowDropDownLine } from 'react-icons/ri';
+import { RiArrowDropDownLine, RiRobot2Line } from 'react-icons/ri';
 import { CiSearch } from 'react-icons/ci';
 import { useTranslation } from 'react-i18next';
 import { changeLanguage } from '../../i18n/config';
@@ -11,11 +11,15 @@ import { useAuth } from '../../context/AuthContext';
 import './navbar.css';
 
 const Navbar = () => {
+    // Use fallback to avoid destructuring undefined
+    const auth = useAuth() || {};
+    // Provide default values when destructuring
+    const { user = null, setUser = () => {} } = auth;
     const { t, i18n } = useTranslation();
     const { theme, toggleTheme } = useTheme();
-    const auth = useAuth();
     const navigate = useNavigate();
     const isRTL = i18n.language === 'ar';
+    const isLoggedIn = !!user;
     const currentLang = i18n.language;
 
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
@@ -31,23 +35,6 @@ const Navbar = () => {
     const searchInputRef = useRef(null);
     const searchDropdownRef = useRef(null);
     const userDropdownRef = useRef(null);
-
-    // Initialize user state from localStorage on component mount
-    useEffect(() => {
-        const savedUser = localStorage.getItem('user');
-        const token = localStorage.getItem('token');
-
-        if (token && savedUser && !auth.user) {
-            try {
-                const parsedUser = JSON.parse(savedUser);
-                auth.setUser(parsedUser);
-            } catch (error) {
-                console.error('Error parsing saved user:', error);
-                localStorage.removeItem('user');
-                localStorage.removeItem('token');
-            }
-        }
-    }, [auth]);
 
     const handleUserDropdownEnter = () => setIsUserDropdownVisible(true);
     const handleUserDropdownLeave = (e) => {
@@ -69,7 +56,7 @@ const Navbar = () => {
     };
 
     const handleLogout = () => {
-        auth.setUser(null);
+        setUser(null);
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         navigate('/loginPage');
@@ -137,6 +124,22 @@ const Navbar = () => {
         };
         fetchInstructors();
     }, []);
+
+    useEffect(() => {
+        const savedUser = localStorage.getItem('user');
+        const token = localStorage.getItem('token');
+
+        if (token && savedUser && !user) {
+            try {
+                const parsedUser = JSON.parse(savedUser);
+                setUser(parsedUser);
+            } catch (error) {
+                console.error('Error parsing saved user:', error);
+                localStorage.removeItem('user');
+                localStorage.removeItem('token');
+            }
+        }
+    }, [user, setUser]);
 
     const handleCategoryHover = (categoryId) => {
         setSelectedCategory(categoryId);
@@ -209,10 +212,10 @@ const Navbar = () => {
             <div className={`flex items-center justify-start gap-12 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
                 <div className="flex items-center text-3xl ml-4">
                     <Link
-                        to={auth.isAuthenticated ? "/home" : "/"}
+                        to={isLoggedIn ? "/home" : "/"}
                         className="flex items-center space-x-2"
                         onClick={() => {
-                            if (auth.isAuthenticated && window.location.pathname === '/') {
+                            if (isLoggedIn && window.location.pathname === '/') {
                                 navigate('/home');
                             }
                         }}
@@ -344,11 +347,18 @@ const Navbar = () => {
                         </span>
                     </li>
 
+                    <li className="flex items-center">
+                        <Link to="/AIChatPage" className="hover:text-red-500 flex items-center">
+                            <RiRobot2Line className="mr-1" />
+                            AI Chat
+                        </Link>
+                    </li>
+
                     <li>
                         <button
                             className={`rounded px-6 text-2xl py-2 border-2 transition ${theme === 'dark'
-                                    ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
-                                    : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
+                                ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
+                                : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
                                 }`}
                         >
                             Subscribe
@@ -465,17 +475,17 @@ const Navbar = () => {
                         </button>
                     </div>
 
-                    {auth.isAuthenticated ? (
+                    {isLoggedIn ? (
                         <div
                             className="relative"
                             onMouseEnter={handleUserDropdownEnter}
                             onMouseLeave={handleUserDropdownLeave}
                         >
                             <button className="flex items-center space-x-2 hover:opacity-80 transition-opacity p-2">
-                                {auth.user?.profilePicture ? (
+                                {user?.profilePicture ? (
                                     <img
-                                        src={auth.user.profilePicture}
-                                        alt={getLocalizedName(auth.user.firstName)}
+                                        src={user.profilePicture}
+                                        alt={getLocalizedName(user.firstName)}
                                         className={`h-10 w-10 rounded-full object-cover border-2 ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}
                                     />
                                 ) : (
@@ -493,10 +503,10 @@ const Navbar = () => {
                                 >
                                     <div className={`p-4 border-b ${theme === 'dark' ? 'bg-[#232323] border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
                                         <p className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                                            {auth.user?.firstName ? getLocalizedName(auth.user.firstName) : ''} {auth.user?.lastName ? getLocalizedName(auth.user.lastName) : ''}
+                                            {user?.firstName ? getLocalizedName(user.firstName) : ''} {user?.lastName ? getLocalizedName(user.lastName) : ''}
                                         </p>
                                         <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} truncate`}>
-                                            {auth.user?.email || ''}
+                                            {user?.email || ''}
                                         </p>
                                         <Link
                                             to="/subscribe"
@@ -587,17 +597,17 @@ const Navbar = () => {
                             <Link
                                 to="/loginPage"
                                 className={`text-sm transition-colors ${theme === 'dark'
-                                        ? 'text-gray-300 hover:text-white'
-                                        : 'text-gray-600 hover:text-black'
+                                    ? 'text-gray-300 hover:text-white'
+                                    : 'text-gray-600 hover:text-black'
                                     }`}
                             >
                                 {t('common.login')}
                             </Link>
                             <Link
-                                to="/signup"
+                                to="/subscribe"
                                 className={`bg-red-500 text-white px-4 py-1.5 rounded transition-colors ${theme === 'dark'
-                                        ? 'hover:bg-red-600'
-                                        : 'hover:bg-red-600'
+                                    ? 'hover:bg-red-600'
+                                    : 'hover:bg-red-600'
                                     } text-sm`}
                             >
                                 {t('common.signup')}
