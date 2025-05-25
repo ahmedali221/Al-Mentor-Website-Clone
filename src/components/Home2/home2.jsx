@@ -6,7 +6,9 @@ import { RiArrowDropLeftLine, RiArrowDropRightLine } from "react-icons/ri";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../context/ThemeContext";
 import axios from "axios";
-import { FaBookmark } from "react-icons/fa";
+import { FaBookmark, FaSpinner } from "react-icons/fa";
+import { toast } from 'react-toastify';
+import { useAuth } from '../../context/AuthContext';
 
 const Home = () => {
   const { t, i18n } = useTranslation();
@@ -14,8 +16,8 @@ const Home = () => {
   const isRTL = i18n.language === "ar";
   const currentLang = i18n.language;
   const navigate = useNavigate();
+  const { user } = useAuth();
 
-  // State hooks for API data storage
   const [instructors, setInstructors] = useState([]);
   const [loadingInstructors, setLoadingInstructors] = useState(true);
   const [errorInstructors, setErrorInstructors] = useState(null);
@@ -24,35 +26,111 @@ const Home = () => {
   const [programs, setPrograms] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [savedCourses, setSavedCourses] = useState([]);
+  const [savingCourse, setSavingCourse] = useState(false);
   
-  // State for free and trending courses
   const [freeCourses, setFreeCourses] = useState([]);
   const [trendingCourses, setTrendingCourses] = useState([]);
   const [loadingFreeCourses, setLoadingFreeCourses] = useState(true);
   const [loadingTrendingCourses, setLoadingTrendingCourses] = useState(true);
 
-  // State for bookmarked courses
-  const [savedCourses, setSavedCourses] = useState(() => {
-    const saved = localStorage.getItem('savedCourses');
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  // Save bookmarks to localStorage when they change
+  // Fetch saved courses
   useEffect(() => {
-    localStorage.setItem('savedCourses', JSON.stringify(savedCourses));
-  }, [savedCourses]);
+    const fetchSavedCourses = async () => {
+      if (!user) return;
+      
+      try {
+        const response = await fetch(`http://localhost:5000/api/saved-courses/user/${user._id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        
+        if (!response.ok) throw new Error('Failed to fetch saved courses');
+        
+        const data = await response.json();
+        setSavedCourses(data.map(item => item.courseId._id));
+      // eslint-disable-next-line no-unused-vars
+      } catch (err) {
+        toast.error(t('Failed to fetch saved courses'));
+      }
+    };
 
-  // Toggle bookmark function
-  const toggleSaveCourse = (courseId, e) => {
+    fetchSavedCourses();
+  }, [user, t]);
+
+  // Toggle save/unsave course
+  const toggleSaveCourse = async (courseId, e) => {
     e.stopPropagation();
-    setSavedCourses(prev =>
-      prev.includes(courseId)
-        ? prev.filter(id => id !== courseId)
-        : [...prev, courseId]
-    );
+    
+    if (!user) {
+      navigate('/loginPage');
+      return;
+    }
+
+    if (savingCourse) return;
+
+    try {
+      setSavingCourse(true);
+      const isCurrentlySaved = savedCourses.includes(courseId);
+
+      if (isCurrentlySaved) {
+        // Unsave course
+        const response = await fetch(`http://localhost:5000/api/saved-courses/${user._id}/${courseId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Unsave error response:', errorData);
+          throw new Error('Failed to unsave course');
+        }
+
+        setSavedCourses(prev => prev.filter(id => id !== courseId));
+        toast.success(t('Course removed from saved courses'));
+      } else {
+        // Save course
+        const payload = {
+          userId: user?._id,
+          courseId,
+          savedAt: new Date().toISOString()
+        };
+        const response = await fetch('http://localhost:5000/api/saved-courses', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          console.error('Save error response:', data);
+          if (
+            response.status === 409 ||
+            (response.status === 400 && data.message && data.message.toLowerCase().includes('already saved'))
+          ) {
+            toast.info(t('Course is already in your saved courses'));
+            return;
+          }
+          throw new Error(data.message || 'Failed to save course');
+        }
+
+        setSavedCourses(prev => [...prev, courseId]);
+        toast.success(t('Course added to saved courses'));
+      }
+    } catch (err) {
+      toast.error(err.message || t('Failed to update saved courses'));
+    } finally {
+      setSavingCourse(false);
+    }
   };
-  
-  // Fetch instructors data
+
+  // Fetch instructors
   useEffect(() => {
     setLoadingInstructors(true);
     axios
@@ -69,7 +147,7 @@ const Home = () => {
       });
   }, []);
 
-  // Fetch courses data
+  // Fetch courses
   useEffect(() => {
     axios
       .get("/api/courses")
@@ -84,10 +162,8 @@ const Home = () => {
         setFreeCourses(free);
         setLoadingFreeCourses(false);
         
-        // Filter for trending courses (assuming a property or just using the first 10 for demo)
+        // Filter for trending courses
         setLoadingTrendingCourses(true);
-        // In a real application, you might have a trending flag or sort by popularity
-        // Here we're just taking the first 10 courses for demonstration
         const trending = courseData.slice(0, 10);
         setTrendingCourses(trending);
         setLoadingTrendingCourses(false);
@@ -99,7 +175,7 @@ const Home = () => {
       });
   }, []);
 
-  // Fetch programs data
+  // Fetch programs
   useEffect(() => {
     axios
       .get("/api/programs")
@@ -110,7 +186,7 @@ const Home = () => {
       .catch((err) => console.error("Error fetching programs:", err));
   }, []);
 
-  // Fetch categories data
+  // Fetch categories
   useEffect(() => {
     axios
       .get("/api/category")
@@ -145,7 +221,7 @@ const Home = () => {
     dots: false,
     infinite: true,
     speed: 500,
-    slidesToShow: 5,
+    slidesToShow: 6,
     slidesToScroll: 1,
     arrows: true,
     prevArrow: <CustomPrevArrow />,
@@ -172,7 +248,7 @@ const Home = () => {
       { breakpoint: 768, settings: { slidesToShow: 2 } },
       { breakpoint: 480, settings: { slidesToShow: 1 } },
     ],
-  } ;
+  };
 
   // Helper function to get localized text
   const getLocalizedText = (obj) => {
@@ -196,7 +272,7 @@ const Home = () => {
 
     return (
       <div
-        className="course-card mx-2 relative cursor-pointer transition-transform duration-200 hover:scale-105"
+        className="course-card mx-2 relative cursor-pointer transition-transform duration-200 hover:scale-100"
         onClick={() => navigate(`/courses/${course._id}`)}
       >
         <div className={`rounded-lg overflow-hidden shadow-lg ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'}`}>
@@ -225,8 +301,9 @@ const Home = () => {
                 <span className="text-yellow-500 mr-1">★★★★★</span>
               </div>
               <button
-                className="bg-transparent border-none p-0 ml-2"
+                className={`bg-transparent border-none p-0 ml-2 ${savingCourse ? 'opacity-50 cursor-not-allowed' : ''}`}
                 onClick={(e) => toggleSaveCourse(course._id, e)}
+                disabled={savingCourse}
               >
                 <FaBookmark className={savedCourses.includes(course._id) ? "text-red-600" : theme === 'dark' ? "text-white" : "text-gray-600"} />
               </button>
@@ -238,9 +315,7 @@ const Home = () => {
   };
 
   // Apply theme and RTL direction
-  const containerClassName = `${
-    theme === "dark" ? "bg-[#121212] text-white" : "bg-white text-black"
-  }`;
+  const containerClassName = `${theme === "dark" ? "bg-[#121212] text-white" : "bg-white text-black"}`;
 
   return (
     <div className={containerClassName} dir={isRTL ? "rtl" : "ltr"}>
@@ -253,15 +328,12 @@ const Home = () => {
             margin: "auto",
           }}
         >
-          {/* خلفية شفافة */}
           <img
             src="/authorized-home-banner.jpg"
             alt="banner"
             className="w-full h-auto object-cover opacity-60 rounded-xl"
             style={{ maxHeight: "500px" }}
           />
-          
-          {/* الطبقة فوق الخلفية */}
           <div className="absolute inset-0 flex flex-col justify-center items-start p-10 text-white z-10">
             <h1 className={`text-4xl font-bold mb-4 leading-none ${theme === "dark" ? "text-white" : "text-black"}`}>
               {t("home2.banner.title")}
@@ -269,19 +341,20 @@ const Home = () => {
             <p className={`text-2xl mb-8  ${theme === "dark" ? "text-gray-300" : "text-[#000000]"}`}>
               {t("home2.banner.subtitle")}
             </p>
-            <button className="bg-red-500 hover:bg-red-700 text-white px-8 py-4 rounded font-semibold text-lg">
+            <button className="bg-red-500 hover:bg-red-700 text-white px-8 py-4 rounded font-semibold text-lg"
+              onClick={() => navigate('/subscribe')}>
               {t("home2.banner.subscribeButton")}
             </button>
           </div>
         </div>
       </section>
 
-      {/* Trending Courses Section - NEW */}
+      {/* Trending Courses Section */}
       <section className="py-20 px-6">
         <div className="flex justify-between items-center mb-6 max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold px-10">{t('home.trend')}</h2>
           <button 
-            onClick={() => navigate('/trending-courses')} 
+            onClick={() => navigate('/all-courses')} 
             className={`text-sm px-10 py-2 rounded transition ${theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-700 hover:text-black'}`}
           >
             {t('buttons.viewAll')} 
@@ -297,7 +370,7 @@ const Home = () => {
           </div>
         ) : (
           <div className="max-w-6xl mx-auto">
-            <Slider  className="px-10"{...courseSliderSettings}>
+            <Slider className="px-10" {...courseSliderSettings}>
               {trendingCourses.map((course, idx) => (
                 <CourseCard key={idx} course={course} />
               ))}
@@ -306,12 +379,12 @@ const Home = () => {
         )}
       </section>
 
-      {/* Free Courses Section - NEW */}
+      {/* Free Courses Section */}
       <section className="py-15 px-5 bg-opacity-5">
         <div className="flex justify-between items-center mb-6 max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold px-10">{t('home.free')}</h2>
           <button 
-            onClick={() => navigate('/free-courses')} 
+            onClick={() => navigate('/all-courses')} 
             className={`text-sm px-10 py-2 rounded transition ${theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-700 hover:text-black'}`}
           >
             {t('buttons.viewAll')}
@@ -327,7 +400,7 @@ const Home = () => {
           </div>
         ) : (
           <div className="max-w-6xl mx-auto">
-            <Slider className="px-10"{...courseSliderSettings}>
+            <Slider className="px-10" {...courseSliderSettings}>
               {freeCourses.map((course, idx) => (
                 <CourseCard key={idx} course={course} />
               ))}
@@ -358,7 +431,7 @@ const Home = () => {
             ]}
             className="px-10" 
           >
-            {programs.map((program, idx) => (
+            {programs.slice(0, 2).map((program, idx) => (
               <div key={idx} className={`rounded-lg shadow-md overflow-hidden ${theme === 'dark' ? 'bg-[#141717]' : 'bg-white'} py-10 min-h-[420px]`}>
                 <div className="flex flex-col md:flex-row">
                   <div className="relative md:w-1/3">
@@ -391,16 +464,13 @@ const Home = () => {
                   </div>
                 </div>
               </div>
-            )).slice(0, 2)} 
+            ))} 
           </Slider>
         </div>
       </section>
 
       {/* Courses Section */}
       <section className="py-1 px-6">
-        <h2 className="text-[60px] leading-[60px] font-bold text-center font-inter mb-6"></h2>
-
-        {/* Category Buttons */}
         <div className="flex justify-center gap-3 mb-8 flex-wrap max-w-4xl mx-auto text-2xl">
           <button
             onClick={() => handleCategoryClick(null)}
@@ -434,22 +504,14 @@ const Home = () => {
           ))}
         </div>
 
-        {/* Courses Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
           {courses.map((course, index) => {
             const title = course.title?.[currentLang] || course.title?.en;
-            const instructor = course.instructor?.user;
-            const instructorName = instructor
-              ? `${
-                  instructor.firstName?.[currentLang] ||
-                  instructor.firstName?.en ||
-                  ""
-                } ${
-                  instructor.lastName?.[currentLang] ||
-                  instructor.lastName?.en ||
-                  ""
-                }`
-              : "Unknown Instructor";
+            const instructorProfile = course.instructorDetails?.profile || 
+            (course.instructor?.user || course.instructor || {});
+            const instructorName = instructorProfile
+              ? `${getLocalizedText(instructorProfile.firstName)} ${getLocalizedText(instructorProfile.lastName)}`
+              : 'Unknown Instructor';
             const image = course.thumbnail || "/default-course-img.png";
 
             return (
@@ -477,11 +539,7 @@ const Home = () => {
                 </div>
                 <div className="p-6">
                   <h3 className="text-lg font-semibold">{title}</h3>
-                  <p
-                    className={`${
-                      theme === "dark" ? "text-gray-400" : "text-gray-500"
-                    }`}
-                  >
+                  <p className={`${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
                     {instructorName}
                   </p>
                   <div className="flex justify-between items-center mt-3">
@@ -489,8 +547,9 @@ const Home = () => {
                       <span className="text-yellow-500 mr-1">★★★★★</span>
                     </div>
                     <button
-                      className="bg-transparent border-none p-0 ml-2"
+                      className={`bg-transparent border-none p-0 ml-2 ${savingCourse ? 'opacity-50 cursor-not-allowed' : ''}`}
                       onClick={(e) => toggleSaveCourse(course._id, e)}
+                      disabled={savingCourse}
                     >
                       <FaBookmark className={savedCourses.includes(course._id) ? "text-red-600" : theme === 'dark' ? "text-white" : "text-gray-600"} />
                     </button>
@@ -515,14 +574,8 @@ const Home = () => {
         </div>
       </section>
 
-         {/* CTA Section */}
-         <section
-        className={`relative py-16 ${
-          theme === "dark"
-            ? "bg-[##121212] text-white"
-            : "bg-[#ffffff] text-black"
-        }`}
-      >
+      {/* CTA Section */}
+      <section className={`relative py-16 ${theme === "dark" ? "bg-[##121212] text-white" : "bg-[#ffffff] text-black"}`}>
         <div className="relative z-10 max-w-2xl mx-auto px-1 text-center">
           <div className="p-8">
             <h1 className="text-4xl font-bold mb-3 leading-tight">
@@ -530,8 +583,8 @@ const Home = () => {
             </h1>
 
             <button
-             onClick={() => navigate('/subscribe')}
-             className="bg-red-500 hover:bg-red-700 text-white px-8 py-4 my-5 rounded font-medium text-lg">
+              onClick={() => navigate('/subscribe')}
+              className="bg-red-500 hover:bg-red-700 text-white px-8 py-4 my-5 rounded font-medium text-lg">
               {t("home.cta.button")}
             </button>
           </div>
@@ -557,17 +610,12 @@ const Home = () => {
             <Slider className="px-10" {...sliderSettings}>
               {instructors.map((instructor, index) => {
                 const profile = instructor.profile || {};
-                const name = `${profile.firstName?.[currentLang] || ""} ${
-                  profile.lastName?.[currentLang] || ""
-                }`;
+                const name = `${profile.firstName?.[currentLang] || ""} ${profile.lastName?.[currentLang] || ""}`;
                 const title = instructor.professionalTitle?.[currentLang] || "";
                 const image = profile.profilePicture || "/default-profile.png";
 
                 return (
-                  <div
-                    key={index}
-                    className="px-4 min-h-72 flex flex-col items-center justify-start"
-                  >
+                  <div key={index} className="px-4 min-h-72 flex flex-col items-center justify-start">
                     <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden shadow">
                       <img
                         src={image}
@@ -579,11 +627,7 @@ const Home = () => {
                     <h3 className="text-lg font-semibold mt-4 text-center">
                       {name}
                     </h3>
-                    <p
-                      className={`${
-                        theme === "dark" ? "text-gray-400" : "text-gray-500"
-                      } text-sm text-center`}
-                    >
+                    <p className={`${theme === "dark" ? "text-gray-400" : "text-gray-500"} text-sm text-center`}>
                       {title}
                     </p>
                   </div>

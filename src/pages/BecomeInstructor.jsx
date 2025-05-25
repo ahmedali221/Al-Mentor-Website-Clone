@@ -215,9 +215,11 @@ function Accordion({ question, answer, theme }) {
 }
 
 function MentorApplicationModal({ isOpen, onClose }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const { theme } = useTheme();
   const auth = useAuth();
   const navigate = useNavigate();
+  const i18n = useTranslation().i18n;
 
   // 👇 إضافة الترجمات المفقودة
   const translations = {
@@ -276,8 +278,8 @@ function MentorApplicationModal({ isOpen, onClose }) {
     yearsOfExperience: ''
   });
 
-  const [sampleVideo, setSampleVideo] = useState(null);
-  const [cv, setCv] = useState(null);
+  const [setSampleVideo] = useState(null);
+  const [setCv] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [serverError, setServerError] = useState('');
@@ -379,10 +381,10 @@ function MentorApplicationModal({ isOpen, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80">
-      <div className="bg-black w-full max-w-4xl rounded-lg shadow-lg p-6 relative overflow-y-auto max-h-[95vh] text-white">
+      <div className={`${theme === 'dark' ? 'bg-black' : 'bg-white'} w-full max-w-4xl rounded-lg shadow-lg p-6 relative overflow-y-auto max-h-[95vh] ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-300 hover:text-red-500 text-xl font-bold"
+          className={`absolute top-4 right-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} hover:text-red-500 text-xl font-bold`}
         >
           &times;
         </button>
@@ -393,47 +395,47 @@ function MentorApplicationModal({ isOpen, onClose }) {
           {success && <div className="bg-green-800 p-2 text-green-100 text-center rounded">{t("mentorForm.applicationSuccess")}</div>}
           {serverError && <div className="bg-red-800 p-2 text-red-100 text-center rounded">{serverError}</div>}
 
-          <div className="bg-gray-800 p-4 rounded-lg">
+          <div className={`${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-gray-100'} p-4 rounded-lg`}>
             <h3 className="text-lg font-semibold mb-4">{t("mentorForm.userInfo")}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300">{t("mentorForm.firstName")} *</label>
+                <label className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} block text-sm font-medium`}>{t("mentorForm.firstName")} *</label>
                 <input 
                   name="firstName" 
                   type="text" 
                   value={fields.firstName} 
                   disabled 
-                  className="w-full border border-gray-600 bg-[#1a1a1a] p-2 rounded text-white mt-1" 
+                  className={`w-full border p-2 rounded mt-1 ${theme === 'dark' ? 'bg-[#1a1a1a] border-gray-600 text-white' : 'bg-white border-gray-300 text-black'}`} 
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300">{t("mentorForm.lastName")} *</label>
+                <label className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} block text-sm font-medium`}>{t("mentorForm.lastName")} *</label>
                 <input 
                   name="lastName" 
                   type="text" 
                   value={fields.lastName} 
                   disabled 
-                  className="w-full border border-gray-600 bg-[#1a1a1a] p-2 rounded text-white mt-1" 
+                  className={`w-full border p-2 rounded mt-1 ${theme === 'dark' ? 'bg-[#1a1a1a] border-gray-600 text-white' : 'bg-white border-gray-300 text-black'}`} 
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-300">{t("mentorForm.email")} *</label>
+                <label className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} block text-sm font-medium`}>{t("mentorForm.email")} *</label>
                 <input 
                   name="email" 
                   type="email" 
                   value={fields.email} 
                   disabled 
-                  className="w-full border border-gray-600 bg-[#1a1a1a] p-2 rounded text-white mt-1" 
+                  className={`w-full border p-2 rounded mt-1 ${theme === 'dark' ? 'bg-[#1a1a1a] border-gray-600 text-white' : 'bg-white border-gray-300 text-black'}`} 
                 />
               </div>
             </div>
           </div>
 
-          <div className="space-y-4">
+          <div className={`${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-gray-100'} p-4 rounded-lg space-y-4`}>
             <h3 className="text-lg font-semibold">{t("mentorForm.professionalTitle")} *</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-white">English *</label>
+                <label className="block text-sm font-medium ">English *</label>
                 <input 
                   name="professionalTitleEn"
                   type="text"
@@ -441,11 +443,11 @@ function MentorApplicationModal({ isOpen, onClose }) {
                   onChange={handleChange}
                   required
                   placeholder="e.g., Senior Software Engineer"
-                  className="w-full border border-gray-600 bg-[#1a1a1a] p-2 rounded text-white"
+                  className={`w-full border p-2 rounded ${theme === 'dark' ? 'bg-[#1a1a1a] border-gray-600 text-white' : 'bg-white border-gray-300 text-black'}`} 
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-white">العربية *</label>
+                <label className="block text-sm font-medium ">العربية *</label>
                 <input 
                   name="professionalTitleAr"
                   type="text"
@@ -453,18 +455,17 @@ function MentorApplicationModal({ isOpen, onClose }) {
                   onChange={handleChange}
                   required
                   placeholder="مثال: مهندس برمجيات أول"
-                  className="w-full border border-gray-600 bg-[#1a1a1a] p-2 rounded text-white"
+                  className={`w-full border p-2 rounded ${theme === 'dark' ? 'bg-[#1a1a1a] border-gray-600 text-white' : 'bg-white border-gray-300 text-black'}`} 
                   dir="rtl"
                 />
               </div>
             </div>
           </div>
-
-          <div className="space-y-4">
+          <div className={`${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-gray-100'} p-4 rounded-lg space-y-4`}>
             <h3 className="text-lg font-semibold">{t("mentorForm.biography")} *</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-white">English *</label>
+                <label className="block text-sm font-medium">English *</label>
                 <textarea 
                   name="biographyEn"
                   value={fields.biographyEn}
@@ -472,11 +473,11 @@ function MentorApplicationModal({ isOpen, onClose }) {
                   required
                   rows={4}
                   placeholder="Write your biography in English (50-2000 characters)"
-                  className="w-full border border-gray-600 bg-[#1a1a1a] p-2 rounded text-white"
+                  className={`w-full border p-2 rounded ${theme === 'dark' ? 'bg-[#1a1a1a] border-gray-600 text-white' : 'bg-white border-gray-300 text-black'}`} 
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-white">العربية *</label>
+                <label className="block text-sm font-medium">العربية *</label>
                 <textarea 
                   name="biographyAr"
                   value={fields.biographyAr}
@@ -484,18 +485,18 @@ function MentorApplicationModal({ isOpen, onClose }) {
                   required
                   rows={4}
                   placeholder="اكتب نبذتك التعريفية بالعربية (50-2000 حرف)"
-                  className="w-full border border-gray-600 bg-[#1a1a1a] p-2 rounded text-white"
+                  className={`w-full border p-2 rounded ${theme === 'dark' ? 'bg-[#1a1a1a] border-gray-600 text-white' : 'bg-white border-gray-300 text-black'}`} 
                   dir="rtl"
                 />
               </div>
             </div>
           </div>
 
-          <div className="space-y-4">
+          <div className={`${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-gray-100'} p-4 rounded-lg space-y-4`}>
             <h3 className="text-lg font-semibold">{t("mentorForm.expertiseAreas")} *</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-white">English *</label>
+                <label className="block text-sm font-medium">English *</label>
                 <input 
                   name="expertiseEn"
                   type="text"
@@ -503,12 +504,12 @@ function MentorApplicationModal({ isOpen, onClose }) {
                   onChange={handleChange}
                   required
                   placeholder="e.g., Web Development, Node.js, MongoDB"
-                  className="w-full border border-gray-600 bg-[#1a1a1a] p-2 rounded text-white"
+                  className={`w-full border p-2 rounded ${theme === 'dark' ? 'bg-[#1a1a1a] border-gray-600 text-white' : 'bg-white border-gray-300 text-black'}`} 
                 />
                 <p className="text-sm text-gray-400 mt-1">Separate areas with commas (1-10 areas)</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-white">العربية *</label>
+                <label className="block text-sm font-medium">العربية *</label>
                 <input 
                   name="expertiseAr"
                   type="text"
@@ -516,7 +517,7 @@ function MentorApplicationModal({ isOpen, onClose }) {
                   onChange={handleChange}
                   required
                   placeholder="مثال: تطوير الويب، نود.جي إس، مونغو دي بي"
-                  className="w-full border border-gray-600 bg-[#1a1a1a] p-2 rounded text-white"
+                  className={`w-full border p-2 rounded ${theme === 'dark' ? 'bg-[#1a1a1a] border-gray-600 text-white' : 'bg-white border-gray-300 text-black'}`} 
                   dir="rtl"
                 />
                 <p className="text-sm text-gray-400 mt-1 text-right">افصل المجالات بفواصل (1-10 مجالات)</p>
@@ -524,58 +525,59 @@ function MentorApplicationModal({ isOpen, onClose }) {
             </div>
           </div>
 
-          <div className="space-y-4">
+          <div className={`${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-gray-100'} p-4 rounded-lg space-y-4`}>
             <h3 className="text-lg font-semibold">{t("mentorForm.socialMedia")}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-white">{t("mentorForm.linkedin")}</label>
+                <label className="block text-sm font-medium">{t("mentorForm.linkedin")}</label>
                 <input 
                   name="linkedin"
                   type="url"
                   value={fields.linkedin}
                   onChange={handleChange}
                   placeholder="https://linkedin.com/in/your-profile"
-                  className="w-full border border-gray-600 bg-[#1a1a1a] p-2 rounded text-white"
+                  className={`w-full border p-2 rounded ${theme === 'dark' ? 'bg-[#1a1a1a] border-gray-600 text-white' : 'bg-white border-gray-300 text-black'}`} 
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-white">{t("mentorForm.twitter")}</label>
+                <label className="block text-sm font-medium ">{t("mentorForm.twitter")}</label>
                 <input 
                   name="twitter"
                   type="url"
                   value={fields.twitter}
                   onChange={handleChange}
                   placeholder="https://twitter.com/your-handle"
-                  className="w-full border border-gray-600 bg-[#1a1a1a] p-2 rounded text-white"
+                  className={`w-full border p-2 rounded ${theme === 'dark' ? 'bg-[#1a1a1a] border-gray-600 text-white' : 'bg-white border-gray-300 text-black'}`} 
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-white">{t("mentorForm.youtube")}</label>
+                <label className="block text-sm font-medium ">{t("mentorForm.youtube")}</label>
                 <input 
                   name="youtube"
                   type="url"
                   value={fields.youtube}
                   onChange={handleChange}
                   placeholder="https://youtube.com/c/your-channel"
-                  className="w-full border border-gray-600 bg-[#1a1a1a] p-2 rounded text-white"
+                  className={`w-full border p-2 rounded ${theme === 'dark' ? 'bg-[#1a1a1a] border-gray-600 text-white' : 'bg-white border-gray-300 text-black'}`} 
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-white">{t("mentorForm.website")}</label>
+                <label className="block text-sm font-medium ">{t("mentorForm.website")}</label>
                 <input 
                   name="website"
                   type="url"
                   value={fields.website}
                   onChange={handleChange}
                   placeholder="https://your-website.com"
-                  className="w-full border border-gray-600 bg-[#1a1a1a] p-2 rounded text-white"
+                  className={`w-full border p-2 rounded ${theme === 'dark' ? 'bg-[#1a1a1a] border-gray-600 text-white' : 'bg-white border-gray-300 text-black'}`} 
                 />
               </div>
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-white">{t("mentorForm.yearsOfExperience")}</label>
+          <div className={`${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-gray-100'} p-4 rounded-lg space-y-4`}>
+
+            <label className="block text-sm font-medium ">{t("mentorForm.yearsOfExperience")}</label>
             <input 
               name="yearsOfExperience"
               type="number"
@@ -583,31 +585,31 @@ function MentorApplicationModal({ isOpen, onClose }) {
               max="60"
               value={fields.yearsOfExperience}
               onChange={handleChange}
-              className="w-full border border-gray-600 bg-[#1a1a1a] p-2 rounded text-white"
-            />
+              className={`w-full border p-2 rounded ${theme === 'dark' ? 'bg-[#1a1a1a] border-gray-600 text-white' : 'bg-white border-gray-300 text-black'}`} 
+              />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className={`${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-gray-100'} p-4 rounded-lg space-y-4 grid grid-cols-1 md:grid-cols-2 gap-4`}>
             <div>
-              <label className="block text-sm font-medium text-white">{t("mentorForm.sampleVideo")} *</label>
+              <label className="block text-sm font-medium ">{t("mentorForm.sampleVideo")} *</label>
               <input 
                 name="sampleVideo"
                 type="file"
                 accept="video/*"
                 onChange={handleFileChange}
                 required
-                className="w-full bg-[#1a1a1a] text-white file:text-white file:bg-red-600 file:border-0 file:px-3 file:py-1"
+                className={`w-full ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-100'}file:text-white file:bg-red-600 file:border-0 file:px-3 file:py-1`}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-white">{t("mentorForm.cv")} *</label>
+              <label className="block text-sm font-medium ">{t("mentorForm.cv")} *</label>
               <input 
                 name="cv"
                 type="file"
                 accept=".pdf,.doc,.docx"
                 onChange={handleFileChange}
                 required
-                className="w-full bg-[#1a1a1a] text-white file:text-white file:bg-red-600 file:border-0 file:px-3 file:py-1"
+                className={`w-full ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-100'}file:text-white file:bg-red-600 file:border-0 file:px-3 file:py-1`}
               />
             </div>
           </div>

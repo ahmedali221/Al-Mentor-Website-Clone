@@ -1,15 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { FiSend, FiCopy, FiCheck, FiPaperclip, FiImage, FiFile, FiDownload, FiPlus, FiTrash2, FiEdit3, FiMessageSquare, FiSave, FiX } from 'react-icons/fi';
+import { FiSend, FiCopy, FiCheck, FiPaperclip, FiImage, FiFile, FiDownload, FiPlus, FiTrash2, FiEdit3, FiMessageSquare, FiX } from 'react-icons/fi';
 import { RiRobot2Line, RiUser3Line } from 'react-icons/ri';
-// Theming and i18n imports
 import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
-import { changeLanguage } from '../i18n/config';
 
 const AIChatHomepage = () => {
-  // Use theme from context
-  const { theme, toggleTheme } = useTheme();
-  // Use translation hook
+  const { theme } = useTheme();
   const { t, i18n } = useTranslation();
 
   const [userInput, setUserInput] = useState('');
@@ -27,23 +23,18 @@ const AIChatHomepage = () => {
   const fileInputRef = useRef(null);
   const chatContainerRef = useRef(null);
 
-  // Get userId from localStorage token (JWT) or fallback to mock
   const [userId, setUserId] = useState(null);
 
   useEffect(() => {
-    // Set document direction on language change
     document.documentElement.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
     document.documentElement.lang = i18n.language;
   }, [i18n.language]);
 
   useEffect(() => {
-    // Try to get userId from JWT token in localStorage
     const token = localStorage.getItem('token');
     if (token) {
       try {
-        // Decode JWT payload
         const payload = JSON.parse(atob(token.split('.')[1]));
-        console.log('Decoded User Id:', payload.userId);
         setUserId(payload.userId || payload.id || payload._id);
       } catch (error) {
         console.error('Error decoding token:', error);
@@ -103,7 +94,7 @@ const AIChatHomepage = () => {
 
   const deleteChat = async (chatId, e) => {
     e.stopPropagation();
-if (window.confirm(t('deleteChatConfirm', 'Are you sure you want to delete this chat?'))) {
+    if (window.confirm(t('ai.chat.deleteChatConfirm'))) {
       try {
         const response = await fetch(`/api/chats/${chatId}`, {
           method: 'DELETE'
@@ -152,14 +143,13 @@ if (window.confirm(t('deleteChatConfirm', 'Are you sure you want to delete this 
         },
         body: JSON.stringify({
           userId,
-          chatId, // always use the same chatId
+          chatId,
           message,
           role
         })
       });
       const data = await response.json();
       if (data.success) {
-        // If this is the first message, set the chatId for the rest of the conversation
         if (!currentChatId && data.data._id) {
           setCurrentChatId(data.data._id);
           fetchUserChats();
@@ -213,12 +203,10 @@ if (window.confirm(t('deleteChatConfirm', 'Are you sure you want to delete this 
     setIsLoading(true);
     setSelectedFile(null);
 
-    // Save user message to backend, get chatId if new
     const chatData = await saveChatMessage(
-      userInput + (selectedFile ? ` [Attachment: ${selectedFile.name}]` : ''),
+      userInput + (selectedFile ? ` [${t('ai.chat.attachment')}: ${selectedFile.name}]` : ''),
       'user'
     );
-    // Use the chatId returned from backend if this is the first message
     const chatIdToUse = currentChatId || chatData?._id;
 
     try {
@@ -247,16 +235,15 @@ if (window.confirm(t('deleteChatConfirm', 'Are you sure you want to delete this 
         };
         setMessages(prev => [...prev, aiMessage]);
 
-        // Save AI response to backend, always use the same chatId
         await saveChatMessage(aiMessage.content, 'assistant', chatIdToUse);
       }
     } catch (error) {
       console.error('Error:', error);
-      const errorMessage ={
-  role: 'assistant',
-  content: t('errorProcessing', 'Sorry, there was an error processing your request.'),
-  timestamp: new Date().toISOString()
-};
+      const errorMessage = {
+        role: 'assistant',
+        content: t('ai.chat.errorProcessing'),
+        timestamp: new Date().toISOString()
+      };
       setMessages(prev => [...prev, errorMessage]);
       await saveChatMessage(errorMessage.content, 'assistant', chatIdToUse);
     }
@@ -274,7 +261,7 @@ if (window.confirm(t('deleteChatConfirm', 'Are you sure you want to delete this 
   const startEditingTitle = (chat, e) => {
     e.stopPropagation();
     setEditingChatId(chat._id);
-    setEditingTitle(chat.title || t('newChat', 'New Chat'));
+    setEditingTitle(chat.title || t('ai.chat.newChat'));
   };
 
   const saveTitle = (chatId) => {
@@ -392,7 +379,7 @@ if (window.confirm(t('deleteChatConfirm', 'Are you sure you want to delete this 
                 {copied === index ? (
                   <div className="flex items-center gap-1 text-xs">
                     <FiCheck className="text-sm" />
-                    <span>{t('copied', 'Copied!')}</span>
+                    <span>{t('ai.chat.copied')}</span>
                   </div>
                 ) : (
                   <FiCopy className="text-sm" />
@@ -403,7 +390,7 @@ if (window.confirm(t('deleteChatConfirm', 'Are you sure you want to delete this 
 
           <div className={`flex items-center gap-2 text-xs mt-1 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
             }`}>
-            <span>{isUser ? t('you', 'You') : t('aiAssistant', 'AI Assistant')}</span>
+            <span>{isUser ? t('ai.chat.you') : t('ai.chat.aiAssistant')}</span>
             <span>•</span>
             <span>{new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
           </div>
@@ -428,13 +415,11 @@ if (window.confirm(t('deleteChatConfirm', 'Are you sure you want to delete this 
         : 'bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200'
         }`}
     >
-      {/* Sidebar */}
       <div className={`${showSidebar ? 'w-80' : 'w-0'} transition-all duration-300 overflow-hidden flex-shrink-0`}>
         <div className={`h-full p-4 ${theme === 'dark'
           ? 'bg-[#1e2338]/50 border-r border-gray-800'
           : 'bg-white/90 border-r border-gray-200'
           }`}>
-          {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div className={`flex items-center gap-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'
               }`}>
@@ -462,7 +447,6 @@ if (window.confirm(t('deleteChatConfirm', 'Are you sure you want to delete this 
             </button>
           </div>
 
-          {/* New Chat Button */}
           <button
             onClick={createNewChat}
             className={`w-full flex items-center gap-3 p-3 rounded-xl mb-4 transition-all duration-200 ${theme === 'dark'
@@ -471,14 +455,13 @@ if (window.confirm(t('deleteChatConfirm', 'Are you sure you want to delete this 
               }`}
           >
             <FiPlus className="text-lg" />
-            <span className="font-medium">{t('newChat', 'New Chat')}</span>
+            <span className="font-medium">{t('ai.chat.newChat')}</span>
           </button>
 
-          {/* Chat History */}
           <div className="space-y-2">
             <h3 className={`text-sm font-medium mb-3 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
               }`}>
-              {t('recentChats', 'Recent Chats')}
+              {t('ai.chat.recentChats')}
             </h3>
             <div className="space-y-1 max-h-[60vh] overflow-y-auto">
               {chatHistory.map((chat) => (
@@ -522,11 +505,10 @@ if (window.confirm(t('deleteChatConfirm', 'Are you sure you want to delete this 
                     ) : (
                       <p className={`text-sm truncate ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
                         }`}>
-                        {chat.title || `${t('chat', 'Chat')} ${new Date(chat.createdAt).toLocaleDateString()}`}
+                        {chat.title || `${t('ai.chat.chat')} ${new Date(chat.createdAt).toLocaleDateString()}`}
                       </p>
                     )}
-                    <p className={`text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'
-                      }`}>
+                    <p className={`text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
                       {new Date(chat.updatedAt).toLocaleDateString()}
                     </p>
                   </div>
@@ -558,9 +540,7 @@ if (window.confirm(t('deleteChatConfirm', 'Are you sure you want to delete this 
         </div>
       </div>
 
-      {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
-        {/* Toggle Sidebar Button */}
         {!showSidebar && (
           <button
             onClick={() => setShowSidebar(true)}
@@ -574,13 +554,11 @@ if (window.confirm(t('deleteChatConfirm', 'Are you sure you want to delete this 
           </button>
         )}
 
-        {/* Chat Container */}
         <div className="flex-1 p-4">
           <div className={`h-full max-w-4xl mx-auto rounded-2xl shadow-2xl overflow-hidden border ${theme === 'dark'
             ? 'bg-[#1e2338]/50 border-gray-800 shadow-black/30 backdrop-blur-xl'
             : 'bg-white/90 border-gray-200 shadow-gray-200/30 backdrop-blur-xl'
             }`}>
-            {/* Messages */}
             <div
               ref={chatContainerRef}
               className={`h-[calc(100%-70px)] overflow-y-auto p-5 space-y-6 scroll-smooth
@@ -599,9 +577,9 @@ if (window.confirm(t('deleteChatConfirm', 'Are you sure you want to delete this 
                     <RiRobot2Line className={`text-5xl ${theme === 'dark' ? 'text-red-400' : 'text-red-600'
                       }`} />
                   </div>
-                  <p className="text-xl font-medium mb-3">{t('welcome', 'Welcome! How can I assist you today?')}</p>
+                  <p className="text-xl font-medium mb-3">{t('ai.chat.welcome')}</p>
                   <p className={`max-w-md mx-auto ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
-                    {t('welcomeDesc', "Ask me anything - from quick questions to complex problems, I'm here to help.")}
+                    {t('ai.chat.welcomeDesc')}
                   </p>
                 </div>
               )}
@@ -630,7 +608,6 @@ if (window.confirm(t('deleteChatConfirm', 'Are you sure you want to delete this 
               )}
             </div>
 
-            {/* Input Form */}
             <div className={`h-[70px] p-3 border-t ${theme === 'dark' ? 'border-gray-800' : 'border-gray-200'}`}>
               <form onSubmit={handleSubmit} className="flex gap-2">
                 <div className="relative flex-1">
@@ -638,14 +615,13 @@ if (window.confirm(t('deleteChatConfirm', 'Are you sure you want to delete this 
                     type="text"
                     value={userInput}
                     onChange={(e) => setUserInput(e.target.value)}
-                    placeholder={t('typeMessage', 'Type your message...')}
+                    placeholder={t('ai.chat.placeholder')}
                     className={`w-full pl-12 pr-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 transition-all duration-200 ${theme === 'dark'
                       ? 'bg-[#1e2338]/80 text-white placeholder-gray-400 focus:ring-red-500/50 border border-gray-700 focus:border-red-500/50'
                       : 'bg-gray-50 text-gray-900 placeholder-gray-500 focus:ring-red-500/30 border border-gray-200 focus:border-red-400'
                       }`}
                   />
 
-                  {/* Attachment Button */}
                   <div className="absolute left-2 top-1/2 transform -translate-y-1/2">
                     <button
                       type="button"
@@ -658,7 +634,6 @@ if (window.confirm(t('deleteChatConfirm', 'Are you sure you want to delete this 
                       <FiPaperclip className="text-lg" />
                     </button>
 
-                    {/* Attachment Menu */}
                     {showAttachMenu && (
                       <div className={`absolute bottom-full left-0 mb-2 p-2 rounded-lg shadow-lg ${theme === 'dark'
                         ? 'bg-[#2a2f42] border border-gray-700'
@@ -676,7 +651,7 @@ if (window.confirm(t('deleteChatConfirm', 'Are you sure you want to delete this 
                             }`}
                         >
                           <FiImage className="text-lg" />
-                          <span>Image</span>
+                          <span>{t('ai.chat.image')}</span>
                         </button>
                         <button
                           type="button"
@@ -690,13 +665,12 @@ if (window.confirm(t('deleteChatConfirm', 'Are you sure you want to delete this 
                             }`}
                         >
                           <FiFile className="text-lg" />
-                          <span>Document</span>
+                          <span>{t('ai.chat.document')}</span>
                         </button>
                       </div>
                     )}
                   </div>
 
-                  {/* File Input (hidden) */}
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -704,7 +678,6 @@ if (window.confirm(t('deleteChatConfirm', 'Are you sure you want to delete this 
                     className="hidden"
                   />
 
-                  {/* Selected File Indicator */}
                   {selectedFile && (
                     <div className={`absolute left-12 top-1/2 transform -translate-y-1/2 flex items-center gap-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
                       }`}>
@@ -723,7 +696,7 @@ if (window.confirm(t('deleteChatConfirm', 'Are you sure you want to delete this 
                       : 'bg-gradient-to-r from-red-500 to-red-700 text-white hover:from-red-600 hover:to-red-800'
                     }`}
                 >
-                  <span>Send</span>
+                  <span>{t('ai.chat.send')}</span>
                   <FiSend className="text-base" />
                 </button>
               </form>

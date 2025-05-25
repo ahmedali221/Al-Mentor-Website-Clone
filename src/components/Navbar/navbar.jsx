@@ -204,26 +204,20 @@ const Navbar = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [showSearchDropdown, searchDropdownRef, searchInputRef]);
 
-    return (
-        <nav
-            className={`fixed top-0 left-0 right-0 px-4 py-4 z-50 shadow transition-all duration-300 text-lg font-medium ${theme === 'dark' ? 'bg-[#1a1a1a] text-white' : 'bg-white text-black'
-                }`}
-        >
-            <div className={`flex items-center justify-start gap-12 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
-                <div className="flex items-center text-3xl ml-4">
-                    <Link
-                        to={isLoggedIn ? "/home" : "/"}
-                        className="flex items-center space-x-2"
-                        onClick={() => {
-                            if (isLoggedIn && window.location.pathname === '/') {
-                                navigate('/home');
-                            }
-                        }}
-                    >
-                        <img src="/logo.jpeg" alt="Almentor Logo" className={`h-12 w-auto ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                        <span className="text-3xl font-semibold">Almentor</span>
-                    </Link>
-                </div>
+  return (
+    <nav
+      className={`fixed top-0 left-0 right-0 px-4 py-4 z-50 shadow transition-all duration-300 text-lg font-medium ${
+        theme === 'dark' ? 'bg-[#1a1a1a] text-white' : 'bg-white text-black'
+      }`}
+    >
+      <div className={`flex items-center justify-start gap-12 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
+        {/* Logo */}
+        <div className="flex items-center text-3xl ml-4">
+          <img src="/logo.jpeg" alt="Almentor Logo" className={`h-12 w-auto ${isRTL ? 'ml-2' : 'mr-2'}`} />
+          <a href="/" className="text-3xl font-semibold">
+            Almentor
+          </a>
+        </div>
 
                 <ul className={`flex items-center ml-1 ${isRTL ? 'space-x-reverse space-x-6' : 'space-x-6'} text-1xl font-medium`}>
                     <li className="relative">
@@ -266,75 +260,50 @@ const Navbar = () => {
                                     </div>
                                 </div>
 
-                                <div className="w-1/2 p-5">
-                                    {categoryCourses.length === 0 ? (
-                                        <p className="text-gray-500">{t('common.noCourses')}</p>
-                                    ) : (
-                                        <ul>
-                                            {categoryCourses.slice(0, 4).map((course) => {
-                                                const lang = i18n.language;
-                                                const title =
-                                                    typeof course.title === 'object'
-                                                        ? course.title[lang] || course.title.en || 'Untitled Course'
-                                                        : course.title || 'Untitled Course';
+                <div className="w-1/2 p-5">
+                  {categoryCourses.length === 0 ? (
+                    <p className="text-gray-500">{t('common.noCourses')}</p>
+                  ) : (
+                    <ul>
+                   {categoryCourses.slice(0, 4).map((course) => {
+  const lang = i18n.language;
+  const title =
+    typeof course.title === 'object'
+      ? course.title[lang] || course.title.en || 'Untitled Course'
+      : course.title || 'Untitled Course';
 
-                                                // Find instructor from instructors list
-                                                const instructorObj = instructors.find(inst => {
-                                                    if (typeof course.instructor === 'object') {
-                                                        return inst._id === course.instructor._id;
-                                                    }
-                                                    return inst._id === course.instructor;
-                                                });
+  const profile = course.instructor?.profile || course.instructor?.user || course.instructor || {};
+  const instructorName =
+    `${profile.firstName?.[lang] || profile.firstName?.en || ''} ${profile.lastName?.[lang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
 
-                                                let instructorName = 'Unknown Instructor';
-                                                let instructorImage = '/default-profile.png';
-
-                                                if (instructorObj && instructorObj.profile) {
-                                                    const firstName = instructorObj.profile.firstName?.[lang] || instructorObj.profile.firstName?.en || '';
-                                                    const lastName = instructorObj.profile.lastName?.[lang] || instructorObj.profile.lastName?.en || '';
-                                                    instructorName = `${firstName} ${lastName}`.trim() || 'Unknown Instructor';
-                                                    instructorImage = instructorObj.profile.profilePicture || '/default-profile.png';
-                                                } else if (course.instructor && typeof course.instructor === 'object') {
-                                                    // Fallback to embedded instructor data
-                                                    const profile = course.instructor.profile || course.instructor.user || course.instructor;
-                                                    const firstName = profile.firstName?.[lang] || profile.firstName?.en || '';
-                                                    const lastName = profile.lastName?.[lang] || profile.lastName?.en || '';
-                                                    instructorName = `${firstName} ${lastName}`.trim() || 'Unknown Instructor';
-                                                    instructorImage = profile.profilePicture || '/default-profile.png';
-                                                }
-
-                                                return (
-                                                    <li
-                                                        key={course._id}
-                                                        className="flex items-center gap-4 mb-5 cursor-pointer hover:bg-gray-100 rounded transition"
-                                                        onClick={() => navigate(`/courses/${course._id}`)}
-                                                    >
-                                                        <img
-                                                            src={course.thumbnail || '/default-course-img.png'}
-                                                            alt={title}
-                                                            className="w-20 h-14 object-cover rounded"
-                                                        />
-                                                        <div>
-                                                            <h4 className="text-base font-semibold text-black text-red-600">
-                                                                {title}
-                                                            </h4>
-                                                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                                {instructorName}
-                                                            </p>
-                                                        </div>
-                                                    </li>
-                                                );
-                                            })}
-                                        </ul>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-                    </li>
+  return (
+    <li key={course._id} className="flex items-center gap-4 mb-5">
+      <img
+        src={course.thumbnail || '/default-course-img.png'}
+        alt={title}
+        className="w-20 h-14 object-cover rounded"
+      />
+      <div>
+        <h4 className="text-base font-semibold text-black text-red-600">
+          {title}
+        </h4>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          {instructorName}
+        </p>
+      </div>
+    </li>
+  );
+})}
+                    </ul>
+                  )}
+                </div>
+              </div>
+            )}
+          </li>
 
                     <li>
                         <Link to="/instructors" className="hover:text-red-500">
-                            Instructors
+                            {t('navigation.instructors')}
                         </Link>
                     </li>
 
@@ -343,28 +312,29 @@ const Navbar = () => {
                             {t('navigation.programs')}
                         </Link>
                         <span className="ml-2 bg-red-500 text-white text-[10px] px-1 py-0.5 rounded-full">
-                            NEW
+                            {t('home.new')}
                         </span>
                     </li>
 
                     <li className="flex items-center">
                         <Link to="/AIChatPage" className="hover:text-red-500 flex items-center">
                             <RiRobot2Line className="mr-1" />
-                            AI Chat
+                            {t('buttons.aiChat')}
                         </Link>
                     </li>
 
-                    <li>
-                        <button
-                            className={`rounded px-6 text-2xl py-2 border-2 transition ${theme === 'dark'
-                                ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
-                                : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
-                                }`}
-                        >
-                            Subscribe
-                        </button>
-                    </li>
-                </ul>
+          <li>
+            <button
+              className={`rounded px-6 text-2xl py-2 border-2 transition ${
+                theme === 'dark'
+                  ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
+                  : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
+              }`}
+            >
+              {t('buttons.subscribe')}
+            </button>
+          </li>
+        </ul>
 
                 <div className={`flex items-center ml-auto ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
                     <div className="relative">
@@ -510,7 +480,7 @@ const Navbar = () => {
                                         </p>
                                         <Link
                                             to="/subscribe"
-                                            className="mt-3 block w-full text-center bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors"
+                                            className="mt-3 block w-full text-center bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition-colors"
                                             onClick={handleUserDropdownLeave}
                                         >
                                             {t('profile.subscribe')}
@@ -599,18 +569,17 @@ const Navbar = () => {
                                 className={`text-sm transition-colors ${theme === 'dark'
                                     ? 'text-gray-300 hover:text-white'
                                     : 'text-gray-600 hover:text-black'
-                                    }`}
+                                    }text-lg`}
                             >
                                 {t('common.login')}
                             </Link>
                             <Link
                                 to="/subscribe"
-                                className={`bg-red-500 text-white px-4 py-1.5 rounded transition-colors ${theme === 'dark'
+                                className={`bg-red-500 text-white px-5 py-2 rounded transition-colors ${theme === 'dark'
                                     ? 'hover:bg-red-600'
                                     : 'hover:bg-red-600'
-                                    } text-sm`}
-                            >
-                                {t('common.signup')}
+                                    } text-sm text-center`}
+                            >{t('common.signup')}
                             </Link>
                         </>
                     )}

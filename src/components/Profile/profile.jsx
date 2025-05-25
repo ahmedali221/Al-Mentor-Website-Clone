@@ -2,102 +2,70 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { FaUserCircle } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '../../context/ThemeContext';
 import './Profile.css';
 
 const Profile = () => {
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const { i18n } = useTranslation();
+  const { theme } = useTheme();
   const currentLang = i18n.language;
 
-  const getLocalizedName = (nameObj) => {
-    if (!nameObj) return '';
-    if (typeof nameObj === 'string') return nameObj;
-    return nameObj[currentLang] || nameObj.en || '';
-  };
-
-  const [name, setName] = useState(user ? `${getLocalizedName(user.firstName)} ${getLocalizedName(user.lastName)}`.trim() : '');
-  const [gender, setGender] = useState('Female');
-  const [dateOfBirth, setDateOfBirth] = useState({ day: '', month: '', year: '' });
+  // Load initial state from localStorage or user data
+  const [nameAr] = useState(user ? `${user.firstName?.ar || ''} ${user.lastName?.ar || ''}`.trim() : '');
+  const [nameEn] = useState(user ? `${user.firstName?.en || ''} ${user.lastName?.en || ''}`.trim() : '');
+  const [gender, setGender] = useState(() => localStorage.getItem('userGender') || 'Female');
+  const [dateOfBirth, setDateOfBirth] = useState(() => {
+    const saved = localStorage.getItem('userDateOfBirth');
+    return saved ? JSON.parse(saved) : { day: '', month: '', year: '' };
+  });
   const [activeSection, setActiveSection] = useState('Personal Information');
-  const [email, setEmail] = useState(user ? user.email : '');
-  const [password, setPassword] = useState('********');
-  const [mobile, setMobile] = useState(user ? user.mobile || '' : '');
-  const [availableInterests, setAvailableInterests] = useState([
-    'الموارد البشرية', 'وسائل التواصل الاجتماعي', 'التعليم', 'التواصل', 'إدارة التغيير', 'العلامة التجارية',
-    'القيادة', 'التطوير الوظيفي', 'تجربة العملاء', 'ريادة الأعمال', 'الرعاية الصحية', 'مقابلات',
-    'الإنتاجية', 'الرسوم المتحركة', 'التحليلات', 'الرياضة', 'الاستراتيجية', 'بينة العمل'
-  ]);
-  const [selectedInterests, setSelectedInterests] = useState([]);
-  const [purchaseHistory] = useState([
-    {
-      id: 1,
-      date: '16/05/2025',
-      status: 'قيد التنفيذ',
-      packageName: 'الباقة السنوية',
-      price: '2399 EGP',
-      paymentMethod: 'Fawry',
-      orderNumber: 'dc74a69c-612b-4721-928d-5c5dd74e3ccf',
-    },
-    {
-      id: 2,
-      date: '16/05/2025',
-      status: 'قيد التنفيذ',
-      packageName: 'الباقه الربع سنوية',
-      price: '799 EGP',
-      paymentMethod: 'Visa',
-      orderNumber: '9aef29de-62ab-4d2b-b999-9eb2bf8692a8',
-    },
-  ]);
+  const [email] = useState(user ? user.email : '');
 
-  // Load interests from localStorage
   useEffect(() => {
-    const storedInterests = localStorage.getItem('userInterests');
-    if (storedInterests) {
-      setSelectedInterests(JSON.parse(storedInterests));
-    }
-  }, []);
+    localStorage.setItem('userGender', gender);
+    localStorage.setItem('userDateOfBirth', JSON.stringify(dateOfBirth));
+  }, [gender, dateOfBirth]);
 
-  // Handlers
   const handleSave = () => {
-    console.log('Saved Personal Information:', { name, gender, dateOfBirth });
+    console.log('Saved Personal Information:', { 
+      nameAr, 
+      nameEn, 
+      gender, 
+      dateOfBirth 
+    });
   };
 
-  const handleSaveInterests = () => {
-    localStorage.setItem('userInterests', JSON.stringify(selectedInterests));
-    console.log('Saved Interests:', selectedInterests);
-  };
-
-  const handleSelectInterest = (interest) => {
-    if (!selectedInterests.includes(interest)) {
-      setSelectedInterests([...selectedInterests, interest]);
-      setAvailableInterests(availableInterests.filter(item => item !== interest));
-    }
-  };
-
-  const handleRemoveInterest = (interest) => {
-    setSelectedInterests(selectedInterests.filter(item => item !== interest));
-    setAvailableInterests([...availableInterests, interest]);
-  };
-
-  // Render sections
   const renderContent = () => {
     switch (activeSection) {
       case 'Personal Information':
         return (
-          <form className="profile-form">
-            <h2>Personal Information</h2>
+          <form className={`profile-form ${theme === 'dark' ? 'dark' : ''}`}>
+            <h2>{t('profile.personalInfo')}</h2>
             <div className="form-group">
-              <label htmlFor="name">Name</label>
+              <label htmlFor="nameAr">{t('profile.name')} (العربية)</label>
               <input
-                id="name"
+                id="nameAr"
                 type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={nameAr}
                 className="input-field"
+                dir="rtl"
+                disabled
               />
             </div>
             <div className="form-group">
-              <label>Gender</label>
+              <label htmlFor="nameEn">{t('profile.name')} (English)</label>
+              <input
+                id="nameEn"
+                type="text"
+                value={nameEn}
+                className="input-field"
+                dir="ltr"
+                disabled
+              />
+            </div>
+            <div className="form-group">
+              <label>{t('profile.gender')}</label>
               <div className="gender-options">
                 {['Male', 'Female'].map((option) => (
                   <label key={option} className={gender === option ? 'selected' : ''}>
@@ -107,20 +75,20 @@ const Profile = () => {
                       checked={gender === option}
                       onChange={(e) => setGender(e.target.value)}
                     />
-                    {option}
+                    {t(`profile.${option.toLowerCase()}`)}
                   </label>
                 ))}
               </div>
             </div>
             <div className="form-group">
-              <label>Date of Birth</label>
+              <label>{t('profile.dateOfBirth')}</label>
               <div className="date-inputs">
                 <select
                   value={dateOfBirth.day}
                   onChange={(e) => setDateOfBirth({ ...dateOfBirth, day: e.target.value })}
                   className="date-select"
                 >
-                  <option value="">Day</option>
+                  <option value="">{t('profile.day')}</option>
                   {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
                     <option key={day} value={day}>{day}</option>
                   ))}
@@ -130,7 +98,7 @@ const Profile = () => {
                   onChange={(e) => setDateOfBirth({ ...dateOfBirth, month: e.target.value })}
                   className="date-select"
                 >
-                  <option value="">Month</option>
+                  <option value="">{t('profile.month')}</option>
                   {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
                     <option key={month} value={month}>{month}</option>
                   ))}
@@ -140,7 +108,7 @@ const Profile = () => {
                   onChange={(e) => setDateOfBirth({ ...dateOfBirth, year: e.target.value })}
                   className="date-select"
                 >
-                  <option value="">Year</option>
+                  <option value="">{t('profile.year')}</option>
                   {Array.from({ length: 100 }, (_, i) => 2025 - i).map((year) => (
                     <option key={year} value={year}>{year}</option>
                   ))}
@@ -148,122 +116,45 @@ const Profile = () => {
               </div>
             </div>
             <button type="button" onClick={handleSave} className="save-button">
-              Save changes
+              {t('profile.saveChanges')}
             </button>
           </form>
         );
       case 'Account Information':
         return (
-          <div className="account-info-form">
-            <h2>بيانات الحساب</h2>
+          <div className={`account-info-form ${theme === 'dark' ? 'dark' : ''}`}>
+            <h2>{t('profile.accountInfo')}</h2>
             <div className="form-group">
-              <label htmlFor="email">الحساب</label>
+              <label htmlFor="name">{t('profile.name')}</label>
+              <input
+                id="name"
+                type="text"
+                value={currentLang === 'ar' ? nameAr : nameEn}
+                className="input-field"
+                disabled
+                dir={currentLang === 'ar' ? 'rtl' : 'ltr'}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="email">{t('profile.email')}</label>
               <input
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 className="input-field"
                 disabled
               />
             </div>
-            <div className="form-group">
-              <label htmlFor="password">كلمة المرور</label>
-              <div className="input-group">
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="input-field"
-                />
-                <span className="icon">←</span>
-              </div>
-            </div>
-            <div className="form-group">
-              <label htmlFor="mobile">رقم الهاتف المحمول</label>
-              <div className="input-group">
-                <input
-                  id="mobile"
-                  type="text"
-                  value={mobile}
-                  onChange={(e) => setMobile(e.target.value)}
-                  className="input-field"
-                />
-                <span className="icon">←</span>
-              </div>
-            </div>
           </div>
         );
-      case 'Interests':
-        return (
-          <div className="interests-section">
-            <h2>الاهتمامات</h2>
-            <p>اختر كل ما هو ضمن اهتماماتك</p>
-            <div className="selected-interests">
-              {selectedInterests.map((interest) => (
-                <span
-                  key={interest}
-                  className="interest-tag selected"
-                  onClick={() => handleRemoveInterest(interest)}
-                >
-                  {interest} <span className="remove-icon">×</span>
-                </span>
-              ))}
-            </div>
-            <div className="available-interests">
-              {availableInterests.map((interest) => (
-                <span
-                  key={interest}
-                  className="interest-tag"
-                  onClick={() => handleSelectInterest(interest)}
-                >
-                  {interest}
-                </span>
-              ))}
-            </div>
-            <button onClick={handleSaveInterests} className="save-button">
-              حفظ التعديلات
-            </button>
-          </div>
-        );
-      case 'Purchase Log':
-        return (
-          <div className="purchase-log-section">
-            <h2>سجل الشراء</h2>
-            <div className="purchase-items-list">
-              {purchaseHistory.map((item) => (
-                <div key={item.id} className="purchase-item-card">
-                  <div className="item-header">
-                    <span className="item-date">{item.date}</span>
-                    <span className="item-status">
-                      {item.status}
-                      <span className="status-icon">!</span>
-                    </span>
-                  </div>
-                  <div className="item-details">
-                    <div className="package-info">
-                      <div className="package-name">{item.packageName}</div>
-                      <div className="package-price">{item.price}</div>
-                    </div>
-                    <div className={`payment-method-icon ${item.paymentMethod.toLowerCase()}`}></div>
-                  </div>
-                  <div className="order-info">رقم الطلب: {item.orderNumber}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      case 'Payment Information':
-        return <h2>Payment Information Content</h2>;
       default:
-        return <h2>Select a section from the sidebar</h2>;
+        return <h2>{t('profile.selectSection')}</h2>;
     }
   };
 
   return (
-    <div className="profile-wrapper">
-      <div className="profile-header">
+    <div className={`profile-wrapper ${theme === 'dark' ? 'dark' : ''}`}>
+      <div className={`profile-header ${theme === 'dark' ? 'dark' : ''}`}>
         <div className="profile-avatar">
           {user?.profilePicture ? (
             <img src={user.profilePicture} alt="User Avatar" />
@@ -273,33 +164,30 @@ const Profile = () => {
           <div className="camera-icon" />
         </div>
         <div className="profile-info">
-          <p className="profile-name">{name}</p>
+          <p className="profile-name">{currentLang === 'ar' ? nameAr : nameEn}</p>
           <p className="profile-email">{email}</p>
-        </div>
-        <div className="subscription-info">
-          <p className="subscription-text">You can subscribe on</p>
-          <p className="subscription-plan">Monthly Plan with 399 EGP</p>
         </div>
       </div>
       <div className="content-wrapper">
-        <aside className="sidebar">
+        <aside className={`sidebar ${theme === 'dark' ? 'dark' : ''}`}>
           <nav>
             <ul>
-              {['Personal Information', 'Account Information', 'Interests', 'Purchase Log', 'Payment Information'].map(
-                (section) => (
-                  <li
-                    key={section}
-                    className={activeSection === section ? 'active' : ''}
-                    onClick={() => setActiveSection(section)}
-                  >
-                    {section}
-                  </li>
-                )
-              )}
+              {[
+                { id: 'Personal Information', label: t('profile.personalInfo') },
+                { id: 'Account Information', label: t('profile.accountInfo') }
+              ].map((section) => (
+                <li
+                  key={section.id}
+                  className={activeSection === section.id ? 'active' : ''}
+                  onClick={() => setActiveSection(section.id)}
+                >
+                  {section.label}
+                </li>
+              ))}
             </ul>
           </nav>
         </aside>
-        <main className="main-content">
+        <main className={`main-content ${theme === 'dark' ? 'dark' : ''}`}>
           {renderContent()}
         </main>
       </div>

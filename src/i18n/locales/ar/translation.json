@@ -2,11 +2,12 @@
   "common": {
     "welcome": "مرحباً بك في المينتور",
     "login": "تسجيل الدخول",
-    "signup": "إنشاء حساب",
+    "signup": "حساب جديد",
     "logout": "تسجيل الخروج",
     "search": "ابحث عن الدورات، المواضيع، المدربين...",
     "menu": "القائمة",
-    "language": "اللغة"
+    "language": "اللغة",
+    "noCourses": "لا توجد دورات متاحة في الوقت الحالي."
   },
   "navigation": {
     "home": "الرئيسية",
@@ -66,7 +67,10 @@
         "languages": "اللغات",
         "softSkills": "المهارات الناعنة"
       }
+     
     },
+    
+    "new":"جديد",
     "instructors": {
       "title": "مدربونا",
       "title2": "هل تريد أن تصبح خبير؟",
@@ -77,7 +81,10 @@
     "cta": {
       "title": "فقط 199 جنيه شهرياً! احصل على وصول غير محدود لكل الدورات عند الاشتراك في ألفمينتور.",
       "button": "اشترك الآن"
-    }
+    },
+    "freespan":"مجاني",
+    "free":"الدورات المجانية",
+    "trend": "الدورات الرائجة"
   },
   "courses": {
     "title": "دوراتنا",
@@ -106,7 +113,12 @@
     "delete": "حذف",
     "back": "رجوع",
     "continue": "المتابعة",
-    "subscribeNow": "اشترك الآن"
+    "subscribeNow": "اشترك الآن",
+    "viewAll": "عرض الكل",
+    "instructors": "المدربين",
+    "courses":"الدورات",
+    "aiChat": "الدردشة الذكية",
+    "subscribe": "اشترك"
   },
   "messages": {
     "loading": "جاري التحميل...",
@@ -314,6 +326,11 @@
     }
   },
   "mentorForm": {
+    "userInfo": "معلومات المستخدم",
+    "professionalTitle": "المسمى الوظيفي",
+    "biography": "السيرة الذاتية",
+    "expertiseAreas": "مجالات الخبرة",
+    "socialMedia": "حسابات وسائل التواصل الاجتماعي",
     "title": "قدم كمرشد",
     "subtitle": "يرجى إخبارنا المزيد عن نفسك وكيف يمكننا التواصل معك:",
     "firstName": "الاسم الأول",
@@ -329,6 +346,10 @@
     "yearsExperience": "كم عدد سنوات الخبرة لديك في مجال التدريب؟",
     "linkedin": "رابط لينكدإن",
     "facebook": "صفحة فيسبوك",
+    "twitter": "حساب تويتر",
+    "youtube": "قناة يوتيوب",
+    "website": "الموقع الإلكتروني",
+    "yearsOfExperience": "سنوات الخبرة",
     "company": "الشركة (في حال التقديم كشريك)",
     "topics": "ما هي المواضيع التي ترغب في تقديمها على المنصة؟",
     "sampleVideo": "فيديو تجريبي لك",
@@ -356,14 +377,48 @@
     "savedCourses": "الدورات المحفوظة",
     "certificates": "الشهادات",
     "accountSettings": "إعدادات الحساب",
-    "becomeInstructor": "كن مدرباً"
+    "becomeInstructor": "كن مدرباً",
+    "personalInfo": "المعلومات الشخصية",
+    "accountInfo": "معلومات الحساب",
+    "interests": "الاهتمامات",
+    "name": "الاسم",
+    "gender": "الجنس",
+    "male": "ذكر",
+    "female": "أنثى",
+    "dateOfBirth": "تاريخ الميلاد",
+    "day": "اليوم",
+    "month": "الشهر",
+    "year": "السنة",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "mobile": "رقم الهاتف المحمول",
+    "saveChanges": "حفظ التغييرات",
+    "selectInterests": "اختر كل ما هو ضمن اهتماماتك",
+    "saveInterests": "حفظ الاهتمامات",
+    "interestList": {
+      "humanResources": "الموارد البشرية",
+      "socialMedia": "وسائل التواصل الاجتماعي",
+      "education": "التعليم",
+      "communication": "التواصل",
+      "changeManagement": "إدارة التغيير",
+      "branding": "العلامة التجارية",
+      "leadership": "القيادة",
+      "careerDevelopment": "التطوير الوظيفي",
+      "customerExperience": "تجربة العملاء",
+      "entrepreneurship": "ريادة الأعمال",
+      "healthcare": "الرعاية الصحية",
+      "interviews": "مقابلات",
+      "productivity": "الإنتاجية",
+      "animation": "الرسوم المتحركة",
+      "analytics": "التحليلات",
+      "sports": "الرياضة",
+      "strategy": "الاستراتيجية",
+      "businessIntelligence": "بينة العمل"
+    }
   },
   "Loading...": "جارٍ التحميل...",
   "Saved Courses": "الدورات المحفوظة",
-    "subscriptionCTA": {
-    "label": "ندعوك للاشتراك الآن للحصول على وصول غير محدود لجميع الدورات.",
-    "button": "اشترك الآن"
-  },
+   
   "payment": {
     "title": "الدفع",
     "details": "تفاصيل الدفع",

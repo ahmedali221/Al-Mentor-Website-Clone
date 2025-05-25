@@ -1,12 +1,52 @@
 {
+  "auth": {
+    "welcomeBack": "Welcome Back",
+    "welcomeToAlmentor": "Welcome to Almentor",
+    "welcomeMessage": "Welcome to Almentor!",
+    "createAccount": "Create an account",
+    "signupAndLearn": "Sign up and start learning",
+    "signupSubtitle": "Sign up and start learning",
+    "loginWithFacebook": "Login with Facebook",
+    "loginWithGoogle": "Login with Google",
+    "enterEmail": "Enter Your Email",
+    "emailPlaceholder": "Type Your Email...",
+    "enterPassword": "Enter Password",
+    "passwordPlaceholder": "Type Password...",
+    "passwordCreatePlaceholder": "Create a Password",
+    "fullNameEn": "Full Name (English)",
+    "fullNameEnPlaceholder": "Enter Your Full Name in English",
+    "fullNameAr": "Full Name (Arabic)",
+    "fullNameArPlaceholder": "Enter Your Full Name in Arabic",
+    "username": "Username",
+    "usernamePlaceholder": "Choose a Username",
+    "email": "Email",
+    "emailInputPlaceholder": "Enter your email",
+    "password": "Password",
+    "passwordInputPlaceholder": "Create a Password",
+    "termsAgreement": "By signing up, I agree to the",
+    "termsAndConditions": "Terms and Conditions",
+    "and": "and",
+    "privacyPolicy": "Privacy Policy",
+    "haveAccount": "Already have an account?",
+    "noAccount": "Don't have an account?",
+    "minutes": "Minutes",
+    "skills": "Skills You Will Gain",
+    "included": "Included Courses",
+    "category": "Category",
+    "facebook": "Facebook",
+    "google": "Google",
+    "emailVerified": "Email verified! Please enter your password.",
+    "continue": "Continue with"
+  },
   "common": {
     "welcome": "Welcome to Al-Mentor",
     "login": "Login",
-    "signup": "Sign Up",
+    "signup": "SignUp",
     "logout": "Logout",
     "search": "Search courses, topics, instructors...",
     "menu": "Menu",
-    "language": "Language"
+    "language": "Language",
+    "noCourses": "No courses available"
   },
   "navigation": {
     "home": "Home",
@@ -30,11 +70,11 @@
     "instructors": "Instructors",
     "learningPartners": "Learning Partners",
     "business": "Business",
-    "becomeInstructor": "Become an instructor",
+    "becomeInstructor": "Become an Instructor",
     "trainTeam": "Train Your Team",
     "downloadApp": "Download App",
-    "termsOfUse": "Terms of use",
-    "privacyPolicy": "Privacy policy",
+    "termsOfUse": "Terms of Use",
+    "privacyPolicy": "Privacy Policy",
     "helpCenter": "Help Center",
     "support": "Support",
     "terms": "Terms & Conditions",
@@ -70,6 +110,7 @@
         "softSkills": "Soft Skills"
       }
     },
+    "new": "New",
     "instructors": {
       "title": "Our Instructors",
       "title2": "How To Become an Instructor?",
@@ -82,7 +123,10 @@
     "cta": {
       "title": "Only at 199 EGP /month! Get unlimited access to all courses when you subscribe to Almentor.",
       "button": "Subscribe Now"
-    }
+    },
+    "freespan": "Free",
+    "free": "Free Courses",
+    "trend": "Trending Courses"
   },
   "courses": {
     "title": "Our Courses",
@@ -106,7 +150,12 @@
     "submit": "Submit",
     "edit": "Edit",
     "delete": "Delete",
-    "back": "Back"
+    "back": "Back",
+    "viewAll": "View All",
+    "instructors": "Instructors",
+    "courses": "Courses",
+    "aiChat": "AI Chat",
+    "subscribe": "Subscribe"
   },
   "messages": {
     "loading": "Loading...",
@@ -131,7 +180,7 @@
     "starred": "Starred",
     "notes": "Notes",
     "lessons": "Lessons",
-    "complete": "complete",
+    "complete": "Complete",
     "loadingLessons": "Loading lessons...",
     "noLessons": "No lessons available",
     "starredLessons": "Starred Lessons",
@@ -255,9 +304,14 @@
     }
   },
   "close": "Close modal",
-  "logo_alt": "almentor logo",
+  "logo_alt": "Almentor logo",
   "mentorForm": {
+    "userInfo": "User Information",
+    "professionalTitle": "Professional Title",
     "title": "Apply as a Mentor",
+    "socialMedia": "Social Media",
+    "biography": "Biography",
+    "expertiseAreas": "Areas of Expertise",
     "subtitle": "Please tell us more about yourself and how we can reach you:",
     "firstName": "First name",
     "lastName": "Last name",
@@ -272,6 +326,10 @@
     "yearsExperience": "How many years of experience do you have in the field of training?",
     "linkedin": "LinkedIn Profile",
     "facebook": "Facebook Page",
+    "twitter": "Twitter Profile",
+    "youtube": "YouTube Channel",
+    "website": "Website",
+    "yearsOfExperience": "Years of Experience",
     "company": "Company (if applying as partner)",
     "topics": "What are the topics that you would like to introduce on the platform?",
     "sampleVideo": "Sample video of you",
@@ -299,9 +357,46 @@
     "savedCourses": "Saved Courses",
     "certificates": "Certificates",
     "accountSettings": "Account Settings",
-    "becomeInstructor": "Become Instructor"
+    "becomeInstructor": "Become Instructor",
+    "personalInfo": "Personal Information",
+    "accountInfo": "Account Information",
+    "interests": "Interests",
+    "name": "Name",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "dateOfBirth": "Date of Birth",
+    "day": "Day",
+    "month": "Month",
+    "year": "Year",
+    "email": "Email",
+    "password": "Password",
+    "mobile": "Mobile Number",
+    "saveChanges": "Save Changes",
+    "selectInterests": "Select all that interest you",
+    "saveInterests": "Save Interests",
+    "interestList": {
+      "humanResources": "Human Resources",
+      "socialMedia": "Social Media",
+      "education": "Education",
+      "communication": "Communication",
+      "changeManagement": "Change Management",
+      "branding": "Branding",
+      "leadership": "Leadership",
+      "careerDevelopment": "Career Development",
+      "customerExperience": "Customer Experience",
+      "entrepreneurship": "Entrepreneurship",
+      "healthcare": "Healthcare",
+      "interviews": "Interviews",
+      "productivity": "Productivity",
+      "animation": "Animation",
+      "analytics": "Analytics",
+      "sports": "Sports",
+      "strategy": "Strategy",
+      "businessIntelligence": "Business Intelligence"
+    }
   },
-    "payment": {
+  "payment": {
     "title": "Payment",
     "details": "Payment Details",
     "loggedInWith": "Logged in with",
@@ -388,4 +483,3 @@
   },
   "changePlan": "Change Plan"
 }
-
