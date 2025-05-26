@@ -9,7 +9,7 @@ function Subscribe() {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const isRTL = i18n.language === "ar";
 
   const [subscriptions, setSubscriptions] = useState([]);
@@ -35,9 +35,7 @@ function Subscribe() {
   };
 
   const handleSubscribe = (planId) => {
-    if (isAuthenticated) {
-      navigate(`/payment/${planId}`);
-    } else {
+    if (!user) {
       navigate("/loginPage", {
         state: {
           from: "/subscribe",
@@ -45,10 +43,20 @@ function Subscribe() {
           planId: planId,
         },
       });
+      return;
     }
+
+    if (!planId) {
+      setError(t("messages.invalidPlan"));
+      return;
+    }
+
+    navigate(`/payment/${planId}`);
   };
 
   useEffect(() => {
+    if (authLoading) return;
+
     const fetchSubscriptions = async () => {
       try {
         setLoading(true);
@@ -65,7 +73,7 @@ function Subscribe() {
         if (response.data && Array.isArray(response.data)) {
           setSubscriptions(response.data);
         } else {
-          throw new Error("Invalid data format");
+          throw new Error(t("messages.invalidData"));
         }
       } catch (err) {
         console.error("Error fetching subscriptions:", err);
@@ -79,7 +87,7 @@ function Subscribe() {
     };
 
     fetchSubscriptions();
-  }, [t]);
+  }, [t, authLoading]);
 
   if (loading) {
     return (
@@ -114,21 +122,21 @@ function Subscribe() {
 
   return (
     <div
-      className={`min-h-screen pt-16 ${
+      className={`min-h-screen flex items-center justify-center ${
         theme === "dark"
           ? "bg-[#1A1A1A] text-white"
           : "bg-gray-50 text-gray-900"
       }`}
       dir={isRTL ? "rtl" : "ltr"}>
-      <div className='container mx-auto px-4 py-12 max-w-7xl'>
-        <div className='text-center mb-16'>
-          <h1 className='text-5xl font-bold mb-4'>
+      <div className='w-full max-w-7xl px-4 py-8 sm:py-12'>
+        <div className='text-center mb-8 sm:mb-16'>
+          <h1 className='text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 px-4'>
             {t("subscription.mainTitle", "Subscribe now and start learning")}
           </h1>
           <p
-            className={`text-xl ${
+            className={`text-lg sm:text-xl ${
               theme === "dark" ? "text-gray-300" : "text-gray-600"
-            } max-w-3xl mx-auto`}>
+            } max-w-3xl mx-auto px-4`}>
             {t(
               "subscription.subtitle",
               "Choose a plan and get unlimited access to the best learning content in the Arab world for the best price."
@@ -146,32 +154,32 @@ function Subscribe() {
             </p>
           </div>
         ) : (
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 px-4 sm:px-6 lg:px-8'>
             {subscriptions.map((plan) => (
               <div
                 key={plan._id}
-                className={`rounded-lg p-6 ${
+                className={`rounded-lg p-4 sm:p-6 ${
                   theme === "dark" ? "bg-[#2C2C2C]" : "bg-white"
                 } shadow-lg transform transition-transform duration-300 hover:scale-105`}>
                 <div className='text-center'>
-                  <h3 className='text-2xl font-bold mb-2'>
+                  <h3 className='text-xl sm:text-2xl font-bold mb-2'>
                     {getLocalizedContent(plan.displayName, plan.name)}
                   </h3>
-                  <p className='text-4xl font-bold mb-4'>
+                  <p className='text-3xl sm:text-4xl font-bold mb-3 sm:mb-4'>
                     {formatPrice(plan.price)}
                   </p>
                   <p
-                    className={`mb-6 ${
+                    className={`mb-4 sm:mb-6 ${
                       theme === "dark" ? "text-gray-400" : "text-gray-600"
                     }`}>
                     {getDurationText(plan.duration)}
                   </p>
                   {plan.features && (
-                    <ul className='text-left space-y-3 mb-8'>
+                    <ul className='text-left space-y-2 sm:space-y-3 mb-6 sm:mb-8'>
                       {plan.features.map((feature, index) => (
-                        <li key={index} className='flex items-center'>
+                        <li key={index} className='flex items-start sm:items-center'>
                           <svg
-                            className='w-5 h-5 text-green-500 mr-2'
+                            className='w-5 h-5 text-green-500 mr-2 mt-1 sm:mt-0 flex-shrink-0'
                             fill='none'
                             stroke='currentColor'
                             viewBox='0 0 24 24'>
@@ -182,14 +190,16 @@ function Subscribe() {
                               d='M5 13l4 4L19 7'
                             />
                           </svg>
-                          {getLocalizedContent(feature)}
+                          <span className='text-sm sm:text-base'>
+                            {getLocalizedContent(feature)}
+                          </span>
                         </li>
                       ))}
                     </ul>
                   )}
                   <button
                     onClick={() => handleSubscribe(plan._id)}
-                    className='w-full py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors duration-200'>
+                    className='w-full py-2.5 sm:py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors duration-200 text-sm sm:text-base'>
                     {t("subscription.subscribe")}
                   </button>
                 </div>

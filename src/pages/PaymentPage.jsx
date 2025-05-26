@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../context/ThemeContext";
-import { useUser } from "../context/UserContext";
 import { useAuth } from "../context/AuthContext";
 import { PhoneNumberForm, CreditCardForm } from "../components/PaymentForms";
 import axios from "axios";
@@ -12,7 +11,7 @@ import Swal from "sweetalert2";
 function PaymentPage() {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
-  const { user, loading, logout } = useAuth();
+  const { user, loading: authLoading, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const { planId } = useParams();
@@ -152,11 +151,18 @@ function PaymentPage() {
     }
    };
   useEffect(() => {
-    if (loading) return;
+    if (authLoading) return;
+
     if (!user) {
-      navigate("/loginPage", { state: { from: location.pathname } });
+      navigate("/loginPage", { 
+        state: { 
+          from: location.pathname,
+          message: t("messages.loginRequired")
+        } 
+      });
       return;
     }
+
     const fetchPlanDetails = async () => {
       if (!planId) {
         navigate("/subscribe");
@@ -177,7 +183,7 @@ function PaymentPage() {
         setPlanLoading(false);
       } catch (err) {
         console.error("Error fetching plan details:", err);
-        setError("Failed to load plan details");
+        setError(t("messages.failedToLoadPlan"));
         setPlanLoading(false);
         setTimeout(() => navigate("/subscribe"), 3000);
       }
@@ -185,7 +191,7 @@ function PaymentPage() {
 
     console.log("planId:", planId);
     fetchPlanDetails();
-  }, [user, loading, navigate]);
+  }, [user, authLoading, navigate, planId, location.pathname, t]);
 
   const handlePaymentMethodClick = (methodId) => {
     setSelectedPaymentMethod((prevMethod) => {
@@ -211,11 +217,6 @@ function PaymentPage() {
       icons: ["mastercard.png", "visa.png"],
     },
     {
-      id: "fawry",
-      label: t("payment.paymentMethods.fawry"),
-      icons: ["fawry.png"],
-    },
-    {
       id: "vodafone",
       label: t("payment.paymentMethods.vodafone"),
       icons: ["vodafone.png"],
@@ -233,7 +234,6 @@ function PaymentPage() {
     switch (selectedPaymentMethod) {
       case "credit":
         return <CreditCardForm onSubmit={handlePaymentSubmit} />;
-      case "fawry":
       case "vodafone":
       case "valu":
         return <PhoneNumberForm onSubmit={handlePaymentSubmit} />;
@@ -242,7 +242,7 @@ function PaymentPage() {
     }
   };
 
-  if (loading || planLoading) {
+  if (authLoading || planLoading) {
     return (
       <div
         className={`min-h-screen flex items-center justify-center ${
@@ -282,14 +282,14 @@ function PaymentPage() {
 
   return (
     <div
-      className={`min-h-screen py-8 flex items-center justify-center ${
+      className={`min-h-screen flex items-center justify-center mt-16 ${
         theme === "dark"
           ? "bg-[#1A1A1A] text-white"
           : "bg-gray-50 text-gray-900"
       }`}
       dir={isRTL ? "rtl" : "ltr"}>
-      <div className='max-w-[1200px] mx-auto px-6'>
-        <div className='flex gap-8'>
+      <div className='w-full max-w-[1200px] px-4 sm:px-6 py-8'>
+        <div className='flex flex-col lg:flex-row gap-8'>
           {/* Left Section */}
           <div className='flex-1'>
             {/* Title */}
@@ -382,8 +382,6 @@ function PaymentPage() {
                     )}
                   </div>
                 ))}
-                {/* "user, subscription, amount, transactionId,
-                currency,paymentMethod, status" */}
                 <PayPalButton
                   amountval={planDetails.price.amount}
                   onSuccess={(details) => {
@@ -396,7 +394,7 @@ function PaymentPage() {
           </div>
 
           {/* Right Section - Order Summary */}
-          <div className='w-[400px]'>
+          <div className='w-full lg:w-[400px]'>
             <div
               className={`${
                 theme === "dark" ? "bg-[#1A1A1A]" : "bg-white"

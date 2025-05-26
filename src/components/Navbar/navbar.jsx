@@ -329,7 +329,8 @@ const Navbar = () => {
                     </li>
 
           <li>
-            <button
+            <Link
+              to="/subscribe"
               className={`rounded px-6 text-2xl py-2 border-2 transition ${
                 theme === 'dark'
                   ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
@@ -337,7 +338,7 @@ const Navbar = () => {
               }`}
             >
               {t('buttons.subscribe')}
-            </button>
+            </Link>
           </li>
         </ul>
 
