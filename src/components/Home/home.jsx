@@ -4,10 +4,15 @@ import './home.css';
 import { RiArrowDropLeftLine, RiArrowDropRightLine } from "react-icons/ri";
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../context/ThemeContext';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import { toast } from 'react-toastify';
 
 const Home = () => {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const isRTL = i18n.language === 'ar';
   const currentLang = i18n.language;
 
@@ -75,6 +80,42 @@ const Home = () => {
     setCourses(filtered);
   };
 
+  const handleCourseClick = (courseId) => {
+    if (!user) {
+      toast.info(t('messages.pleaseLogin'));
+      navigate('/loginPage');
+      return;
+    }
+    navigate(`/courses/${courseId}`);
+  };
+
+  const handleSubscribeClick = () => {
+    if (!user) {
+      toast.info(t('messages.pleaseLogin'));
+      navigate('/loginPage');
+      return;
+    }
+    navigate('/subscribe');
+  };
+
+  const handleViewAllCourses = () => {
+    if (!user) {
+      toast.info(t('messages.pleaseLogin'));
+      navigate('/loginPage');
+      return;
+    }
+    navigate('/courses');
+  };
+
+  const handleViewAllInstructors = () => {
+    if (!user) {
+      toast.info(t('messages.pleaseLogin'));
+      navigate('/loginPage');
+      return;
+    }
+    navigate('/instructors');
+  };
+
   const CustomPrevArrow = ({ onClick }) => (
     <div className="custom-arrow left" onClick={onClick}>
       <RiArrowDropLeftLine size={50} />
@@ -119,7 +160,10 @@ const Home = () => {
         <div className={`relative z-20 px-5 py-30 max-w-2xl text-white leading-none font-semibold text-xl ${isRTL ? 'mr-10' : 'ml-10'}`}>
           <h1 className="text-6xl font-bold mb-4 leading-none">{t('home.banner.title')}</h1>
           <p className="text-2xl mb-8 text-gray-300">{t('home.banner.subtitle')}</p>
-          <button className="bg-red-500 hover:bg-red-700 text-white px-8 py-6 rounded font-semibold text-xl">
+          <button 
+            onClick={handleSubscribeClick}
+            className="bg-red-500 hover:bg-red-700 text-white px-8 py-6 rounded font-semibold text-xl transition-colors"
+          >
             {t('home.banner.subscribeButton')}
           </button>
         </div>
@@ -183,10 +227,14 @@ const Home = () => {
               const image = course.thumbnail || '/default-course-img.png';
 
               return (
-                <div key={index} className={`rounded shadow-sm overflow-hidden border transition-all duration-200 
-                  ${theme === 'dark'
-                    ? 'bg-[#2a2a2a] border-gray-700 text-white'
-                    : 'bg-gray-100 border-gray-200 text-black'}`}>
+                <div 
+                  key={index} 
+                  onClick={() => handleCourseClick(course._id)}
+                  className={`rounded shadow-sm overflow-hidden border transition-all duration-200 cursor-pointer hover:shadow-lg
+                    ${theme === 'dark'
+                      ? 'bg-[#2a2a2a] border-gray-700 text-white hover:bg-[#333333]'
+                      : 'bg-gray-100 border-gray-200 text-black hover:bg-gray-200'}`}
+                >
                   <img src={image} alt={title} className="w-full h-64 object-cover" />
                   <div className="p-6">
                     <h3 className="text-lg font-semibold">{title}</h3>
@@ -200,7 +248,8 @@ const Home = () => {
 
         <div className="text-center mt-8">
           <button
-            className={`rounded px-6 py-2 border-2 transition  text-3xl ${
+            onClick={handleViewAllCourses}
+            className={`rounded px-6 py-2 border-2 transition text-3xl cursor-pointer ${
               theme === 'dark'
                 ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
                 : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
@@ -229,7 +278,11 @@ const Home = () => {
                 const image = profile.profilePicture || '/default-profile.png';
 
                 return (
-                  <div key={index} className="px-4 min-h-72 flex flex-col items-center justify-start">
+                  <div 
+                    key={index} 
+                    onClick={() => handleCourseClick(instructor._id)}
+                    className="px-4 min-h-72 flex flex-col items-center justify-start cursor-pointer hover:opacity-80 transition-opacity"
+                  >
                     <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden shadow">
                       <img src={image} alt={name} className="w-full h-full object-cover" />
                     </div>
@@ -246,7 +299,8 @@ const Home = () => {
 
         <div className="text-center mt-8">
           <button
-            className={`rounded px-6 py-2 border-2 transition text-3xl ${
+            onClick={handleViewAllInstructors}
+            className={`rounded px-6 py-2 border-2 transition text-3xl cursor-pointer ${
               theme === 'dark'
                 ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
                 : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
