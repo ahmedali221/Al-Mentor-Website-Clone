@@ -265,40 +265,47 @@ const Navbar = () => {
                     <p className="text-gray-500">{t('common.noCourses')}</p>
                   ) : (
                     <ul>
-                   {categoryCourses.slice(0, 4).map((course) => {
-  const lang = i18n.language;
-  const title =
-    typeof course.title === 'object'
-      ? course.title[lang] || course.title.en || 'Untitled Course'
-      : course.title || 'Untitled Course';
+                      {categoryCourses.slice(0, 4).map((course) => {
+                        const lang = i18n.language;
+                        const title =
+                          typeof course.title === 'object'
+                            ? course.title[lang] || course.title.en || 'Untitled Course'
+                            : course.title || 'Untitled Course';
 
-  // Find instructor from the instructors array
-  const instructorObj = instructors.find(inst => inst._id === course.instructor);
-  let instructorName = 'Unknown Instructor';
+                        // Find instructor from the instructors array
+                        const instructorObj = instructors.find(inst => inst._id === course.instructor);
+                        let instructorName = 'Unknown Instructor';
 
-  if (instructorObj) {
-    const profile = instructorObj.profile || instructorObj.user || instructorObj;
-    instructorName = `${profile.firstName?.[lang] || profile.firstName?.en || ''} ${profile.lastName?.[lang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
-  }
+                        if (instructorObj) {
+                          const profile = instructorObj.profile || instructorObj.user || instructorObj;
+                          instructorName = `${profile.firstName?.[lang] || profile.firstName?.en || ''} ${profile.lastName?.[lang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
+                        }
 
-  return (
-    <li key={course._id} className="flex items-center gap-4 mb-5">
-      <img
-        src={course.thumbnail || '/default-course-img.png'}
-        alt={title}
-        className="w-20 h-14 object-cover rounded"
-      />
-      <div>
-        <h4 className="text-base font-semibold text-black text-red-600">
-          {title}
-        </h4>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          {instructorName}
-        </p>
-      </div>
-    </li>
-  );
-})}
+                        return (
+                          <li 
+                            key={course._id} 
+                            className="flex items-center gap-4 mb-5 cursor-pointer hover:bg-gray-50 p-2 rounded-md transition-colors"
+                            onClick={() => {
+                              navigate(`/courses/${course._id}`);
+                              setIsDropdownVisible(false);
+                            }}
+                          >
+                            <img
+                              src={course.thumbnail || '/default-course-img.png'}
+                              alt={title}
+                              className="w-20 h-14 object-cover rounded"
+                            />
+                            <div>
+                              <h4 className="text-base font-semibold text-black hover:text-red-600 transition-colors">
+                                {title}
+                              </h4>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">
+                                {instructorName}
+                              </p>
+                            </div>
+                          </li>
+                        );
+                      })}
                     </ul>
                   )}
                 </div>
