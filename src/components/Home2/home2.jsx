@@ -609,10 +609,10 @@ const Home = () => {
           <div className="max-w-6xl mx-auto">
             <Slider className="px-10" {...sliderSettings}>
               {instructors.map((instructor, index) => {
-                const profile = instructor.profile || {};
-                const name = `${profile.firstName?.[currentLang] || ""} ${profile.lastName?.[currentLang] || ""}`;
-                const title = instructor.professionalTitle?.[currentLang] || "";
-                const image = profile.profilePicture || "/default-profile.png";
+                const profile = instructor.profile || instructor.user || instructor;
+                const name = `${profile.firstName?.[currentLang] || profile.firstName?.en || ''} ${profile.lastName?.[currentLang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
+                const title = instructor.professionalTitle?.[currentLang] || instructor.professionalTitle?.en || '';
+                const image = profile.profilePicture || '/default-profile.png';
 
                 return (
                   <div key={index} className="px-4 min-h-72 flex flex-col items-center justify-start">
@@ -620,7 +620,7 @@ const Home = () => {
                       <img
                         src={image}
                         alt={name}
-                        className="w-full h-full object-cover justify-end"
+                        className="w-full h-full object-cover"
                         loading="lazy"
                       />
                     </div>

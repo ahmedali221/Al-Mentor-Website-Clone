@@ -118,7 +118,9 @@
     "instructors": "المدربين",
     "courses":"الدورات",
     "aiChat": "الدردشة الذكية",
-    "subscribe": "اشترك"
+    "subscribe": "اشترك",
+    "choosePlan": "اختر الخطة",
+    "seeAllInstructors": "عرض جميع المدربين"
   },
   "messages": {
     "loading": "جاري التحميل...",
@@ -133,7 +135,10 @@
     "courseAlreadySaved": "الدورة موجودة بالفعل في الدورات المحفوظة",
     "failedToUpdateSavedCourses": "فشل في تحديث الدورات المحفوظة",
     "courseAddedToSaved": "تمت إضافة الدورة إلى الدورات المحفوظة",
-    "courseRemovedFromSaved": "تمت إزالة الدورة من الدورات المحفوظة"
+    "courseRemovedFromSaved": "تمت إزالة الدورة من الدورات المحفوظة",
+    "noCoursesForTopic": "لا توجد دورات متاحة لهذا الموضوع",
+    "noCoursesAvailable": "لا توجد دورات متاحة",
+    "noSubscriptionPlans": "لا توجد خطط اشتراك متاحة"
   },
   "auth": {
     "welcomeBack": "مرحبًا بعودتك!",
@@ -504,7 +509,25 @@
       "document": "مستند"
     }
   },
-  "changePlan": "تغيير الخطة"
+  "changePlan": "تغيير الخطة",
+  "sections": {
+    "categories": "فئات الدورات",
+    "picks": "الاختيارات المميزة",
+    "trending": "الدورات الرائجة",
+    "newlyReleased": "الدورات الجديدة",
+    "instructors": "مدربونا",
+    "subscription": {
+      "title": "اشترك بسعر مميز",
+      "description": "احصل على إمكانية الوصول إلى جميع الدورات متى تريد"
+    }
+  },
+  "labels": {
+    "bestValue": "أفضل قيمة"
+  },
+  "loading": {
+    "topics": "جاري تحميل المواضيع...",
+    "general": "جاري التحميل..."
+  }
 }
 
       

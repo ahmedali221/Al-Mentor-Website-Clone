@@ -272,9 +272,14 @@ const Navbar = () => {
       ? course.title[lang] || course.title.en || 'Untitled Course'
       : course.title || 'Untitled Course';
 
-  const profile = course.instructor?.profile || course.instructor?.user || course.instructor || {};
-  const instructorName =
-    `${profile.firstName?.[lang] || profile.firstName?.en || ''} ${profile.lastName?.[lang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
+  // Find instructor from the instructors array
+  const instructorObj = instructors.find(inst => inst._id === course.instructor);
+  let instructorName = 'Unknown Instructor';
+
+  if (instructorObj) {
+    const profile = instructorObj.profile || instructorObj.user || instructorObj;
+    instructorName = `${profile.firstName?.[lang] || profile.firstName?.en || ''} ${profile.lastName?.[lang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
+  }
 
   return (
     <li key={course._id} className="flex items-center gap-4 mb-5">

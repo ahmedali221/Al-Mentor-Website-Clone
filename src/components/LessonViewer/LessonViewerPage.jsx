@@ -52,6 +52,7 @@ export default function EnhancedLessonViewer() {
   const [savingCourse, setSavingCourse] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [isCourseSaved, setIsCourseSaved] = useState(false);
+  const [modalDismissed, setModalDismissed] = useState(false);
   
   // Fetch course data
   useEffect(() => {
@@ -441,12 +442,21 @@ export default function EnhancedLessonViewer() {
   useEffect(() => {
     const allLessonsWatched = lessons.length > 0 && watchedLessons.length === lessons.length;
     setIsCourseCompleted(allLessonsWatched);
-    
-    // Show completion modal if course is completed
-    if (allLessonsWatched && !showCompletionModal) {
+
+    // Only show the modal if not dismissed
+    if (allLessonsWatched && !showCompletionModal && !modalDismissed) {
       setShowCompletionModal(true);
     }
-  }, [watchedLessons, lessons, showCompletionModal]);
+
+    // Add to completedCourses in localStorage if completed
+    if (allLessonsWatched && courseId) {
+      const completedCourses = JSON.parse(localStorage.getItem('completedCourses') || '[]');
+      if (!completedCourses.includes(courseId)) {
+        completedCourses.push(courseId);
+        localStorage.setItem('completedCourses', JSON.stringify(completedCourses));
+      }
+    }
+  }, [watchedLessons, lessons, showCompletionModal, modalDismissed, courseId]);
   
   // Handle getting certificate
   const handleGetCertificate = () => {
@@ -515,7 +525,10 @@ export default function EnhancedLessonViewer() {
               {t('lessonViewer.getCertificate')}
             </button>
             <button
-              onClick={() => setShowCompletionModal(false)}
+              onClick={() => {
+                setShowCompletionModal(false);
+                setModalDismissed(true);
+              }}
               className={`mt-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} hover:text-${theme === 'dark' ? 'white' : 'gray-900'} transition-colors`}
             >
               {t('lessonViewer.close')}

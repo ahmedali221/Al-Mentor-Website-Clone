@@ -39,32 +39,35 @@ const SavedCourses = () => {
           }
         });
 
-        console.log('DEBUG: fetchSavedCourses response status:', response.status);
-        const text = await response.text();
-        console.log('DEBUG: fetchSavedCourses raw response text:', text);
-        let data;
-        try {
-          data = JSON.parse(text);
-        } catch (e) {
-          console.error('DEBUG: fetchSavedCourses failed to parse JSON:', e);
-          setError(t('messages.failedToFetchSavedCourses'));
-          return;
+        if (!response.ok) {
+          throw new Error(t('messages.failedToFetchSavedCourses'));
         }
-        console.log('DEBUG: fetchSavedCourses parsed data:', data);
 
-        // Support both array and object with data field
-        const items = Array.isArray(data) ? data : data.data;
-        if (!Array.isArray(items)) {
-          setError(t('messages.failedToFetchSavedCourses'));
-          console.error('DEBUG: fetchSavedCourses items is not an array:', items);
-          return;
-        }
-        setSavedCourses(items);
+        const data = await response.json();
+        
+        // Extract course data from the response
+        const courses = Array.isArray(data) ? data : data.data || [];
+        
+        // Map the courses to include all necessary data
+        const formattedCourses = courses.map(item => ({
+          _id: item.courseId?._id || item._id,
+          title: item.courseId?.title || item.title,
+          description: item.courseId?.description || item.description,
+          thumbnail: item.courseId?.thumbnail || item.thumbnail,
+          duration: item.courseId?.duration || item.duration,
+          lessonsCount: item.courseId?.lessons?.length || item.lessons?.length || 0,
+          language: item.courseId?.language || item.language,
+          instructor: item.courseId?.instructor || item.instructor,
+          instructorDetails: item.courseId?.instructorDetails || item.instructorDetails,
+          savedAt: item.savedAt
+        }));
+
+        setSavedCourses(formattedCourses);
         setError(null);
       } catch (err) {
+        console.error('Error fetching saved courses:', err);
         setError(t('messages.failedToFetchSavedCourses'));
         toast.error(t('messages.failedToFetchSavedCourses'));
-        console.error('DEBUG: fetchSavedCourses error:', err);
       } finally {
         setLoading(false);
       }
@@ -83,17 +86,6 @@ const SavedCourses = () => {
 
     if (savingCourse) return;
 
-    // Debug logs
-    console.log('DEBUG: user =', user);
-    console.log('DEBUG: courseId =', courseId);
-    console.log('DEBUG: token =', localStorage.getItem('token'));
-    const payload = {
-      userId: user?._id,
-      courseId,
-      savedAt: new Date().toISOString()
-    };
-    console.log('DEBUG: payload =', payload);
-
     try {
       setSavingCourse(true);
       const isCurrentlySaved = savedCourses.some(course => course._id === courseId);
@@ -108,8 +100,6 @@ const SavedCourses = () => {
         });
 
         if (!response.ok) {
-          const errorData = await response.json();
-          console.error('DEBUG: Unsave error response:', errorData);
           throw new Error(t('messages.failedToUpdateSavedCourses'));
         }
 
@@ -123,23 +113,37 @@ const SavedCourses = () => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({
+            userId: user._id,
+            courseId,
+            savedAt: new Date().toISOString()
+          })
         });
 
         const data = await response.json();
         if (!response.ok) {
-          console.error('DEBUG: Save error response:', data);
-          if (
-            response.status === 409 ||
-            (response.status === 400 && data.message && data.message.toLowerCase().includes('already saved'))
-          ) {
+          if (response.status === 409) {
             toast.info(t('messages.courseAlreadySaved'));
             return;
           }
           throw new Error(data.message || t('messages.failedToUpdateSavedCourses'));
         }
 
-        setSavedCourses(prev => [...prev, data]);
+        // Add the new course to the list
+        const newCourse = {
+          _id: data.courseId?._id || data._id,
+          title: data.courseId?.title || data.title,
+          description: data.courseId?.description || data.description,
+          thumbnail: data.courseId?.thumbnail || data.thumbnail,
+          duration: data.courseId?.duration || data.duration,
+          lessonsCount: data.courseId?.lessons?.length || data.lessons?.length || 0,
+          language: data.courseId?.language || data.language,
+          instructor: data.courseId?.instructor || data.instructor,
+          instructorDetails: data.courseId?.instructorDetails || data.instructorDetails,
+          savedAt: data.savedAt
+        };
+
+        setSavedCourses(prev => [...prev, newCourse]);
         toast.success(t('messages.courseAddedToSaved'));
       }
     } catch (err) {
@@ -165,7 +169,8 @@ const SavedCourses = () => {
     return (
       <div className={`${theme === 'dark' ? 'bg-[#181818] text-white' : 'bg-gray-50 text-gray-900'} min-h-screen py-12 px-4 mt-24`}>
         <div className="max-w-6xl mx-auto text-center">
-          <div className="text-xl">{t('messages.loading')}</div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00bcd4] mx-auto"></div>
+          <div className="text-xl mt-4">{t('messages.loading')}</div>
         </div>
       </div>
     );

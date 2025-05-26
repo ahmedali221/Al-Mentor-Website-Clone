@@ -171,11 +171,12 @@ const Home = () => {
             {courses.map((course, index) => {
               const instructorObj = instructors.find(inst => inst._id === course.instructor);
               let instructorName = 'Unknown Instructor';
-              // let instructorImage = '/default-course-img.png';
+              let instructorImage = '/default-profile.png';
 
-              if (instructorObj && instructorObj.profile) {
-                instructorName = `${instructorObj.profile.firstName?.[currentLang] || ''} ${instructorObj.profile.lastName?.[currentLang] || ''}`;
-                // instructorImage = instructorObj.profile.profilePicture || '/default-course-img.png';
+              if (instructorObj) {
+                const profile = instructorObj.profile || instructorObj.user || instructorObj;
+                instructorName = `${profile.firstName?.[currentLang] || profile.firstName?.en || ''} ${profile.lastName?.[currentLang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
+                instructorImage = profile.profilePicture || '/default-profile.png';
               }
 
               const title = course.title?.[currentLang] || course.title?.en;
@@ -189,7 +190,7 @@ const Home = () => {
                   <img src={image} alt={title} className="w-full h-64 object-cover" />
                   <div className="p-6">
                     <h3 className="text-lg font-semibold">{title}</h3>
-                    <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{instructorName}</p>
+                    <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} mt-2`}>{instructorName}</p>
                   </div>
                 </div>
               );
@@ -222,9 +223,9 @@ const Home = () => {
           <div className="max-w-6xl mx-auto">
             <Slider {...sliderSettings}>
               {instructors.map((instructor, index) => {
-                const profile = instructor.profile || {};
-                const name = `${profile.firstName?.[currentLang] || ''} ${profile.lastName?.[currentLang] || ''}`;
-                const title = instructor.professionalTitle?.[currentLang] || '';
+                const profile = instructor.profile || instructor.user || instructor;
+                const name = `${profile.firstName?.[currentLang] || profile.firstName?.en || ''} ${profile.lastName?.[currentLang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
+                const title = instructor.professionalTitle?.[currentLang] || instructor.professionalTitle?.en || '';
                 const image = profile.profilePicture || '/default-profile.png';
 
                 return (
