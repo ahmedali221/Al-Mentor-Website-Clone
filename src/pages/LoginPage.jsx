@@ -16,7 +16,7 @@ function LoginPage() {
     const [email, setEmail] = useState("");
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(true);
-    
+
     const isRTL = i18n.language === 'ar';
 
     useEffect(() => {
@@ -27,17 +27,17 @@ function LoginPage() {
                     Authorization: `Bearer ${token}`
                 }
             })
-            .then(response => {
-                if (response.data.message === "Authenticated") {
-                    navigate('/home');
-                } else {
+                .then(response => {
+                    if (response.data.message === "Authenticated") {
+                        navigate('/home');
+                    } else {
+                        setIsLoading(false);
+                    }
+                })
+                .catch(() => {
+                    localStorage.removeItem('token');
                     setIsLoading(false);
-                }
-            })
-            .catch(() => {
-                localStorage.removeItem('token');
-                setIsLoading(false);
-            });
+                });
         } else {
             setIsLoading(false);
         }
@@ -52,15 +52,15 @@ function LoginPage() {
     const handleChange = (e) => {
         if (e.target.id === "email") {
             setEmail(e.target.value)
-        } 
+        }
     }
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const response = await axios.post('/api/auth/checkEmail', { email });
-            if(response.data.exists) {
+            if (response.data.exists) {
                 alert(t('auth.emailVerified', 'Email verified! Please enter your password.'));
-                navigate('/password', { state: { email: email } }); 
+                navigate('/password', { state: { email: email } });
             }
             else {
                 setError(t('auth.emailNotFound', 'Email not found. Please check your email or sign up.'));
@@ -99,7 +99,7 @@ function LoginPage() {
                             value={email}
                             placeholder={t('auth.emailPlaceholder', 'Type Your Email...')}
                         ></Custom_Input_Field>
-                      
+
                     </div>
 
                     {error && <p className="text-red-600 text-center">{error}</p>}
@@ -110,18 +110,18 @@ function LoginPage() {
                     >
                         {t('common.login', 'Login')}
                     </button>
-                <p className={`text-center mt-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                    {t('auth.noAccount', "Don't Have An Account?")}{' '}
-                    <a 
-                        href="/signup-Email" 
-                        className="text-red-600 font-medium hover:text-red-700 hover:underline"
-                    >
-                        {t('common.signup', 'Signup')}
-                    </a>
-                </p>
+                    <p className={`text-center mt-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                        {t('auth.noAccount', "Don't Have An Account?")}{' '}
+                        <a
+                            href="/signup-Email"
+                            className="text-red-600 font-medium hover:text-red-700 hover:underline"
+                        >
+                            {t('common.signup', 'Signup')}
+                        </a>
+                    </p>
                 </form>
             </div>
-           
+
         </>
     )
 }

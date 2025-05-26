@@ -123,6 +123,8 @@
     "seeAllInstructors": "عرض جميع المدربين"
   },
   "messages": {
+    "pleaseLogin": "يجب عليك تسجيل الدخول للمتابعة.",
+
     "loading": "جاري التحميل...",
     "error": "حدث خطأ",
     "success": "تم بنجاح!",

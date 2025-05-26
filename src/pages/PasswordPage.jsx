@@ -14,7 +14,7 @@ function PasswordPage() {
     const { setUser } = useAuth();
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    
+
     const isRTL = i18n.language === 'ar';
 
     const handleChange = (e) => {
@@ -37,7 +37,7 @@ function PasswordPage() {
             if (response.data.token) {
                 // Save token
                 localStorage.setItem('token', response.data.token);
-                
+
                 // If user data is not in the response, fetch it using the token
                 if (!response.data.user) {
                     console.log("No user data in response, fetching user data...");
@@ -60,7 +60,7 @@ function PasswordPage() {
                     localStorage.setItem('user', JSON.stringify(response.data.user));
                     setUser(response.data.user);
                 }
-                
+
                 console.log("Login successful, navigating to home...");
                 navigate('/home');
             } else {

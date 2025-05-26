@@ -19,7 +19,7 @@ function SignupPage() {
         fullNameAr: ''
     });
     const [error, setError] = useState('');
-    
+
     const isRTL = i18n.language === 'ar';
 
     const handleChange = (e) => {
@@ -31,7 +31,7 @@ function SignupPage() {
         try {
             const [firstNameEn, lastNameEn] = formData.fullNameEn.split(' ');
             const [firstNameAr, lastNameAr] = formData.fullNameAr.split(' ');
-            
+
             const response = await axios.post('/api/auth/register', {
                 username: formData.username,
                 email: formData.email,
@@ -108,9 +108,9 @@ function SignupPage() {
 
                 <div className="text-center mt-6">
                     <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                        {t('auth.termsAgreement', "By signing up, I agree with almentor's")} 
+                        {t('auth.termsAgreement', "By signing up, I agree with almentor's")}
                         <a href="/terms" className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} underline hover:text-gray-700`}> {t('footer.terms', 'Terms & Conditions')} </a>
-                        {t('auth.and', 'and')} 
+                        {t('auth.and', 'and')}
                         <a href="/privacy" className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} underline hover:text-gray-700`}> {t('footer.privacy', 'Privacy Policy')}</a>
                     </p>
                 </div>
@@ -121,11 +121,11 @@ function SignupPage() {
                 >
                     {t('common.signup', 'Sign Up')}
                 </button>
-                
+
                 <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} mt-4 text-center`}>
                     {t('auth.haveAccount', 'Already have an account?')}{' '}
-                    <a 
-                        href="/login" 
+                    <a
+                        href="/loginPage"
                         className={`${theme === 'dark' ? 'text-gray-100' : 'text-black'} font-medium hover:underline`}
                     >
                         {t('common.login', 'Login')}
