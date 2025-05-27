@@ -32,6 +32,8 @@ const Navbar = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState({ courses: [], instructors: [] });
     const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
     const searchInputRef = useRef(null);
     const searchDropdownRef = useRef(null);
     const userDropdownRef = useRef(null);
@@ -61,6 +63,10 @@ const Navbar = () => {
         localStorage.removeItem('user');
         navigate('/loginPage');
         handleUserDropdownLeave();
+    };
+
+    const toggleMobileMenu = () => {
+        setIsMobileMenuOpen(!isMobileMenuOpen);
     };
 
     const getLocalizedName = (nameObj) => {
@@ -206,400 +212,514 @@ const Navbar = () => {
 
   return (
     <nav
+      dir={isRTL ? 'rtl' : 'ltr'}
       className={`fixed top-0 left-0 right-0 px-4 py-4 z-50 shadow transition-all duration-300 text-lg font-medium ${
         theme === 'dark' ? 'bg-[#1a1a1a] text-white' : 'bg-white text-black'
       }`}
     >
-      <div className={`flex items-center justify-start gap-12 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
+      <div className="flex items-center justify-between w-full">
         {/* Logo */}
-        <div className="flex items-center text-3xl ml-4">
-          <img src="/logo.jpeg" alt="Almentor Logo" className={`h-12 w-auto ${isRTL ? 'ml-2' : 'mr-2'}`} />
-          <a href="/" className="text-3xl font-semibold">
+        <div className={`flex items-center text-2xl ${isRTL ? 'ml-4' : 'mr-4'}`}>
+          <img src="/logo.jpeg" alt="Almentor Logo" className="h-12 w-auto" />
+          <Link to="/" className="text-3xl font-semibold">
             Almentor
-          </a>
+          </Link>
         </div>
 
-                <ul className={`flex items-center ml-1 ${isRTL ? 'space-x-reverse space-x-6' : 'space-x-6'} text-1xl font-medium`}>
-                    <li className="relative">
-                        <button
-                            onMouseEnter={handleDropdownEnter}
-                            className="hover:text-red-500 flex items-center focus:outline-none"
-                        >
-                            {t('navigation.courses')}
-                            <RiArrowDropDownLine className="text-3xl mt-1" />
-                        </button>
+        <button
+            className="lg:hidden flex items-center px-3 py-2 border rounded"
+            onClick={toggleMobileMenu}
+        >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+            </svg>
+        </button>
 
-                        {isDropdownVisible && (
-                            <div
-                                className="absolute top-[80px] left-0 flex w-[800px] bg-white shadow-xl rounded-lg z-50 transition-all duration-300"
-                                onMouseEnter={handleDropdownEnter}
-                                onMouseLeave={handleDropdownLeave}
-                            >
-                                <div className="absolute -top-2 left-6 w-4 h-4 bg-white rotate-45 shadow-md z-40"></div>
+        {/* Main navigation links - collapse on mobile */}
+        <div className={`lg:flex flex-grow items-center ${isMobileMenuOpen ? 'flex flex-col absolute top-full left-0 w-full shadow-md py-4 z-40' : 'hidden'} ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'} lg:static lg:flex-row lg:w-auto lg:shadow-none lg:py-0`}>
+          <ul className={`flex items-center ${isMobileMenuOpen ? 'flex-col space-y-4 w-full items-start px-4' : 'space-x-8'} text-1xl font-medium lg:flex-row lg:space-y-0`}>
+            <li className="relative w-full lg:w-auto">
+              <button
+                onMouseEnter={handleDropdownEnter}
+                className="hover:text-red-500 flex items-center focus:outline-none"
+              >
+                {t('navigation.courses')}
+                <RiArrowDropDownLine className={`text-3xl mt-1 `} />
+              </button>
 
-                                <div className="w-1/2 border-r px-4 py-5">
-                                    <ul>
-                                        {categories.map((category) => (
-                                            <li
-                                                key={category._id}
-                                                onMouseEnter={() => handleCategoryHover(category._id)}
-                                                className="py-2 px-2 hover:bg-gray-100 cursor-pointer text-gray-800 text-sm font-medium rounded-md transition"
-                                            >
-                                                {getLocalizedName(category.name)}
-                                            </li>
-                                        ))}
-                                    </ul>
+              {isDropdownVisible && (
+                <div
+                  className={`absolute top-[80px] ${isRTL ? 'right-0' : 'left-0'} flex w-[800px] bg-white shadow-xl rounded-lg z-50 transition-all duration-300`}
+                  onMouseEnter={handleDropdownEnter}
+                  onMouseLeave={handleDropdownLeave}
+                  dir={isRTL ? 'rtl' : 'ltr'}
+                >
+                  <div className={`absolute -top-2 ${isRTL ? 'right-6' : 'left-6'} w-4 h-4 bg-white rotate-45 shadow-md z-40`}></div>
 
-                                    <div className="mt-6">
-                                        <Link
-                                            to="/courses"
-                                            className="w-full flex items-center justify-center gap-2 bg-red-500 text-white py-2 rounded-md text-sm hover:bg-red-600 transition"
-                                        >
-                                            Browse Courses <span className="text-lg">→</span>
-                                        </Link>
-                                    </div>
-                                </div>
-
-                <div className="w-1/2 p-5">
-                  {categoryCourses.length === 0 ? (
-                    <p className="text-gray-500">{t('common.noCourses')}</p>
-                  ) : (
+                  <div className="w-1/2 border-r px-4 py-5">
                     <ul>
-                      {categoryCourses.slice(0, 4).map((course) => {
-                        const lang = i18n.language;
-                        const title =
-                          typeof course.title === 'object'
-                            ? course.title[lang] || course.title.en || 'Untitled Course'
-                            : course.title || 'Untitled Course';
-
-                        // Find instructor from the instructors array
-                        const instructorObj = instructors.find(inst => inst._id === course.instructor);
-                        let instructorName = 'Unknown Instructor';
-
-                        if (instructorObj) {
-                          const profile = instructorObj.profile || instructorObj.user || instructorObj;
-                          instructorName = `${profile.firstName?.[lang] || profile.firstName?.en || ''} ${profile.lastName?.[lang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
-                        }
-
-                        return (
-                          <li 
-                            key={course._id} 
-                            className="flex items-center gap-4 mb-5 cursor-pointer hover:bg-gray-50 p-2 rounded-md transition-colors"
-                            onClick={() => {
-                              navigate(`/courses/${course._id}`);
-                              setIsDropdownVisible(false);
-                            }}
-                          >
-                            <img
-                              src={course.thumbnail || '/default-course-img.png'}
-                              alt={title}
-                              className="w-20 h-14 object-cover rounded"
-                            />
-                            <div>
-                              <h4 className="text-base font-semibold text-black hover:text-red-600 transition-colors">
-                                {title}
-                              </h4>
-                              <p className="text-sm text-gray-600 dark:text-gray-400">
-                                {instructorName}
-                              </p>
-                            </div>
-                          </li>
-                        );
-                      })}
+                      {categories.map((category) => (
+                        <li
+                          key={category._id}
+                          onMouseEnter={() => handleCategoryHover(category._id)}
+                          className="py-2 px-2 hover:bg-gray-100 cursor-pointer text-gray-800 text-sm font-medium rounded-md transition"
+                        >
+                          {getLocalizedName(category.name)}
+                        </li>
+                      ))}
                     </ul>
-                  )}
+
+                    <div className="mt-6">
+                      <Link
+                        to="/courses"
+                        className="w-full flex items-center justify-center gap-2 bg-red-500 text-white py-2 rounded-md text-sm hover:bg-red-600 transition"
+                      >
+                        Browse Courses <span className="text-lg">→</span>
+                      </Link>
+                    </div>
+                  </div>
+
+                  <div className="w-1/2 p-5">
+                    {categoryCourses.length === 0 ? (
+                      <p className="text-gray-500">{t('common.noCourses')}</p>
+                    ) : (
+                      <ul>
+                        {categoryCourses.slice(0, 4).map((course) => {
+                          const lang = i18n.language;
+                          const title =
+                            typeof course.title === 'object'
+                              ? course.title[lang] || course.title.en || 'Untitled Course'
+                              : course.title || 'Untitled Course';
+
+                          // Find instructor from the instructors array
+                          const instructorObj = instructors.find(inst => inst._id === course.instructor);
+                          let instructorName = 'Unknown Instructor';
+
+                          if (instructorObj) {
+                            const profile = instructorObj.profile || instructorObj.user || instructorObj;
+                            instructorName = `${profile.firstName?.[lang] || profile.firstName?.en || ''} ${profile.lastName?.[lang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
+                          }
+
+                          return (
+                            <li 
+                              key={course._id} 
+                              className="flex items-center gap-4 mb-5 cursor-pointer hover:bg-gray-50 p-2 rounded-md transition-colors"
+                              onClick={() => {
+                                navigate(`/courses/${course._id}`);
+                                setIsDropdownVisible(false);
+                              }}
+                            >
+                              <img
+                                src={course.thumbnail || '/default-course-img.png'}
+                                alt={title}
+                                className="w-20 h-14 object-cover rounded"
+                              />
+                              <div>
+                                <h4 className="text-base font-semibold text-black hover:text-red-600 transition-colors">
+                                  {title}
+                                </h4>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                  {instructorName}
+                                </p>
+                              </div>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
-          </li>
+              )}
+            </li>
 
-                    <li>
-                        <Link to="/instructors" className="hover:text-red-500">
-                            {t('navigation.instructors')}
-                        </Link>
-                    </li>
+            <li>
+              <Link to="/instructors" className="hover:text-red-500">
+                {t('navigation.instructors')}
+              </Link>
+            </li>
 
-                    <li className="flex items-center">
-                        <Link to="/programs" className="hover:text-red-500">
-                            {t('navigation.programs')}
-                        </Link>
-                        <span className="ml-2 bg-red-500 text-white text-[10px] px-1 py-0.5 rounded-full">
-                            {t('home.new')}
-                        </span>
-                    </li>
+            <li className="flex items-center mx-4 w-full lg:w-auto">
+              <Link to="/programs" className="hover:text-red-500">
+                {t('navigation.programs')}
+              </Link>
+              <span className="ml-2 bg-red-500 text-white text-[10px] px-1 py-0.5 rounded-full">
+                {t('home.new')}
+              </span>
+            </li>
 
-                    <li className="flex items-center">
-                        <Link to="/AIChatPage" className="hover:text-red-500 flex items-center">
-                            <RiRobot2Line className="mr-1" />
-                            {t('buttons.aiChat')}
-                        </Link>
-                    </li>
+            <li className="flex items-center mx-4 w-full lg:w-auto">
+              <Link to="/AIChatPage" className="hover:text-red-500 flex items-center">
+                <RiRobot2Line className={`${isRTL ? 'ml-1' : 'mr-1'}`} />
+                {t('buttons.aiChat')}
+              </Link>
+            </li>
 
-          <li>
-            <Link
-              to="/subscribe"
-              className={`rounded px-6 text-2xl py-2 border-2 transition ${
-                theme === 'dark'
+            <li className="flex items-center mx-4 w-full lg:w-auto">
+              <Link
+                to="/subscribe"
+                className={`rounded px-6 text-2xl py-2 border-2 transition w-full text-center ${theme === 'dark'
                   ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
                   : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
-              }`}
-            >
-              {t('buttons.subscribe')}
-            </Link>
-          </li>
-        </ul>
+                }`}
+              >
+                {t('buttons.subscribe')}
+              </Link>
+            </li>
+          </ul>
+        </div>
 
-                <div className={`flex items-center ml-auto ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
-                    <div className="relative">
-                        <input
-                            type="text"
-                            placeholder={t('common.search')}
-                            className={`text-lg px-5 py-3 w-[360px] focus:outline-none focus:ring-2 placeholder-gray-500 transition-all duration-300 rounded-md
+        <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-6' : 'space-x-6'}`}>
+          <div className="relative hidden lg:block">
+            <input
+              type="text"
+              placeholder={t('common.search')}
+              dir={isRTL ? 'rtl' : 'ltr'}
+              className={`text-lg px-5 py-3 w-[360px] focus:outline-none focus:ring-2 placeholder-gray-500 transition-all duration-300 rounded-md
                 ${theme === 'dark' ? 'bg-[#2a2a2a] text-white focus:ring-gray-600' : 'bg-gray-200 text-gray-700 focus:ring-gray-300'}`}
-                            dir={isRTL ? 'rtl' : 'ltr'}
-                            value={searchQuery}
-                            onChange={e => setSearchQuery(e.target.value)}
-                            onFocus={() => searchQuery && setShowSearchDropdown(true)}
-                            ref={searchInputRef}
-                        />
-                        <button className={`absolute top-1/2 transform -translate-y-1/2 ${isRTL ? 'left-4' : 'right-4'} text-gray-400 hover:text-red-500`}>
-                            <CiSearch size={25} />
-                        </button>
-                        {showSearchDropdown && (
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              onFocus={() => searchQuery && setShowSearchDropdown(true)}
+              ref={searchInputRef}
+            />
+            <button className={`absolute top-1/2 transform -translate-y-1/2 ${isRTL ? 'left-4' : 'right-4'} text-gray-400 hover:text-red-500`}>
+              <CiSearch size={25} />
+            </button>
+            {showSearchDropdown && (
+              <div
+                ref={searchDropdownRef}
+                className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 w-[360px] max-h-96 overflow-y-auto rounded-md shadow-lg z-50 ${theme === 'dark' ? 'bg-[#232323] text-white' : 'bg-white text-black'}`}
+                style={{ direction: isRTL ? 'rtl' : 'ltr' }}
+              >
+                {searchResults.courses.length === 0 && searchResults.instructors.length === 0 ? (
+                  <div className="p-4 text-center text-gray-400">{t('common.noResults') || 'No results found'}</div>
+                ) : (
+                  <>
+                    {searchResults.courses.length > 0 && (
+                      <div>
+                        <div className="px-4 pt-3 pb-1 text-xs font-bold uppercase text-gray-500">{t('Courses')}</div>
+                        {searchResults.courses.map(course => {
+                          const lang = i18n.language;
+                          const title = typeof course.title === 'object'
+                            ? course.title[lang] || course.title.en || ''
+                            : course.title || '';
+                          return (
                             <div
-                                ref={searchDropdownRef}
-                                className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 w-[360px] max-h-96 overflow-y-auto rounded-md shadow-lg z-50 ${theme === 'dark' ? 'bg-[#232323] text-white' : 'bg-white text-black'}`}
-                                style={{ direction: isRTL ? 'rtl' : 'ltr' }}
+                              key={course._id}
+                              className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#333] rounded"
+                              onClick={() => {
+                                setShowSearchDropdown(false);
+                                setSearchQuery('');
+                                navigate(`/courses/${course._id}`);
+                              }}
                             >
-                                {searchResults.courses.length === 0 && searchResults.instructors.length === 0 ? (
-                                    <div className="p-4 text-center text-gray-400">{t('common.noResults') || 'No results found'}</div>
-                                ) : (
-                                    <>
-                                        {searchResults.courses.length > 0 && (
-                                            <div>
-                                                <div className="px-4 pt-3 pb-1 text-xs font-bold uppercase text-gray-500">{t('Courses')}</div>
-                                                {searchResults.courses.map(course => {
-                                                    const lang = i18n.language;
-                                                    const title = typeof course.title === 'object'
-                                                        ? course.title[lang] || course.title.en || ''
-                                                        : course.title || '';
-                                                    return (
-                                                        <div
-                                                            key={course._id}
-                                                            className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#333] rounded"
-                                                            onClick={() => {
-                                                                setShowSearchDropdown(false);
-                                                                setSearchQuery('');
-                                                                navigate(`/courses/${course._id}`);
-                                                            }}
-                                                        >
-                                                            <img src={course.thumbnail || '/default-course-img.png'} alt={title} className="w-10 h-8 object-cover rounded" />
-                                                            <span className="font-medium">{title}</span>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        )}
-                                        {searchResults.instructors.length > 0 && (
-                                            <div>
-                                                <div className="px-4 pt-3 pb-1 text-xs font-bold uppercase text-gray-500">{t('Instructors')}</div>
-                                                {searchResults.instructors.map(inst => {
-                                                    const lang = i18n.language;
-                                                    let instructorName = 'Unknown Instructor';
-                                                    let instructorImage = '/default-profile.png';
-
-                                                    if (inst && inst.profile) {
-                                                        instructorName = `${inst.profile.firstName?.[lang] || inst.profile.firstName?.en || ''} ${inst.profile.lastName?.[lang] || inst.profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
-                                                        instructorImage = inst.profile.profilePicture || '/default-profile.png';
-                                                    } else if (inst && typeof inst === 'object') {
-                                                        const profile = inst.profile || inst.user || inst;
-                                                        instructorName = `${profile.firstName?.[lang] || profile.firstName?.en || ''} ${profile.lastName?.[lang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
-                                                        instructorImage = profile.profilePicture || '/default-profile.png';
-                                                    }
-
-                                                    return (
-                                                        <div
-                                                            key={inst._id}
-                                                            className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#333] rounded"
-                                                            onClick={() => {
-                                                                setShowSearchDropdown(false);
-                                                                setSearchQuery('');
-                                                                navigate(`/instructors/${inst._id}`);
-                                                            }}
-                                                        >
-                                                            <img src={instructorImage} alt={instructorName} className="w-10 h-10 object-cover rounded-full" />
-                                                            <span className="font-medium">{instructorName}</span>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        )}
-                                    </>
-                                )}
+                              <img src={course.thumbnail || '/default-course-img.png'} alt={title} className="w-10 h-8 object-cover rounded" />
+                              <span className="font-medium">{title}</span>
                             </div>
-                        )}
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                        <button
-                            onClick={toggleTheme}
-                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors
-                ${theme === 'dark' ? 'bg-gray-800 hover:bg-gray-700' : 'bg-gray-100 hover:bg-gray-200'}`}
-                        >
-                            {theme === 'dark' ? <FaSun className="text-yellow-400" /> : <FaMoon className="text-gray-700" />}
-                        </button>
-
-                        <button
-                            onClick={toggleLanguage}
-                            className={`w-10 h-10 rounded-full text-xl font-medium flex items-center justify-center transition-colors
-                ${theme === 'dark' ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-                        >
-                            {i18n.language === 'en' ? 'ع' : 'EN'}
-                        </button>
-                    </div>
-
-                    {isLoggedIn ? (
-                        <div
-                            className="relative"
-                            onMouseEnter={handleUserDropdownEnter}
-                            onMouseLeave={handleUserDropdownLeave}
-                        >
-                            <button className="flex items-center space-x-2 hover:opacity-80 transition-opacity p-2">
-                                {user?.profilePicture ? (
-                                    <img
-                                        src={user.profilePicture}
-                                        alt={getLocalizedName(user.firstName)}
-                                        className={`h-10 w-10 rounded-full object-cover border-2 ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}
-                                    />
-                                ) : (
-                                    <FaUserCircle className={`text-4xl ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
-                                )}
-                            </button>
-
-                            {isUserDropdownVisible && (
-                                <div
-                                    ref={userDropdownRef}
-                                    onMouseEnter={handleDropdownMenuEnter}
-                                    onMouseLeave={handleDropdownMenuLeave}
-                                    className={`absolute top-full right-0 mt-2 w-72 rounded-lg shadow-xl z-50 overflow-hidden ${theme === 'dark' ? 'bg-[#1a1a1a] border border-gray-700' : 'bg-white border border-gray-200'
-                                        }`}
-                                >
-                                    <div className={`p-4 border-b ${theme === 'dark' ? 'bg-[#232323] border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
-                                        <p className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                                            {user?.firstName ? getLocalizedName(user.firstName) : ''} {user?.lastName ? getLocalizedName(user.lastName) : ''}
-                                        </p>
-                                        <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} truncate`}>
-                                            {user?.email || ''}
-                                        </p>
-                                        <Link
-                                            to="/subscribe"
-                                            className="mt-3 block w-full text-center bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition-colors"
-                                            onClick={handleUserDropdownLeave}
-                                        >
-                                            {t('profile.subscribe')}
-                                        </Link>
-                                    </div>
-
-                                    <div className="py-2">
-                                        <Link
-                                            to="/my-progress"
-                                            className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
-                                                }`}
-                                            onClick={handleUserDropdownLeave}
-                                        >
-                                            <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                            </svg>
-                                            {t('profile.myProgress')}
-                                        </Link>
-
-                                        <Link
-                                            to="/saved-courses"
-                                            className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
-                                                }`}
-                                            onClick={handleUserDropdownLeave}
-                                        >
-                                            <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5h14v14H5z" />
-                                            </svg>
-                                            {t('profile.savedCourses')}
-                                        </Link>
-
-                                        <Link
-                                            to="/certificates"
-                                            className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
-                                                }`}
-                                            onClick={handleUserDropdownLeave}
-                                        >
-                                            <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v8m-4-4h8" />
-                                            </svg>
-                                            {t('profile.certificates')}
-                                        </Link>
-
-                                        <Link
-                                            to="/profile"
-                                            className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
-                                                }`}
-                                            onClick={handleUserDropdownLeave}
-                                        >
-                                            <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                            </svg>
-                                            {t('profile.accountSettings')}
-                                        </Link>
-
-                                        <Link
-                                            to="/become-instructor"
-                                            className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
-                                                }`}
-                                            onClick={handleUserDropdownLeave}
-                                        >
-                                            <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                            </svg>
-                                            {t('profile.becomeInstructor')}
-                                        </Link>
-
-                                        <button
-                                            onClick={handleLogout}
-                                            className={`w-full flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'text-red-400 hover:bg-[#232323] hover:text-red-300' : 'text-red-500 hover:bg-red-50'
-                                                }`}
-                                        >
-                                            <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-red-400' : 'text-red-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                            </svg>
-                                            {t('logout')}
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <>
-                            <Link
-                                to="/loginPage"
-                                className={`text-sm transition-colors ${theme === 'dark'
-                                    ? 'text-gray-300 hover:text-white'
-                                    : 'text-gray-600 hover:text-black'
-                                    }text-lg`}
-                            >
-                                {t('common.login')}
-                            </Link>
-                            <Link
-                                to="/subscribe"
-                                className={`bg-red-500 text-white px-5 py-2 rounded transition-colors ${theme === 'dark'
-                                    ? 'hover:bg-red-600'
-                                    : 'hover:bg-red-600'
-                                    } text-sm text-center`}
-                            >{t('common.signup')}
-                            </Link>
-                        </>
+                          );
+                        })}
+                      </div>
                     )}
+                    {searchResults.instructors.length > 0 && (
+                      <div>
+                        <div className="px-4 pt-3 pb-1 text-xs font-bold uppercase text-gray-500">{t('Instructors')}</div>
+                        {searchResults.instructors.map(inst => {
+                          const lang = i18n.language;
+                          let instructorName = 'Unknown Instructor';
+                          let instructorImage = '/default-profile.png';
+
+                          if (inst && inst.profile) {
+                            instructorName = `${inst.profile.firstName?.[lang] || inst.profile.firstName?.en || ''} ${inst.profile.lastName?.[lang] || inst.profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
+                            instructorImage = inst.profile.profilePicture || '/default-profile.png';
+                          } else if (inst && typeof inst === 'object') {
+                            const profile = inst.profile || inst.user || inst;
+                            instructorName = `${profile.firstName?.[lang] || profile.firstName?.en || ''} ${profile.lastName?.[lang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
+                            instructorImage = profile.profilePicture || '/default-profile.png';
+                          }
+
+                          return (
+                            <div
+                              key={inst._id}
+                              className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#333] rounded"
+                              onClick={() => {
+                                setShowSearchDropdown(false);
+                                setSearchQuery('');
+                                navigate(`/instructors/${inst._id}`);
+                              }}
+                            >
+                              <img src={instructorImage} alt={instructorName} className="w-10 h-10 object-cover rounded-full" />
+                              <span className="font-medium">{instructorName}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={toggleTheme}
+              className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors
+                ${theme === 'dark' ? 'bg-gray-800 hover:bg-gray-700' : 'bg-gray-100 hover:bg-gray-200'}`}
+            >
+              {theme === 'dark' ? <FaSun className="text-yellow-400" /> : <FaMoon className="text-gray-700" />}
+            </button>
+
+            <button
+              onClick={toggleLanguage}
+              className={`w-10 h-10 rounded-full text-xl font-medium flex items-center justify-center transition-colors
+                ${theme === 'dark' ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+            >
+              {i18n.language === 'en' ? 'ع' : 'EN'}
+            </button>
+          </div>
+
+          {isLoggedIn ? (
+            <div
+              className="relative"
+              onMouseEnter={handleUserDropdownEnter}
+              onMouseLeave={handleUserDropdownLeave}
+            >
+              <button className="flex items-center space-x-2 hover:opacity-80 transition-opacity p-2">
+                {user?.profilePicture ? (
+                  <img
+                    src={user.profilePicture}
+                    alt={getLocalizedName(user.firstName)}
+                    className={`h-10 w-10 rounded-full object-cover border-2 ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}
+                  />
+                ) : (
+                  <FaUserCircle className={`text-4xl ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
+                )}
+              </button>
+
+              {isUserDropdownVisible && (
+                <div
+                  ref={userDropdownRef}
+                  onMouseEnter={handleDropdownMenuEnter}
+                  onMouseLeave={handleDropdownMenuLeave}
+                  dir={isRTL ? 'rtl' : 'ltr'}
+                  className={`absolute top-full ${isRTL ? 'left-0' : 'right-0'} mt-2 w-72 rounded-lg shadow-xl z-50 overflow-hidden ${
+                    theme === 'dark' ? 'bg-[#1a1a1a] border border-gray-700' : 'bg-white border border-gray-200'
+                  }`}
+                >
+                  <div className={`p-4 border-b ${theme === 'dark' ? 'bg-[#232323] border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                    <p className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      {user?.firstName ? getLocalizedName(user.firstName) : ''} {user?.lastName ? getLocalizedName(user.lastName) : ''}
+                    </p>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} truncate`}>
+                      {user?.email || ''}
+                    </p>
+                    <Link
+                      to="/subscribe"
+                      className="mt-3 block w-full text-center bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition-colors"
+                      onClick={handleUserDropdownLeave}
+                    >
+                      {t('profile.subscribe')}
+                    </Link>
+                  </div>
+
+                  <div className="py-2">
+                    <Link
+                      to="/my-progress"
+                      className={`flex items-center px-4 py-2 transition-colors ${
+                        theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                      }`}
+                      onClick={handleUserDropdownLeave}
+                    >
+                      <svg className={`w-5 h-5 ${isRTL ? 'ml-3' : 'mr-3'} ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isRTL ? "M15 19l-7-7 7-7" : "M9 5l7 7-7 7"} />
+                      </svg>
+                      {t('profile.myProgress')}
+                    </Link>
+
+                    <Link
+                      to="/saved-courses"
+                      className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                        }`}
+                      onClick={handleUserDropdownLeave}
+                    >
+                      <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5h14v14H5z" />
+                      </svg>
+                      {t('profile.savedCourses')}
+                    </Link>
+
+                    <Link
+                      to="/certificates"
+                      className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                        }`}
+                      onClick={handleUserDropdownLeave}
+                    >
+                      <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v8m-4-4h8" />
+                      </svg>
+                      {t('profile.certificates')}
+                    </Link>
+
+                    <Link
+                      to="/profile"
+                      className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                        }`}
+                      onClick={handleUserDropdownLeave}
+                    >
+                      <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      {t('profile.accountSettings')}
+                    </Link>
+
+                    <Link
+                      to="/become-instructor"
+                      className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                        }`}
+                      onClick={handleUserDropdownLeave}
+                    >
+                      <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      {t('profile.becomeInstructor')}
+                    </Link>
+
+                    <button
+                      onClick={handleLogout}
+                      className={`w-full flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'text-red-400 hover:bg-[#232323] hover:text-red-300' : 'text-red-500 hover:bg-red-50'
+                        }`}
+                    >
+                      <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-red-400' : 'text-red-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                      {t('logout')}
+                    </button>
+                  </div>
                 </div>
+              )}
             </div>
-        </nav>
-    );
+          ) : (
+            <>
+              <Link
+                to="/loginPage"
+                className={`text-sm transition-colors mx-4 ${theme === 'dark'
+                  ? 'text-gray-300 hover:text-white'
+                  : 'text-gray-600 hover:text-black'
+                  }text-lg`}
+              >
+                {t('common.login')}
+              </Link>
+              <Link
+                to="/subscribe"
+                className={`bg-red-500 text-white px-5 py-2 rounded transition-colors mx-4 ${theme === 'dark'
+                  ? 'hover:bg-red-600'
+                  : 'hover:bg-red-600'
+                  } text-sm text-center`}
+              >
+                {t('common.signup')}
+              </Link>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Mobile Search - Show on small screens */}
+      {isMobileMenuOpen && (
+        <div className={`lg:hidden px-4 pb-4 ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'}`}>
+          <div className="relative w-full">
+            <input
+              type="text"
+              placeholder={t('common.search')}
+              dir={isRTL ? 'rtl' : 'ltr'}
+              className={`text-lg px-5 py-3 w-full focus:outline-none focus:ring-2 placeholder-gray-500 transition-all duration-300 rounded-md
+                ${theme === 'dark' ? 'bg-[#2a2a2a] text-white focus:ring-gray-600' : 'bg-gray-200 text-gray-700 focus:ring-gray-300'}`}
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              onFocus={() => searchQuery && setShowSearchDropdown(true)}
+              ref={searchInputRef}
+            />
+            <button className={`absolute top-1/2 transform -translate-y-1/2 ${isRTL ? 'left-4' : 'right-4'} text-gray-400 hover:text-red-500`}>
+              <CiSearch size={25} />
+            </button>
+            {showSearchDropdown && (
+              <div
+                ref={searchDropdownRef}
+                className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 w-full max-h-60 overflow-y-auto rounded-md shadow-lg z-50 ${theme === 'dark' ? 'bg-[#232323] text-white' : 'bg-white text-black'}`}
+                style={{ direction: isRTL ? 'rtl' : 'ltr' }}
+              >
+                {searchResults.courses.length === 0 && searchResults.instructors.length === 0 ? (
+                  <div className="p-4 text-center text-gray-400">{t('common.noResults') || 'No results found'}</div>
+                ) : (
+                  <>
+                    {searchResults.courses.length > 0 && (
+                      <div>
+                        <div className="px-4 pt-3 pb-1 text-xs font-bold uppercase text-gray-500">{t('Courses')}</div>
+                        {searchResults.courses.map(course => {
+                          const lang = i18n.language;
+                          const title = typeof course.title === 'object'
+                            ? course.title[lang] || course.title.en || ''
+                            : course.title || '';
+                          return (
+                            <div
+                              key={course._id}
+                              className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#333] rounded"
+                              onClick={() => {
+                                setShowSearchDropdown(false);
+                                setSearchQuery('');
+                                navigate(`/courses/${course._id}`);
+                                setIsMobileMenuOpen(false);
+                              }}
+                            >
+                              <img src={course.thumbnail || '/default-course-img.png'} alt={title} className="w-10 h-8 object-cover rounded" />
+                              <span className="font-medium">{title}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                    {searchResults.instructors.length > 0 && (
+                      <div>
+                        <div className="px-4 pt-3 pb-1 text-xs font-bold uppercase text-gray-500">{t('Instructors')}</div>
+                        {searchResults.instructors.map(inst => {
+                          const lang = i18n.language;
+                          let instructorName = 'Unknown Instructor';
+                          let instructorImage = '/default-profile.png';
+
+                          if (inst && inst.profile) {
+                            instructorName = `${inst.profile.firstName?.[lang] || inst.profile.firstName?.en || ''} ${inst.profile.lastName?.[lang] || inst.profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
+                            instructorImage = inst.profile.profilePicture || '/default-profile.png';
+                          } else if (inst && typeof inst === 'object') {
+                            const profile = inst.profile || inst.user || inst;
+                            instructorName = `${profile.firstName?.[lang] || profile.firstName?.en || ''} ${profile.lastName?.[lang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
+                            instructorImage = profile.profilePicture || '/default-profile.png';
+                          }
+
+                          return (
+                            <div
+                              key={inst._id}
+                              className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#333] rounded"
+                              onClick={() => {
+                                setShowSearchDropdown(false);
+                                setSearchQuery('');
+                                navigate(`/instructors/${inst._id}`);
+                                setIsMobileMenuOpen(false);
+                              }}
+                            >
+                              <img src={instructorImage} alt={instructorName} className="w-10 h-10 object-cover rounded-full" />
+                              <span className="font-medium">{instructorName}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </nav>
+  );
 };
 
 export default Navbar;
