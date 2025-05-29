@@ -11,9 +11,9 @@
   },
   "navigation": {
     "home": "الرئيسية",
-    "courses": "كورسات",
-    "instructors": "المدربين",
-    "programs": "البرامج",
+    "courses":"الدورات التدريبيه",
+    "instructors": "الخبراء",
+    "programs": "برامج التعلم",
     "subscribe": "اشترك",
     "about": "من نحن",
     "contact": "اتصل بنا",
