@@ -60,7 +60,10 @@
     "blog": "Blog",
     "press": "Press",
     "team": "Team",
-    "backToPrograms": "Back to Programs"
+    "backToPrograms": "Back to Programs",
+    "mySessions": "My Sessions",
+    "instructorSessions": "Instructor Sessions",
+    "aiChat": "Try AI Mentor"
   },
   "footer": {
     "explore": "Explore",
@@ -155,7 +158,16 @@
     "instructors": "Instructors",
     "courses": "Courses",
     "aiChat": "AI Chat",
-    "subscribe": "Subscribe"
+    "subscribe": "Subscribe",
+    "requestSession": "Request Session",
+    "requesting": "Requesting...",
+    "approve": "Approve",
+    "reject": "Reject",
+    "complete": "Complete",
+    "viewChat": "View Chat",
+    "send": "Send",
+    "retry": "Retry",
+    "goBack": "Go Back"
   },
   "messages": {
     "pleaseLogin": "You Must log in to continue.",
@@ -164,7 +176,24 @@
     "success": "Success!",
     "noResults": "No results found",
     "readMore": "Read more",
-    "readLess": "Read less"
+    "readLess": "Read less",
+    "sessionRequested": "Session requested successfully",
+    "requestFailed": "Failed to request session",
+    "sessionApproved": "Session approved successfully",
+    "sessionRejected": "Session rejected",
+    "sessionCompleted": "Session marked as completed",
+    "sessionCancelled": "Session cancelled",
+    "updateFailed": "Failed to update session status",
+    "chatError": "Error connecting to chat",
+    "sessionNotFound": "Session not found",
+    "videoChatPlaceholder": "Video chat will be available soon",
+    "typeMessage": "Type your message...",
+    "connected": "Connected to chat",
+    "reconnecting": "Reconnecting... (Attempt {{count}}/{{max}})",
+    "maxRetriesReached": "Failed to connect to chat. Please refresh the page.",
+    "noCoursesForTopic": "No courses available for this topic",
+    "noCoursesAvailable": "No courses available",
+    "noSubscriptionPlans": "No subscription plans available"
   },
   "instructorStats": {
     "views": "Views",
@@ -482,5 +511,55 @@
       "document": "Document"
     }
   },
-  "changePlan": "Change Plan"
+  "changePlan": "Change Plan",
+  "requestSession": {
+    "title": "Request a Session",
+    "titleLabel": "Session Title",
+    "titlePlaceholder": "Enter session title",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Describe what you'd like to discuss",
+    "dateLabel": "Requested Date & Time",
+    "durationLabel": "Session Duration",
+    "minutes": "minutes"
+  },
+  "sessionHistory": {
+    "title": "Session History",
+    "noSessions": "No sessions found",
+    "status": {
+      "all": "All Sessions",
+      "pending": "Pending",
+      "approved": "Approved",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "minutes": "minutes"
+  },
+  "sections": {
+    "categories": "Course Categories",
+    "picks": "Featured Picks",
+    "trending": "Trending Courses",
+    "newlyReleased": "Newly Released",
+    "instructors": "Our Instructors",
+    "subscription": {
+      "title": "Subscribe at a Special Price",
+      "description": "Get access to all courses whenever you want"
+    }
+  },
+  "labels": {
+    "bestValue": "Best Value"
+  },
+  "loading": {
+    "topics": "Loading topics...",
+    "general": "Loading..."
+  },
+  "badges": {
+    "new": "New"
+  },
+  "instructorDetails": {
+    "biography": "Biography",
+    "expertise": "Areas of Expertise",
+    "courses": "Courses",
+    "showMore": "Show More",
+    "showLess": "Show Less"
+  }
 }

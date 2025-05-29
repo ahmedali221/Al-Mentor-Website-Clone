@@ -32,9 +32,11 @@ import ProgramDetailPage from './pages/ProgramDetailPage';
 import InstructorDetails from './pages/InstructorsDetails';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from "./routes/ProtectedRoute";
-import AIChatPage from './pages/AIChatPage'; // Import AIChatPage component
+import AIChatPage from './pages/AIChatPage';
 import Subscribe from './pages/Subscribe';
 import PaymentPage from './pages/PaymentPage';
+import InstructorSessionChat from './components/InstructorSession/InstructorSessionChat';
+import SessionHistory from './components/InstructorSession/SessionHistory';
 
 // Create a separate component for routes
 const AppRoutes = () => {
@@ -130,23 +132,44 @@ const AppRoutes = () => {
             <BecomeInstructor />
           </ProtectedRoute>
         } />
+
         <Route path="/AIChatPage" element={
           <ProtectedRoute>
             <AIChatPage />
           </ProtectedRoute>
         } />
+
         <Route path="/subscribe" element={
           <ProtectedRoute>
             <Subscribe />
           </ProtectedRoute>
         } />
+
         <Route path="/payment/:planId" element={
           <ProtectedRoute>
             <PaymentPage />
           </ProtectedRoute>
         } />
+
+        {/* Instructor Session Routes */}
+        <Route path="/instructor-session/:sessionId" element={
+          <ProtectedRoute>
+            <InstructorSessionChat />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/my-sessions" element={
+          <ProtectedRoute>
+            <SessionHistory isInstructor={false} />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/instructor-sessions" element={
+          <ProtectedRoute>
+            <SessionHistory isInstructor={true} />
+          </ProtectedRoute>
+        } />
       </Route>
-      
     </Routes>
   );
 };
@@ -154,7 +177,6 @@ const AppRoutes = () => {
 function App() {
   return (
     <ThemeProvider>
-      {/* Move BrowserRouter outside of AuthProvider */}
       <BrowserRouter>
         <AuthProvider>
           <MyCoursesProvider>
