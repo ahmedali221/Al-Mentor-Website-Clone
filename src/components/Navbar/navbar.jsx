@@ -10,6 +10,7 @@ import { FaUserCircle } from "react-icons/fa";
 import './navbar.css';
 import { ChatBubbleLeftRightIcon, AcademicCapIcon } from '@heroicons/react/24/outline';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import axios from 'axios';
 
 const Navbar = () => {
   const { t, i18n } = useTranslation();
@@ -17,23 +18,101 @@ const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
-  const [searchResults] = useState({ courses: [], instructors: [] });
+  const [searchResults, setSearchResults] = useState({ courses: [], instructors: [], programs: [] });
+  const [allData, setAllData] = useState({ courses: [], instructors: [], programs: [] });
   const searchDropdownRef = useRef(null);
   const searchInputRef = useRef(null);
   const isRTL = i18n.language === 'ar';
   const { theme, toggleTheme } = useTheme();
   const currentLang = i18n.language;
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef(null);
+
+  // Fetch all data on component mount
+  useEffect(() => {
+    const fetchAllData = async () => {
+      try {
+        const [coursesRes, instructorsRes, programsRes] = await Promise.all([
+          axios.get('/api/courses'),
+          axios.get('/api/instructors'),
+          axios.get('/api/programs')
+        ]);
+
+        setAllData({
+          courses: coursesRes.data.data || coursesRes.data,
+          instructors: instructorsRes.data.data || instructorsRes.data,
+          programs: programsRes.data.data || programsRes.data
+        });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchAllData();
+  }, []);
+
+  const getLocalizedText = (obj) => {
+    if (!obj) return '';
+    if (typeof obj === 'string') return obj;
+    return obj[currentLang] || obj.en || '';
+  };
+
+  const handleSearch = (query) => {
+    if (!query.trim()) {
+      setSearchResults({ courses: [], instructors: [], programs: [] });
+      setShowSearchDropdown(false);
+      return;
+    }
+
+    const searchLower = query.toLowerCase();
+
+    // Search in courses
+    const matchedCourses = allData.courses.filter(course => {
+      const title = getLocalizedText(course.title);
+      const description = getLocalizedText(course.description);
+      return title.toLowerCase().includes(searchLower) ||
+        description.toLowerCase().includes(searchLower);
+    });
+
+    // Search in instructors
+    const matchedInstructors = allData.instructors.filter(instructor => {
+      const profile = instructor.profile || instructor.user || instructor;
+      const firstName = getLocalizedText(profile.firstName);
+      const lastName = getLocalizedText(profile.lastName);
+      const title = getLocalizedText(instructor.professionalTitle);
+      return `${firstName} ${lastName}`.toLowerCase().includes(searchLower) ||
+        title.toLowerCase().includes(searchLower);
+    });
+
+    // Search in programs
+    const matchedPrograms = allData.programs.filter(program => {
+      const title = getLocalizedText(program.title);
+      const description = getLocalizedText(program.description);
+      return title.toLowerCase().includes(searchLower) ||
+        description.toLowerCase().includes(searchLower);
+    });
+
+    setSearchResults({
+      courses: matchedCourses.slice(0, 5),
+      instructors: matchedInstructors.slice(0, 5),
+      programs: matchedPrograms.slice(0, 5)
+    });
+    setShowSearchDropdown(true);
+  };
+
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      if (searchQuery) {
+        handleSearch(searchQuery);
+      }
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
+  }, [searchQuery]);
 
   const toggleLanguage = () => {
     const newLang = i18n.language === 'en' ? 'ar' : 'en';
     i18n.changeLanguage(newLang);
-  };
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
   };
 
   const navigationItems = [
@@ -83,6 +162,9 @@ const Navbar = () => {
     },
   ];
 
+  // Keep the same order for both English and Arabic - only change flex direction
+  const orderedNavigationItems = navigationItems;
+
   const handleLogout = () => {
     logout();
     localStorage.removeItem('token');
@@ -121,8 +203,7 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 px-4 py-4 z-50 shadow transition-all duration-300 text-lg font-medium ${theme === 'dark' ? 'bg-[#1a1a1a] text-white' : 'bg-white text-black'
-        }`}
+      className={`fixed top-0 left-0 right-0 px-4 py-4 z-50 shadow transition-all duration-300 text-lg font-medium ${theme === 'dark' ? 'bg-[#1a1a1a] text-white' : 'bg-white text-black'}`}
     >
       <div className={`flex items-center justify-start gap-12 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
         {/* Logo */}
@@ -134,7 +215,7 @@ const Navbar = () => {
         </div>
 
         <ul className={`flex items-center ml-1 ${isRTL ? 'space-x-reverse space-x-6' : 'space-x-6'} text-1xl font-medium`}>
-          {navigationItems.map((item) => (
+          {orderedNavigationItems.map((item) => (
             <li key={item.name} className={`relative ${item.showWhen === 'authenticated' ? '' : 'hidden'}`}>
               <Link to={item.href} className="hover:text-red-500 flex items-center relative">
                 {item.name}
@@ -147,7 +228,7 @@ const Navbar = () => {
             </li>
           ))}
 
-          <li>
+          <li className={`${isRTL ? 'mx-10' : 'mx-10'}`}>
             <Link
               to="/subscribe"
               className={`rounded px-6 text-2xl py-2 border-2 transition ${theme === 'dark'
@@ -160,7 +241,7 @@ const Navbar = () => {
           </li>
         </ul>
 
-        <div className={`flex items-center ml-auto ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
+        <div className={`flex items-center ${isRTL ? 'mr-8' : 'ml-8'} ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
           <div className="relative">
             <input
               type="text"
@@ -182,18 +263,37 @@ const Navbar = () => {
                 className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 w-[360px] max-h-96 overflow-y-auto rounded-md shadow-lg z-50 ${theme === 'dark' ? 'bg-[#232323] text-white' : 'bg-white text-black'}`}
                 style={{ direction: isRTL ? 'rtl' : 'ltr' }}
               >
-                {searchResults.courses.length === 0 && searchResults.instructors.length === 0 ? (
+                {searchResults.courses.length === 0 && searchResults.instructors.length === 0 && searchResults.programs.length === 0 ? (
                   <div className="p-4 text-center text-gray-400">{t('common.noResults') || 'No results found'}</div>
                 ) : (
                   <>
+                    {searchResults.programs.length > 0 && (
+                      <div>
+                        <div className="px-4 pt-3 pb-1 text-xs font-bold uppercase text-gray-500">{t('navigation.programs')}</div>
+                        {searchResults.programs.map(program => {
+                          const title = getLocalizedText(program.title);
+                          return (
+                            <div
+                              key={program._id}
+                              className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#333] rounded"
+                              onClick={() => {
+                                setShowSearchDropdown(false);
+                                setSearchQuery('');
+                                navigate(`/programs/${program._id}`);
+                              }}
+                            >
+                              <img src={program.thumbnail || '/default-program-img.png'} alt={title} className="w-10 h-8 object-cover rounded" />
+                              <span className="font-medium">{title}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                     {searchResults.courses.length > 0 && (
                       <div>
-                        <div className="px-4 pt-3 pb-1 text-xs font-bold uppercase text-gray-500">{t('Courses')}</div>
+                        <div className="px-4 pt-3 pb-1 text-xs font-bold uppercase text-gray-500">{t('navigation.courses')}</div>
                         {searchResults.courses.map(course => {
-                          const lang = i18n.language;
-                          const title = typeof course.title === 'object'
-                            ? course.title[lang] || course.title.en || ''
-                            : course.title || '';
+                          const title = getLocalizedText(course.title);
                           return (
                             <div
                               key={course._id}
@@ -213,20 +313,11 @@ const Navbar = () => {
                     )}
                     {searchResults.instructors.length > 0 && (
                       <div>
-                        <div className="px-4 pt-3 pb-1 text-xs font-bold uppercase text-gray-500">{t('Instructors')}</div>
+                        <div className="px-4 pt-3 pb-1 text-xs font-bold uppercase text-gray-500">{t('navigation.instructors')}</div>
                         {searchResults.instructors.map(inst => {
-                          const lang = i18n.language;
-                          let instructorName = 'Unknown Instructor';
-                          let instructorImage = '/default-profile.png';
-
-                          if (inst && inst.profile) {
-                            instructorName = `${inst.profile.firstName?.[lang] || inst.profile.firstName?.en || ''} ${inst.profile.lastName?.[lang] || inst.profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
-                            instructorImage = inst.profile.profilePicture || '/default-profile.png';
-                          } else if (inst && typeof inst === 'object') {
-                            const profile = inst.profile || inst.user || inst;
-                            instructorName = `${profile.firstName?.[lang] || profile.firstName?.en || ''} ${profile.lastName?.[lang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
-                            instructorImage = profile.profilePicture || '/default-profile.png';
-                          }
+                          const profile = inst.profile || inst.user || inst;
+                          const instructorName = `${getLocalizedText(profile.firstName)} ${getLocalizedText(profile.lastName)}`.trim() || 'Unknown Instructor';
+                          const instructorImage = profile.profilePicture || '/default-profile.png';
 
                           return (
                             <div
@@ -251,7 +342,7 @@ const Navbar = () => {
             )}
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
             <button
               onClick={toggleTheme}
               className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors
@@ -273,7 +364,7 @@ const Navbar = () => {
             <div className="relative" ref={profileRef}>
               <button
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="flex items-center space-x-2 hover:opacity-80 transition-opacity p-2"
+                className="flex items-center hover:opacity-80 transition-opacity p-2"
               >
                 {user?.profilePicture ? (
                   <img
@@ -287,7 +378,7 @@ const Navbar = () => {
               </button>
 
               {isProfileOpen && (
-                <div className={`absolute top-full right-0 mt-2 w-72 rounded-lg shadow-xl z-50 overflow-hidden ${theme === 'dark' ? 'bg-[#1a1a1a] border border-gray-700' : 'bg-white border border-gray-200'}`}>
+                <div className={`absolute top-full ${isRTL ? 'left-0' : 'right-0'} mt-2 w-72 rounded-lg shadow-xl z-50 overflow-hidden ${theme === 'dark' ? 'bg-[#1a1a1a] border border-gray-700' : 'bg-white border border-gray-200'}`}>
                   <div className={`p-4 border-b ${theme === 'dark' ? 'bg-[#232323] border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
                     <p className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                       {user?.firstName ? getLocalizedName(user.firstName) : ''} {user?.lastName ? getLocalizedName(user.lastName) : ''}
@@ -307,9 +398,9 @@ const Navbar = () => {
                     <Link
                       to="/my-progress"
                       className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
-                        }`}
+                        } ${isRTL ? 'flex-row-reverse' : ''}`}
                     >
-                      <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className={`w-5 h-5 ${isRTL ? 'ml-3' : 'mr-3'} ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                       {t('profile.myProgress')}
@@ -318,9 +409,9 @@ const Navbar = () => {
                     <Link
                       to="/saved-courses"
                       className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
-                        }`}
+                        } ${isRTL ? 'flex-row-reverse' : ''}`}
                     >
-                      <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className={`w-5 h-5 ${isRTL ? 'ml-3' : 'mr-3'} ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5h14v14H5z" />
                       </svg>
                       {t('profile.savedCourses')}
@@ -329,9 +420,9 @@ const Navbar = () => {
                     <Link
                       to="/certificates"
                       className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
-                        }`}
+                        } ${isRTL ? 'flex-row-reverse' : ''}`}
                     >
-                      <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className={`w-5 h-5 ${isRTL ? 'ml-3' : 'mr-3'} ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v8m-4-4h8" />
                       </svg>
                       {t('profile.certificates')}
@@ -340,9 +431,9 @@ const Navbar = () => {
                     <Link
                       to="/profile"
                       className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
-                        }`}
+                        } ${isRTL ? 'flex-row-reverse' : ''}`}
                     >
-                      <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className={`w-5 h-5 ${isRTL ? 'ml-3' : 'mr-3'} ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                       </svg>
                       {t('profile.accountSettings')}
@@ -351,9 +442,9 @@ const Navbar = () => {
                     <Link
                       to="/become-instructor"
                       className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
-                        }`}
+                        } ${isRTL ? 'flex-row-reverse' : ''}`}
                     >
-                      <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className={`w-5 h-5 ${isRTL ? 'ml-3' : 'mr-3'} ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                       {t('profile.becomeInstructor')}
@@ -362,9 +453,9 @@ const Navbar = () => {
                     <button
                       onClick={handleLogout}
                       className={`w-full flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'text-red-400 hover:bg-[#232323] hover:text-red-300' : 'text-red-500 hover:bg-red-50'
-                        }`}
+                        } ${isRTL ? 'flex-row-reverse' : ''}`}
                     >
-                      <svg className={`w-5 h-5 mr-3 ${theme === 'dark' ? 'text-red-400' : 'text-red-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className={`w-5 h-5 ${isRTL ? 'ml-3' : 'mr-3'} ${theme === 'dark' ? 'text-red-400' : 'text-red-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                       </svg>
                       {t('logout')}
@@ -374,35 +465,25 @@ const Navbar = () => {
               )}
             </div>
           ) : (
-            <>
+            <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
               <Link
                 to="/loginPage"
                 className={`text-sm transition-colors ${theme === 'dark'
                   ? 'text-gray-300 hover:text-white'
                   : 'text-gray-600 hover:text-black'
-                  }text-lg`}
+                  }`}
               >
                 {t('common.login')}
               </Link>
               <Link
                 to="/subscribe"
-                className={`bg-red-500 text-white px-5 py-2 rounded transition-colors ${theme === 'dark'
-                  ? 'hover:bg-red-600'
-                  : 'hover:bg-red-600'
-                  } text-sm text-center`}
-              >{t('common.signup')}
+                className={`bg-red-500 text-white px-5 py-2 rounded transition-colors hover:bg-red-600 text-sm text-center`}
+              >
+                {t('common.signup')}
               </Link>
-            </>
+            </div>
           )}
         </div>
-      </div>
-
-      {/* Mobile menu */}
-      <div
-        className={`${isMenuOpen ? 'block' : 'hidden'
-          } md:hidden absolute top-full left-0 right-0 bg-white dark:bg-gray-800 shadow-lg z-50`}
-      >
-        {/* ... existing mobile menu content ... */}
       </div>
     </nav>
   );
