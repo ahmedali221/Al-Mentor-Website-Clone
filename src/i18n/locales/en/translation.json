@@ -570,5 +570,22 @@
     "courses": "Courses",
     "showMore": "Show More",
     "showLess": "Show Less"
+  },
+  "instructorDashboard": {
+    "welcome": "Welcome to Your Instructor Dashboard",
+    "subtitle": "Manage your courses, track your progress, and grow your teaching business",
+    "totalStudents": "Total Students",
+    "totalCourses": "Total Courses",
+    "totalRevenue": "Total Revenue",
+    "rating": "Rating",
+    "createCourse": "Create New Course",
+    "createCourseDesc": "Start creating your next course and share your knowledge",
+    "myCourses": "My Courses",
+    "myCoursesDesc": "Manage and update your existing courses",
+    "editProfile": "Edit Profile",
+    "editProfileDesc": "Update your instructor profile and settings",
+    "recentActivity": "Recent Activity",
+    "noActivity": "No recent activity to display",
+    "defaultTitle": "Professional Instructor"
   }
 }

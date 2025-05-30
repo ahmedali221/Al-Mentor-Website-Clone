@@ -595,6 +595,23 @@
     "courses": "الدورات",
     "showMore": "عرض المزيد",
     "showLess": "عرض أقل"
+  },
+  "instructorDashboard": {
+    "welcome": "مرحباً بك في لوحة تحكم المدرب",
+    "subtitle": "إدارة دوراتك، متابعة تقدمك، وتنمية أعمالك التعليمية",
+    "totalStudents": "إجمالي الطلاب",
+    "totalCourses": "إجمالي الدورات",
+    "totalRevenue": "إجمالي الإيرادات",
+    "rating": "التقييم",
+    "createCourse": "إنشاء دورة جديدة",
+    "createCourseDesc": "ابدأ في إنشاء دورتك القادمة وشارك معرفتك",
+    "myCourses": "دوراتي",
+    "myCoursesDesc": "إدارة وتحديث دوراتك الحالية",
+    "editProfile": "تعديل الملف الشخصي",
+    "editProfileDesc": "تحديث ملفك الشخصي وإعداداتك كمدرب",
+    "recentActivity": "النشاط الأخير",
+    "noActivity": "لا يوجد نشاط حديث لعرضه",
+    "defaultTitle": "مدرب محترف"
   }
 }
 
