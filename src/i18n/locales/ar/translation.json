@@ -237,7 +237,13 @@
     "congratulations": "تهانينا!",
     "courseCompleted": "لقد أكملت الدورة \"{{courseName}}\" بنجاح",
     "getCertificate": "احصل على شهادتك",
-    "close": "إغلاق"
+    "close": "إغلاق",
+    "subscriptionExpired": "انتهت صلاحية الاشتراك",
+    "subscriptionRequired": "الاشتراك مطلوب",
+    "subscriptionExpiredMessage": "انتهت صلاحية اشتراكك. يرجى تجديد اشتراكك للاستمرار في الوصول إلى محتوى الدورات.",
+    "subscriptionRequiredMessage": "الاشتراك مطلوب للوصول إلى محتوى هذه الدورة. يرجى الاشتراك للاستمرار في التعلم.",
+    "getSubscription": "اشترك الآن",
+    "renewSubscription": "تجديد الاشتراك"
   },
   "becomeInstructor": {
     "header": {
