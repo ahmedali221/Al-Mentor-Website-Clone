@@ -3,8 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { useTheme } from "../context/ThemeContext";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../context/AuthContext"; // Add this import at the top
 
 export default function Instructors() {
+  const { user } = useAuth();
+  const [isInstructor, setIsInstructor] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
   const [instructors, setInstructors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -15,9 +19,7 @@ export default function Instructors() {
   const { theme } = useTheme();
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
-  const redirectToInstructorPage = () => {
-    navigate("/become-instructor");
-  };
+
   useEffect(() => {
     setLoading(true);
     setError(null);
@@ -56,6 +58,31 @@ export default function Instructors() {
       });
   }, [page, limit, t, i18n.language]);
 
+  useEffect(() => {
+    const checkInstructorStatus = async () => {
+      if (!user) {
+        setIsChecking(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:5000/api/instructors?page=1&limit=100`);
+        const data = await response.json();
+
+        if (data.success) {
+          const instructorStatus = data.data.some(instructor => instructor.user === user._id);
+          setIsInstructor(instructorStatus);
+        }
+      } catch (error) {
+        console.error("Error checking instructor status:", error);
+      } finally {
+        setIsChecking(false);
+      }
+    };
+
+    checkInstructorStatus();
+  }, [user]);
+
   const themeClasses = {
     bg: theme === "dark" ? "bg-[#121212]" : "bg-gray-50",
     text: theme === "dark" ? "text-white" : "text-gray-900",
@@ -77,14 +104,14 @@ export default function Instructors() {
 
   if (loading && page === 1 && instructors.length === 0)
     return (
-        
-            <div className={`min-h-screen flex items-center justify-center ${theme === 'dark' ? 'bg-[#1A1A1A] text-white' : 'bg-gray-50 text-gray-900'}`}>
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600 mx-auto"></div>
-                    <p className="mt-4">{t('loading', 'Loading...')}</p>
-                </div>
-            </div>
-      
+
+      <div className={`min-h-screen flex items-center justify-center ${theme === 'dark' ? 'bg-[#1A1A1A] text-white' : 'bg-gray-50 text-gray-900'}`}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600 mx-auto"></div>
+          <p className="mt-4">{t('loading', 'Loading...')}</p>
+        </div>
+      </div>
+
     );
 
   if (error && instructors.length === 0)
@@ -113,28 +140,24 @@ export default function Instructors() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1
           key={i18n.language}
-          className={`text-3xl lg:text-4xl font-bold mb-10 md:mb-12 ${
-            isRTL ? "text-right" : "text-left"
-          }`}
+          className={`text-3xl lg:text-4xl font-bold mb-10 md:mb-12 ${isRTL ? "text-right" : "text-left"
+            }`}
         >
           {t("home.instructors.title")}
         </h1>
 
         <div
-          className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-8 mb-12 md:mb-16 relative ${
-            loading ? "opacity-50 pointer-events-none" : ""
-          }`}
+          className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-8 mb-12 md:mb-16 relative ${loading ? "opacity-50 pointer-events-none" : ""
+            }`}
         >
           {loading && (
             <div
-              className={`absolute inset-0 flex justify-center items-center ${
-                theme === "dark" ? "bg-black" : "bg-white"
-              } bg-opacity-50 z-10 rounded-md`}
+              className={`absolute inset-0 flex justify-center items-center ${theme === "dark" ? "bg-black" : "bg-white"
+                } bg-opacity-50 z-10 rounded-md`}
             >
               <svg
-                className={`animate-spin h-8 w-8 ${
-                  theme === "dark" ? "text-white" : "text-gray-700"
-                }`}
+                className={`animate-spin h-8 w-8 ${theme === "dark" ? "text-white" : "text-gray-700"
+                  }`}
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -167,11 +190,9 @@ export default function Instructors() {
               ins.professionalTitle?.[i18n.language] ||
               ins.professionalTitle?.en ||
               t("common.instructor");
-            const placeholderAvatar = `https://ui-avatars.com/api/?name=${
-              fullName || "N A"
-            }&background=${themeClasses.placeholderBg}&color=${
-              themeClasses.placeholderColor
-            }&size=128`;
+            const placeholderAvatar = `https://ui-avatars.com/api/?name=${fullName || "N A"
+              }&background=${themeClasses.placeholderBg}&color=${themeClasses.placeholderColor
+              }&size=128`;
             const picture = profile.profilePicture || placeholderAvatar;
 
             return (
@@ -236,11 +257,10 @@ export default function Instructors() {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1 || loading}
-            className={`p-2 rounded-full ${
-              page === 1 || loading
+            className={`p-2 rounded-full ${page === 1 || loading
                 ? "opacity-30 cursor-not-allowed"
                 : `opacity-70 ${themeClasses.buttonHover} hover:opacity-100`
-            }`}
+              }`}
           >
             {isRTL ? (
               <ChevronRightIcon className="h-6 w-6" />
@@ -252,11 +272,10 @@ export default function Instructors() {
             <button
               key={p}
               onClick={() => setPage(p)}
-              className={`px-3 py-1 rounded text-sm font-medium ${
-                p === page
+              className={`px-3 py-1 rounded text-sm font-medium ${p === page
                   ? "bg-red-600 text-white"
                   : `${themeClasses.buttonHover} ${themeClasses.text}`
-              }`}
+                }`}
             >
               {p}
             </button>
@@ -264,11 +283,10 @@ export default function Instructors() {
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages || loading}
-            className={`p-2 rounded-full ${
-              page === totalPages || loading
+            className={`p-2 rounded-full ${page === totalPages || loading
                 ? "opacity-30 cursor-not-allowed"
                 : `opacity-70 ${themeClasses.buttonHover} hover:opacity-100`
-            }`}
+              }`}
           >
             {isRTL ? (
               <ChevronLeftIcon className="h-6 w-6" />
@@ -278,30 +296,32 @@ export default function Instructors() {
           </button>
         </div>
 
-        <div
-          className="relative max-w-4xl mx-auto rounded-lg overflow-hidden h-52 md:h-60 w-500 mb-12 shadow-xl"
-          style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80')`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/80 flex flex-col justify-center items-center text-center px-6 text-white">
-            <h3 className="text-2xl md:text-3xl font-bold mb-2">
-              {" "}
-              {t("home.instructors.title2")}
-            </h3>
-            <p className="mt-1 md:mt-2 text-base md:text-lg mb-5 max-w-lg">
-              {t("home.instructors.subtitle")}
-            </p>
-            <button
-              onClick={redirectToInstructorPage}
-              className={`mt-2 bg-[#E4002B] hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 inline-block px-8 py-2.5 rounded text-base font-semibold transition-colors duration-200 ease-in-out`}
-            >
-              {t("home.instructors.button")}
-            </button>
+        {/* Conditionally render the "Become an Instructor" section */}
+        {!isChecking && !isInstructor && !user?.isAdmin && (
+          <div
+            className="relative max-w-4xl mx-auto rounded-lg overflow-hidden h-52 md:h-60 w-500 mb-12 shadow-xl"
+            style={{
+              backgroundImage: `url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80')`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/80 flex flex-col justify-center items-center text-center px-6 text-white">
+              <h3 className="text-2xl md:text-3xl font-bold mb-2">
+                {t("home.instructors.title2")}
+              </h3>
+              <p className="mt-1 md:mt-2 text-base md:text-lg mb-5 max-w-lg">
+                {t("home.instructors.subtitle")}
+              </p>
+              <button
+                onClick={() => navigate("/instructor-application")}
+                className={`mt-2 bg-[#E4002B] hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 inline-block px-8 py-2.5 rounded text-base font-semibold transition-colors duration-200 ease-in-out`}
+              >
+                {t("home.instructors.button")}
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

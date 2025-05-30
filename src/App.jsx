@@ -36,6 +36,8 @@ import Subscribe from './pages/Subscribe';
 import PaymentPage from './pages/PaymentPage';
 import InstructorSessionChat from './components/InstructorSession/InstructorSessionChat';
 import SessionHistory from './components/InstructorSession/SessionHistory';
+import InstructorDashboard from './pages/instructorDashbaord';
+import InstructorApplication from './pages/InstructorApplication';
 
 // Create a separate component for routes
 const AppRoutes = () => {
@@ -187,6 +189,19 @@ const AppRoutes = () => {
         <Route path="/instructor-sessions" element={
           <ProtectedRoute>
             <SessionHistory isInstructor={true} />
+          </ProtectedRoute>
+        } />
+
+        {/* Instructor Routes */}
+        <Route path="/instructor-dashboard" element={
+          <ProtectedRoute>
+            <InstructorDashboard />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/instructor-application" element={
+          <ProtectedRoute>
+            <InstructorApplication />
           </ProtectedRoute>
         } />
       </Route>
