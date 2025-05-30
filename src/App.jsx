@@ -7,8 +7,8 @@ import LoginPage from './pages/LoginPage';
 import PasswordPage from './pages/PasswordPage';
 import SignupPage from './pages/SignupPage';
 import SignEmail from './pages/SignEmail';
-import Home from './components/Home/Home';  // Updated case
-import Instructors from './pages/Instructors';
+import Home from './components/Home/Home';
+import Instructors from './pages/Instructors.jsx';  // Updated extension
 import { ThemeProvider } from './context/ThemeContext';
 import { MyCoursesProvider } from './context/MyCoursesContext';
 import './i18n/config';
