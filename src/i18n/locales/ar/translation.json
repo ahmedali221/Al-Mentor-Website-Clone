@@ -21,7 +21,10 @@
     "blog": "المدونة",
     "press": "الصحافة",
     "team": "الفريق",
-    "backToPrograms": "العودة إلى البرامج"
+    "backToPrograms": "العودة إلى البرامج",
+    "mySessions": "جلساتي",
+    "instructorSessions": "جلسات المدرب",
+    "aiChat": "جرب المنتور"
   },
   "footer": {
     "explore": "استكشف",
@@ -120,7 +123,16 @@
     "aiChat": "الدردشة الذكية",
     "subscribe": "اشترك",
     "choosePlan": "اختر الخطة",
-    "seeAllInstructors": "عرض جميع المدربين"
+    "seeAllInstructors": "عرض جميع المدربين",
+    "requestSession": "طلب جلسة",
+    "requesting": "جاري الطلب...",
+    "approve": "موافقة",
+    "reject": "رفض",
+    "complete": "إكمال",
+    "viewChat": "عرض الدردشة",
+    "send": "إرسال",
+    "retry": "إعادة المحاولة",
+    "goBack": "رجوع"
   },
   "messages": {
     "pleaseLogin": "يجب عليك تسجيل الدخول للمتابعة.",
@@ -140,7 +152,21 @@
     "courseRemovedFromSaved": "تمت إزالة الدورة من الدورات المحفوظة",
     "noCoursesForTopic": "لا توجد دورات متاحة لهذا الموضوع",
     "noCoursesAvailable": "لا توجد دورات متاحة",
-    "noSubscriptionPlans": "لا توجد خطط اشتراك متاحة"
+    "noSubscriptionPlans": "لا توجد خطط اشتراك متاحة",
+    "sessionRequested": "تم طلب الجلسة بنجاح",
+    "requestFailed": "فشل في طلب الجلسة",
+    "sessionApproved": "تمت الموافقة على الجلسة بنجاح",
+    "sessionRejected": "تم رفض الجلسة",
+    "sessionCompleted": "تم إكمال الجلسة",
+    "sessionCancelled": "تم إلغاء الجلسة",
+    "updateFailed": "فشل في تحديث حالة الجلسة",
+    "chatError": "خطأ في الاتصال بالدردشة",
+    "sessionNotFound": "لم يتم العثور على الجلسة",
+    "videoChatPlaceholder": "ستكون الدردشة المرئية متاحة قريباً",
+    "typeMessage": "اكتب رسالتك...",
+    "connected": "تم الاتصال بالدردشة",
+    "reconnecting": "إعادة الاتصال... (محاولة {{count}}/{{max}})",
+    "maxRetriesReached": "فشل الاتصال بالدردشة. يرجى تحديث الصفحة."
   },
   "auth": {
     "welcomeBack": "مرحبًا بعودتك!",
@@ -535,6 +561,38 @@
   "loading": {
     "topics": "جاري تحميل المواضيع...",
     "general": "جاري التحميل..."
+  },
+  "requestSession": {
+    "title": "طلب جلسة",
+    "titleLabel": "عنوان الجلسة",
+    "titlePlaceholder": "أدخل عنوان الجلسة",
+    "descriptionLabel": "الوصف",
+    "descriptionPlaceholder": "صف ما تود مناقشته",
+    "dateLabel": "التاريخ والوقت المطلوب",
+    "durationLabel": "مدة الجلسة",
+    "minutes": "دقيقة"
+  },
+  "sessionHistory": {
+    "title": "سجل الجلسات",
+    "noSessions": "لا توجد جلسات",
+    "status": {
+      "all": "جميع الجلسات",
+      "pending": "قيد الانتظار",
+      "approved": "تمت الموافقة",
+      "completed": "مكتملة",
+      "cancelled": "ملغاة"
+    },
+    "minutes": "دقيقة"
+  },
+  "badges": {
+    "new": "جديد"
+  },
+  "instructorDetails": {
+    "biography": "السيرة الذاتية",
+    "expertise": "مجالات الخبرة",
+    "courses": "الدورات",
+    "showMore": "عرض المزيد",
+    "showLess": "عرض أقل"
   }
 }
 
