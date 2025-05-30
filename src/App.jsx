@@ -33,10 +33,10 @@ import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 import AIChatPage from './pages/AIChatPage.jsx';
 import Subscribe from './pages/Subscribe.jsx';
+import InstructorDashboard from './pages/InstructorDashbaord.jsx';
 import PaymentPage from './pages/PaymentPage.jsx';
 import InstructorSessionChat from './components/InstructorSession/InstructorSessionChat.jsx';
 import SessionHistory from './components/InstructorSession/SessionHistory.jsx';
-import InstructorDashboard from './pages/InstructorDashboard.jsx';
 import InstructorApplication from './pages/InstructorApplication.jsx';
 
 // Create a separate component for routes
