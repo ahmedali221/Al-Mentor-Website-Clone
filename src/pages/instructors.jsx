@@ -258,8 +258,8 @@ export default function Instructors() {
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1 || loading}
             className={`p-2 rounded-full ${page === 1 || loading
-                ? "opacity-30 cursor-not-allowed"
-                : `opacity-70 ${themeClasses.buttonHover} hover:opacity-100`
+              ? "opacity-30 cursor-not-allowed"
+              : `opacity-70 ${themeClasses.buttonHover} hover:opacity-100`
               }`}
           >
             {isRTL ? (
@@ -273,8 +273,8 @@ export default function Instructors() {
               key={p}
               onClick={() => setPage(p)}
               className={`px-3 py-1 rounded text-sm font-medium ${p === page
-                  ? "bg-red-600 text-white"
-                  : `${themeClasses.buttonHover} ${themeClasses.text}`
+                ? "bg-red-600 text-white"
+                : `${themeClasses.buttonHover} ${themeClasses.text}`
                 }`}
             >
               {p}
@@ -284,8 +284,8 @@ export default function Instructors() {
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages || loading}
             className={`p-2 rounded-full ${page === totalPages || loading
-                ? "opacity-30 cursor-not-allowed"
-                : `opacity-70 ${themeClasses.buttonHover} hover:opacity-100`
+              ? "opacity-30 cursor-not-allowed"
+              : `opacity-70 ${themeClasses.buttonHover} hover:opacity-100`
               }`}
           >
             {isRTL ? (
@@ -314,7 +314,7 @@ export default function Instructors() {
                 {t("home.instructors.subtitle")}
               </p>
               <button
-                onClick={() => navigate("/instructor-application")}
+                onClick={() => navigate("/become-instructo")}
                 className={`mt-2 bg-[#E4002B] hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 inline-block px-8 py-2.5 rounded text-base font-semibold transition-colors duration-200 ease-in-out`}
               >
                 {t("home.instructors.button")}

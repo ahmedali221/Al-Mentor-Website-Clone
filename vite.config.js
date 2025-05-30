@@ -4,16 +4,14 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  build: {
-    rollupOptions: {
-      external: ["@rollup/rollup-linux-x64-gnu"],
-    },
-  },
   server: {
+    host: "localhost",
+    port: 3000,
     open: true,
+    strictPort: true,
     proxy: {
       "/api": {
-        target: "https://al-mentor-database-production.up.railway.app/api",
+        target: "https://al-mentor-database-production.up.railway.app/",
         changeOrigin: true,
         secure: false,
       },
