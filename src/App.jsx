@@ -1,43 +1,43 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import { ToastContainer } from 'react-toastify';
-import MainLayout from './components/Layout/MainLayout';
-import AuthLayout from './components/Layout/AuthLayout';
-import LoginPage from './pages/LoginPage';
-import PasswordPage from './pages/PasswordPage';
-import SignupPage from './pages/SignupPage';
-import SignEmail from './pages/SignEmail';
-import Home from './components/Home/Home';
-import Instructors from './pages/Instructors.jsx';  // Updated extension
-import { ThemeProvider } from './context/ThemeContext';
-import { MyCoursesProvider } from './context/MyCoursesContext';
+import MainLayout from './components/Layout/MainLayout.jsx';
+import AuthLayout from './components/Layout/AuthLayout.jsx';
+import LoginPage from './pages/LoginPage.jsx';
+import PasswordPage from './pages/PasswordPage.jsx';
+import SignupPage from './pages/SignupPage.jsx';
+import SignEmail from './pages/SignEmail.jsx';
+import Home from './components/Home/Home.jsx';
+import Instructors from './pages/Instructors.jsx';
+import { ThemeProvider } from './context/ThemeContext.jsx';
+import { MyCoursesProvider } from './context/MyCoursesContext.jsx';
 import './i18n/config';
-import ProgramsPage from './pages/ProgramsPage';
+import ProgramsPage from './pages/ProgramsPage.jsx';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import Courses from './components/Courses/Courses';  // Updated case
-import CategoryPage from './pages/CategoryPage';
-import CourseDetailsPage from './components/CourseDetails/CourseDetails';
-import AllCourses from './components/Courses/AllCourses';
-import LessonViewerPage from './components/LessonViewer/LessonViewerPage';
-import { CourseProvider } from './components/LessonViewer/CourseContext';
-import MyCourses from './components/MyCourses/MyCourses';  // Updated case
-import CertificatePage from './components/Certificate/CertificatePage';
-import SavedCourses from './components/Courses/SavedCourses';
-import Profile from './components/Profile/Profile';  // Fixed typo and case
-import BecomeInstructor from './pages/BecomeInstructor';
-import Home2 from './components/Home2/Home2';  // Updated case
-import ProgramDetailPage from './pages/ProgramDetailPage';
-import InstructorDetails from './pages/InstructorDetails';  // Fixed case
-import { AuthProvider, useAuth } from './context/AuthContext';
-import ProtectedRoute from "./routes/ProtectedRoute";
-import AIChatPage from './pages/AIChatPage';
-import Subscribe from './pages/Subscribe';
-import PaymentPage from './pages/PaymentPage';
-import InstructorSessionChat from './components/InstructorSession/InstructorSessionChat';
-import SessionHistory from './components/InstructorSession/SessionHistory';
-import InstructorDashboard from './pages/InstructorDashboard';  // Fixed typo
-import InstructorApplication from './pages/InstructorApplication';
+import Courses from './components/Courses/Courses.jsx';
+import CategoryPage from './pages/CategoryPage.jsx';
+import CourseDetailsPage from './components/CourseDetails/CourseDetails.jsx';
+import AllCourses from './components/Courses/AllCourses.jsx';
+import LessonViewerPage from './components/LessonViewer/LessonViewerPage.jsx';
+import { CourseProvider } from './components/LessonViewer/CourseContext.jsx';
+import MyCourses from './components/MyCourses/MyCourses.jsx';
+import CertificatePage from './components/Certificate/CertificatePage.jsx';
+import SavedCourses from './components/Courses/SavedCourses.jsx';
+import Profile from './components/Profile/Profile.jsx';
+import BecomeInstructor from './pages/BecomeInstructor.jsx';
+import Home2 from './components/Home2/Home2.jsx';
+import ProgramDetailPage from './pages/ProgramDetailPage.jsx';
+import InstructorDetails from './pages/InstructorDetails.jsx';
+import { AuthProvider, useAuth } from './context/AuthContext.jsx';
+import ProtectedRoute from "./routes/ProtectedRoute.jsx";
+import AIChatPage from './pages/AIChatPage.jsx';
+import Subscribe from './pages/Subscribe.jsx';
+import PaymentPage from './pages/PaymentPage.jsx';
+import InstructorSessionChat from './components/InstructorSession/InstructorSessionChat.jsx';
+import SessionHistory from './components/InstructorSession/SessionHistory.jsx';
+import InstructorDashboard from './pages/InstructorDashboard.jsx';
+import InstructorApplication from './pages/InstructorApplication.jsx';
 
 // Create a separate component for routes
 const AppRoutes = () => {
