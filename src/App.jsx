@@ -36,7 +36,7 @@ import Subscribe from './pages/Subscribe';
 import PaymentPage from './pages/PaymentPage';
 import InstructorSessionChat from './components/InstructorSession/InstructorSessionChat';
 import SessionHistory from './components/InstructorSession/SessionHistory';
-import InstructorDashboard from './pages/instructorDashbaord';
+import InstructorDashboard from './pages/InstructorDashbaord';
 import InstructorApplication from './pages/InstructorApplication';
 
 // Create a separate component for routes
