@@ -238,7 +238,13 @@
     "congratulations": "Congratulations!",
     "courseCompleted": "You have successfully completed the course \"{{courseName}}\"",
     "getCertificate": "Get Your Certificate",
-    "close": "Close"
+    "close": "Close",
+    "subscriptionExpired": "Subscription Expired",
+    "subscriptionRequired": "Subscription Required",
+    "subscriptionExpiredMessage": "Your subscription has expired. Please renew your subscription to continue accessing course content.",
+    "subscriptionRequiredMessage": "A subscription is required to access this course content. Please subscribe to continue learning.",
+    "getSubscription": "Get Subscription",
+    "renewSubscription": "Renew Subscription"
   },
   "becomeInstructor": {
     "header": {

@@ -2,9 +2,9 @@ import React, { useState, useEffect, useMemo, createContext, useContext } from '
 import { ChevronRight, ChevronDown, ChevronLeft, Star, Clock, FileText, 
          Bell, X, PlayCircle, Volume2, Maximize, Settings, Book, 
          BookOpen, Menu, Bookmark, Video, Share, Download, ExternalLink,
-         Award } from 'lucide-react';
+         Award, Lock } from 'lucide-react';
 import axios from 'axios';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Route } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
@@ -12,6 +12,13 @@ import { useTheme } from '../../context/ThemeContext';
 
 // Course Context
 const CourseContext = createContext();
+
+// Add new subscription status types
+const SUBSCRIPTION_STATUS = {
+  ACTIVE: 'active',
+  EXPIRED: 'expired',
+  NONE: 'none'
+};
 
 // Main component
 export default function EnhancedLessonViewer() {
@@ -53,6 +60,9 @@ export default function EnhancedLessonViewer() {
   const [isSaved, setIsSaved] = useState(false);
   const [isCourseSaved, setIsCourseSaved] = useState(false);
   const [modalDismissed, setModalDismissed] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState(null);
+  const [subscriptionLoading, setSubscriptionLoading] = useState(true);
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   
   // Fetch course data
   useEffect(() => {
@@ -412,6 +422,65 @@ export default function EnhancedLessonViewer() {
     }
   };
 
+  // Add subscription check effect
+  useEffect(() => {
+    const checkSubscription = async () => {
+      if (!user) {
+        setSubscriptionStatus(SUBSCRIPTION_STATUS.NONE);
+        setSubscriptionLoading(false);
+        return;
+      }
+
+      try {
+    setSubscriptionLoading(true);
+const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/${user._id}`);
+    if (!response.ok) throw new Error('Failed to fetch subscription');
+    const data = await response.json();
+    console.log('User subscriptions:', data);
+        const currentDate = new Date();
+        
+        // Check if user has any active subscriptions
+        const activeSubscription = data.find(sub => {
+          const endDate = new Date(sub.endDate);
+          const status = sub.status?.en || sub.status;
+          return endDate > currentDate && status !== 'expired';
+        });
+
+        if (activeSubscription) {
+          setSubscriptionStatus(SUBSCRIPTION_STATUS.ACTIVE);
+        } else {
+          // Check if there's an expired subscription
+          const hasExpiredSubscription = data.some(sub => {
+            const status = sub.status?.en || sub.status;
+            return status === 'expired';
+          });
+          setSubscriptionStatus(hasExpiredSubscription ? SUBSCRIPTION_STATUS.EXPIRED : SUBSCRIPTION_STATUS.NONE);
+        }
+      } catch (error) {
+        console.error('Error checking subscription:', error);
+        setSubscriptionStatus(SUBSCRIPTION_STATUS.NONE);
+      } finally {
+        setSubscriptionLoading(false);
+      }
+    };
+
+    checkSubscription();
+  }, [user]);
+
+  // Add subscription check before viewing lesson
+  const handleLessonView = (lesson) => {
+    if (subscriptionStatus !== SUBSCRIPTION_STATUS.ACTIVE) {
+      setShowSubscriptionModal(true);
+      return;
+    }
+    
+    setCurrentLesson({ 
+      lessonId: lesson._id, 
+      title: getLocalizedText(lesson.title) 
+    });
+    markLessonAsWatched(lesson._id);
+  };
+
   // Context value
   const contextValue = {
     courseData,
@@ -539,6 +608,47 @@ export default function EnhancedLessonViewer() {
     );
   };
 
+  // Add Subscription Modal Component
+  const SubscriptionModal = () => {
+    if (!showSubscriptionModal) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className={`${theme === 'dark' ? 'bg-[#232323]' : 'bg-white'} p-8 rounded-lg max-w-md w-full mx-4`}>
+          <div className="text-center">
+            <h2 className="text-2xl font-bold mb-4">
+              {subscriptionStatus === SUBSCRIPTION_STATUS.EXPIRED 
+                ? t('lessonViewer.subscriptionExpired')
+                : t('lessonViewer.subscriptionRequired')}
+            </h2>
+            <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} mb-6`}>
+              {subscriptionStatus === SUBSCRIPTION_STATUS.EXPIRED
+                ? t('lessonViewer.subscriptionExpiredMessage')
+                : t('lessonViewer.subscriptionRequiredMessage')}
+            </p>
+            <div className="flex flex-col gap-3">
+              <Link
+                to="/subscribe"
+                className="w-full bg-[#ff3a30] hover:bg-[#ff1a1a] text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                onClick={() => setShowSubscriptionModal(false)}
+              >
+                {subscriptionStatus === SUBSCRIPTION_STATUS.EXPIRED
+                  ? t('lessonViewer.renewSubscription')
+                  : t('lessonViewer.getSubscription')}
+              </Link>
+              <button
+                onClick={() => setShowSubscriptionModal(false)}
+                className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} hover:text-${theme === 'dark' ? 'white' : 'gray-900'} transition-colors`}
+              >
+                {t('lessonViewer.close')}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <CourseContext.Provider value={contextValue}>
       <div className={`min-h-screen ${theme === 'dark' ? 'bg-[#181818]' : 'bg-gray-100'} text-${theme === 'dark' ? 'white' : 'gray-900'} flex flex-col pt-24 ${isRTL ? 'rtl' : 'ltr'}`}>
@@ -645,13 +755,7 @@ export default function EnhancedLessonViewer() {
                         <div 
                           key={lesson._id}
                           className={`p-3 rounded-lg ${currentLesson?.lessonId === lesson._id ? 'bg-blue-500 bg-opacity-20 border border-blue-500' : `hover:bg-${theme === 'dark' ? 'gray-700' : 'gray-100'} border border-transparent`} cursor-pointer transition-colors`}
-                          onClick={() => {
-                            setCurrentLesson({ 
-                              lessonId: lesson._id, 
-                              title: getLocalizedText(lesson.title) 
-                            });
-                            markLessonAsWatched(lesson._id);
-                          }}
+                          onClick={() => handleLessonView(lesson)}
                         >
                           <div className="flex justify-between mb-1">
                             <h3 className="font-medium flex-1 truncate">{getLocalizedText(lesson.title)}</h3>
@@ -820,59 +924,53 @@ export default function EnhancedLessonViewer() {
                 
                 {/* Video Player */}
                 <div className={`aspect-video ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'} rounded-lg mb-8 relative overflow-hidden flex items-center justify-center group`}>
-                  {currentLessonData?.content?.videoUrl ? (
-                    currentLessonData.content.videoUrl.includes('youtube.com') || currentLessonData.content.videoUrl.includes('youtu.be') ? (
-                      <iframe
-                        className="w-full h-full"
-                        src={currentLessonData.content.videoUrl.replace('watch?v=', 'embed/')}
-                        title={getLocalizedText(currentLessonData.title)}
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      ></iframe>
+                  {subscriptionStatus === SUBSCRIPTION_STATUS.ACTIVE ? (
+                    currentLessonData?.content?.videoUrl ? (
+                      currentLessonData.content.videoUrl.includes('youtube.com') || currentLessonData.content.videoUrl.includes('youtu.be') ? (
+                        <iframe
+                          className="w-full h-full"
+                          src={currentLessonData.content.videoUrl.replace('watch?v=', 'embed/') + '?autoplay=0'}
+                          title={getLocalizedText(currentLessonData.title)}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay=0; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        ></iframe>
+                      ) : (
+                        <video 
+                          className="w-full h-full object-cover"
+                          controls
+                          autoPlay={false}
+                          src={currentLessonData.content.videoUrl}
+                        >
+                          {t('lessonViewer.videoNotSupported')}
+                        </video>
+                      )
                     ) : (
-                      <video 
-                        className="w-full h-full object-cover"
-                        controls
-                        src={currentLessonData.content.videoUrl}
-                      >
-                        {t('lessonViewer.videoNotSupported')}
-                      </video>
+                      <img src="/api/placeholder/800/450" alt={t('lessonViewer.videoPlaceholder')} className="w-full h-full object-cover" />
                     )
                   ) : (
-                    <img src="/api/placeholder/800/450" alt={t('lessonViewer.videoPlaceholder')} className="w-full h-full object-cover" />
-                  )}
-                  
-                  {/* Video Controls - Only show if no video URL */}
-                  {!currentLessonData?.content?.videoUrl && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <button 
-                        onClick={togglePlay}
-                        className="bg-[#ff3a30] hover:bg-blue-700 text-white rounded-full p-4 transform transition-transform group-hover:scale-110"
-                      >
-                        <PlayCircle size={36} />
-                      </button>
-                    </div>
-                  )}
-                  
-                  {/* Progress Bar - Only show if no video URL */}
-                  {!currentLessonData?.content?.videoUrl && (
-                    <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <div className="relative h-1 bg-gray-700 rounded-full">
-                        <div className="absolute h-full bg-[#00bcd4] rounded-full" style={{ width: `${currentLessonData.progress}%` }}></div>
-                        <div className="absolute h-3 w-3 bg-white rounded-full -top-1" style={{ left: `${currentLessonData.progress}%` }}></div>
-                      </div>
-                      <div className="flex justify-between mt-2 text-xs">
-                        <span>00:00</span>
-                        <div className="flex space-x-4">
-                          <button className="text-white hover:text-blue-400">
-                            <Volume2 size={16} />
-                          </button>
-                          <button className="text-white hover:text-blue-400">
-                            <Maximize size={16} />
-                          </button>
-                        </div>
-                        <span>{currentLessonData.duration}</span>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-75">
+                      <div className="text-center p-8">
+                        <Lock size={48} className="mx-auto mb-4 text-[#ff3a30]" />
+                        <h3 className="text-xl font-bold mb-2 text-white">
+                          {subscriptionStatus === SUBSCRIPTION_STATUS.EXPIRED 
+                            ? t('lessonViewer.subscriptionExpired')
+                            : t('lessonViewer.subscriptionRequired')}
+                        </h3>
+                        <p className="text-gray-300 mb-6">
+                          {subscriptionStatus === SUBSCRIPTION_STATUS.EXPIRED
+                            ? t('lessonViewer.subscriptionExpiredMessage')
+                            : t('lessonViewer.subscriptionRequiredMessage')}
+                        </p>
+                        <Link
+                          to="/subscribe"
+                          className="inline-block bg-[#ff3a30] hover:bg-[#ff1a1a] text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                          onClick={() => setShowSubscriptionModal(false)}
+                        >
+                          {subscriptionStatus === SUBSCRIPTION_STATUS.EXPIRED
+                            ? t('lessonViewer.renewSubscription')
+                            : t('lessonViewer.getSubscription')}
+                        </Link>
                       </div>
                     </div>
                   )}
@@ -950,6 +1048,9 @@ export default function EnhancedLessonViewer() {
       
       {/* Completion Modal */}
       <CompletionModal />
+      
+      {/* Add Subscription Modal */}
+      <SubscriptionModal />
     </CourseContext.Provider>
   );
 }

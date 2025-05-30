@@ -3,7 +3,6 @@ import './App.css';
 import { ToastContainer } from 'react-toastify';
 import MainLayout from './components/Layout/MainLayout';
 import AuthLayout from './components/Layout/AuthLayout';
-
 import LoginPage from './pages/LoginPage';
 import PasswordPage from './pages/PasswordPage';
 import SignupPage from './pages/SignupPage';
@@ -32,7 +31,7 @@ import ProgramDetailPage from './pages/ProgramDetailPage';
 import InstructorDetails from './pages/InstructorsDetails';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from "./routes/ProtectedRoute";
-import AIChatPage from './pages/AIChatPage';
+import AIChatPage from './pages/AIChatPage'; 
 import Subscribe from './pages/Subscribe';
 import PaymentPage from './pages/PaymentPage';
 import InstructorSessionChat from './components/InstructorSession/InstructorSessionChat';
@@ -60,13 +59,34 @@ const AppRoutes = () => {
 
         {/* Regular routes */}
         <Route path="/home" element={<Home2 />} />
-        <Route path="/programs" element={<ProgramsPage />} />
-        <Route path="/programs/:programId" element={<ProgramDetailPage />} />
-        <Route path="/instructors" element={<Instructors />} />
-        <Route path="/instructors/:id" element={<InstructorDetails />} />
-        <Route path="/categories/:id" element={<CategoryPage />} />
+      
 
         {/* Protected routes */}
+        <Route path="/programs" element={
+  <ProtectedRoute>
+    <ProgramsPage />
+  </ProtectedRoute>
+} />
+<Route path="/programs/:programId" element={
+  <ProtectedRoute>
+    <ProgramDetailPage />
+  </ProtectedRoute>
+} />
+<Route path="/instructors" element={
+  <ProtectedRoute>
+    <Instructors />
+  </ProtectedRoute>
+} />
+<Route path="/instructors/:id" element={
+  <ProtectedRoute>
+    <InstructorDetails />
+  </ProtectedRoute>
+} />
+<Route path="/categories/:id" element={
+  <ProtectedRoute>
+    <CategoryPage />
+  </ProtectedRoute>
+} />
         <Route path="/courses" element={
           <ProtectedRoute>
             <Courses />
