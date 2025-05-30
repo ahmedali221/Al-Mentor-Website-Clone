@@ -1,0 +1,44 @@
+{
+  "home": {
+    "categories": {
+      "title": "تصنيفات الدورات"
+    },
+    "courses": {
+      "title": "الدورات المميزة",
+      "picks": "الاختيارات",
+      "loadingTopics": "جاري تحميل المواضيع...",
+      "noCoursesForTopic": "لم يتم العثور على دورات لهذا الموضوع",
+      "noCoursesAvailable": "لا توجد دورات متاحة",
+      "viewAll": "عرض الكل",
+      "seeAllCourses": "عرض جميع الدورات"
+    }
+  },
+  "sections": {
+    "categories": "فئات الدورات",
+    "picks": "الاختيارات المميزة",
+    "trending": "الدورات الرائجة",
+    "newlyReleased": "الدورات الجديدة",
+    "instructors": "مدربونا",
+    "subscription": {
+      "title": "اشترك بسعر مميز",
+      "description": "احصل على إمكانية الوصول إلى جميع الدورات متى تريد"
+    }
+  },
+  "buttons": {
+    "viewAll": "عرض الكل",
+    "choosePlan": "اختر الخطة",
+    "seeAllInstructors": "عرض جميع المدربين"
+  },
+  "loading": {
+    "topics": "جاري تحميل المواضيع...",
+    "general": "جاري التحميل..."
+  },
+  "messages": {
+    "noCoursesForTopic": "لا توجد دورات متاحة لهذا الموضوع",
+    "noCoursesAvailable": "لا توجد دورات متاحة",
+    "noSubscriptionPlans": "لا توجد خطط اشتراك متاحة"
+  },
+  "labels": {
+    "bestValue": "أفضل قيمة"
+  }
+}

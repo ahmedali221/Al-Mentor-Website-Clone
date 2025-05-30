@@ -1,5 +1,10 @@
 @import "tailwindcss";
 html, body {
   min-height: 100%;
-  background-color: #121212; /* أو bg-white حسب الوضع الافتراضي */
+   margin: 0 !important;
+  padding: 0 !important;
+}
+
+body {
+  @apply bg-white dark:bg-[#121212];
 }

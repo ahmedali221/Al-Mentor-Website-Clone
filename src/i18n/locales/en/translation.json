@@ -1,12 +1,52 @@
 {
+  "auth": {
+    "welcomeBack": "Welcome Back",
+    "welcomeToAlmentor": "Welcome to Almentor",
+    "welcomeMessage": "Welcome to Almentor!",
+    "createAccount": "Create an account",
+    "signupAndLearn": "Sign up and start learning",
+    "signupSubtitle": "Sign up and start learning",
+    "loginWithFacebook": "Login with Facebook",
+    "loginWithGoogle": "Login with Google",
+    "enterEmail": "Enter Your Email",
+    "emailPlaceholder": "Type Your Email...",
+    "enterPassword": "Enter Password",
+    "passwordPlaceholder": "Type Password...",
+    "passwordCreatePlaceholder": "Create a Password",
+    "fullNameEn": "Full Name (English)",
+    "fullNameEnPlaceholder": "Enter Your Full Name in English",
+    "fullNameAr": "Full Name (Arabic)",
+    "fullNameArPlaceholder": "Enter Your Full Name in Arabic",
+    "username": "Username",
+    "usernamePlaceholder": "Choose a Username",
+    "email": "Email",
+    "emailInputPlaceholder": "Enter your email",
+    "password": "Password",
+    "passwordInputPlaceholder": "Create a Password",
+    "termsAgreement": "By signing up, I agree to the",
+    "termsAndConditions": "Terms and Conditions",
+    "and": "and",
+    "privacyPolicy": "Privacy Policy",
+    "haveAccount": "Already have an account?",
+    "noAccount": "Don't have an account?",
+    "minutes": "Minutes",
+    "skills": "Skills You Will Gain",
+    "included": "Included Courses",
+    "category": "Category",
+    "facebook": "Facebook",
+    "google": "Google",
+    "emailVerified": "Email verified! Please enter your password.",
+    "continue": "Continue with"
+  },
   "common": {
     "welcome": "Welcome to Al-Mentor",
     "login": "Login",
-    "signup": "Sign Up",
+    "signup": "SignUp",
     "logout": "Logout",
     "search": "Search courses, topics, instructors...",
     "menu": "Menu",
-    "language": "Language"
+    "language": "Language",
+    "noCourses": "No courses available"
   },
   "navigation": {
     "home": "Home",
@@ -20,7 +60,10 @@
     "blog": "Blog",
     "press": "Press",
     "team": "Team",
-    "backToPrograms": "Back to Programs"
+    "backToPrograms": "Back to Programs",
+    "mySessions": "My Sessions",
+    "instructorSessions": "Instructor Sessions",
+    "aiChat": "Try AI Mentor"
   },
   "footer": {
     "explore": "Explore",
@@ -30,11 +73,11 @@
     "instructors": "Instructors",
     "learningPartners": "Learning Partners",
     "business": "Business",
-    "becomeInstructor": "Become an instructor",
+    "becomeInstructor": "Become an Instructor",
     "trainTeam": "Train Your Team",
     "downloadApp": "Download App",
-    "termsOfUse": "Terms of use",
-    "privacyPolicy": "Privacy policy",
+    "termsOfUse": "Terms of Use",
+    "privacyPolicy": "Privacy Policy",
     "helpCenter": "Help Center",
     "support": "Support",
     "terms": "Terms & Conditions",
@@ -53,6 +96,9 @@
     },
     "courses": {
       "title": "Explore inspiring courses online",
+      "featuredCourses": "Featured Courses",
+      "loadingCourses": "Loading Courses",
+      "seeAllCourses": "See all courses",
       "categories": {
         "featured": "Featured Courses",
         "business": "Business & Professional Skills",
@@ -67,17 +113,23 @@
         "softSkills": "Soft Skills"
       }
     },
+    "new": "New",
     "instructors": {
       "title": "Our Instructors",
       "title2": "How To Become an Instructor?",
       "subtitle": "Join our community of instructors and share your knowledge with the world.",
       "button": "Apply Now",
-      "about": "About Mentor"
+      "about": "About Mentor",
+      "loadingInstructors": "Loading Instructors",
+      "seeAllInstructors": "See all instructors"
     },
     "cta": {
       "title": "Only at 199 EGP /month! Get unlimited access to all courses when you subscribe to Almentor.",
       "button": "Subscribe Now"
-    }
+    },
+    "freespan": "Free",
+    "free": "Free Courses",
+    "trend": "Trending Courses"
   },
   "courses": {
     "title": "Our Courses",
@@ -101,15 +153,47 @@
     "submit": "Submit",
     "edit": "Edit",
     "delete": "Delete",
-    "back": "Back"
+    "back": "Back",
+    "viewAll": "View All",
+    "instructors": "Instructors",
+    "courses": "Courses",
+    "aiChat": "AI Chat",
+    "subscribe": "Subscribe",
+    "requestSession": "Request Session",
+    "requesting": "Requesting...",
+    "approve": "Approve",
+    "reject": "Reject",
+    "complete": "Complete",
+    "viewChat": "View Chat",
+    "send": "Send",
+    "retry": "Retry",
+    "goBack": "Go Back"
   },
   "messages": {
+    "pleaseLogin": "You Must log in to continue.",
     "loading": "Loading...",
     "error": "An error occurred",
     "success": "Success!",
     "noResults": "No results found",
     "readMore": "Read more",
-    "readLess": "Read less"
+    "readLess": "Read less",
+    "sessionRequested": "Session requested successfully",
+    "requestFailed": "Failed to request session",
+    "sessionApproved": "Session approved successfully",
+    "sessionRejected": "Session rejected",
+    "sessionCompleted": "Session marked as completed",
+    "sessionCancelled": "Session cancelled",
+    "updateFailed": "Failed to update session status",
+    "chatError": "Error connecting to chat",
+    "sessionNotFound": "Session not found",
+    "videoChatPlaceholder": "Video chat will be available soon",
+    "typeMessage": "Type your message...",
+    "connected": "Connected to chat",
+    "reconnecting": "Reconnecting... (Attempt {{count}}/{{max}})",
+    "maxRetriesReached": "Failed to connect to chat. Please refresh the page.",
+    "noCoursesForTopic": "No courses available for this topic",
+    "noCoursesAvailable": "No courses available",
+    "noSubscriptionPlans": "No subscription plans available"
   },
   "instructorStats": {
     "views": "Views",
@@ -120,5 +204,368 @@
   "subscriptionCTA": {
     "label": "Subscribe now to get unlimited access to all courses.",
     "button": "Subscribe Now"
+  },
+  "lessonViewer": {
+    "course": "Course",
+    "starred": "Starred",
+    "notes": "Notes",
+    "lessons": "Lessons",
+    "complete": "Complete",
+    "loadingLessons": "Loading lessons...",
+    "noLessons": "No lessons available",
+    "starredLessons": "Starred Lessons",
+    "noStarredLessons": "No starred lessons yet.",
+    "myNotes": "My Notes",
+    "editNote": "Edit your note...",
+    "writeNote": "Write a new note...",
+    "updateNote": "Update Note",
+    "cancel": "Cancel",
+    "saveNote": "Save Note",
+    "edit": "Edit",
+    "delete": "Delete",
+    "noNotes": "No notes for this lesson yet. Add your first note above!",
+    "videoNotSupported": "Your browser does not support the video tag.",
+    "videoPlaceholder": "Video placeholder",
+    "previousLesson": "Previous Lesson",
+    "nextLesson": "Next Lesson",
+    "description": "Description",
+    "resources": "Resources",
+    "cheatSheet": "Web Fundamentals Cheat Sheet",
+    "interactiveDemo": "Interactive HTTP Demo",
+    "externalWebsite": "External Website",
+    "favorited": "Favorited",
+    "addToFavorites": "Add to favorites",
+    "congratulations": "Congratulations!",
+    "courseCompleted": "You have successfully completed the course \"{{courseName}}\"",
+    "getCertificate": "Get Your Certificate",
+    "close": "Close",
+    "subscriptionExpired": "Subscription Expired",
+    "subscriptionRequired": "Subscription Required",
+    "subscriptionExpiredMessage": "Your subscription has expired. Please renew your subscription to continue accessing course content.",
+    "subscriptionRequiredMessage": "A subscription is required to access this course content. Please subscribe to continue learning.",
+    "getSubscription": "Get Subscription",
+    "renewSubscription": "Renew Subscription"
+  },
+  "becomeInstructor": {
+    "header": {
+      "title": "Inspire Learners Across The World.",
+      "description": "Creating an exceptional learning experience.",
+      "applyButton": "Apply as Instructor"
+    },
+    "benefits": {
+      "competitiveRevenueShare": {
+        "title": "Competitive Revenue Share",
+        "description": "We offer competitive profit-sharing models based on your video production choice."
+      },
+      "helpSupport": {
+        "title": "Help & Support",
+        "description": "Get the guidance you need during your course creation journey."
+      },
+      "worldwideExposure": {
+        "title": "Worldwide Exposure",
+        "description": "Reach more audiences across the world, anywhere and anytime."
+      }
+    },
+    "courseProduction": {
+      "title": "Produce Your Own Course",
+      "steps": [
+        "Prepare your content.",
+        "Shoot your course.",
+        "Submit content for review."
+      ]
+    },
+    "instructorResources": {
+      "title": "Become an instructor and get free instructional resources.",
+      "description": "Learn from our experts the course creation guidelines and production techniques.",
+      "applyButton": "Apply As Instructor"
+    },
+    "revenueSection": {
+      "title": "The richer the content, the more revenues you will make.",
+      "description": "Rich content is your gateway to achieve the desired exposure, which will increase your revenue share.",
+      "applyButton": "Apply As Instructor"
+    },
+    "accordionSection": {
+      "title": "How can we help you?",
+      "description": "See if our FAQs help you know more about our service",
+      "faqs": {
+        "sampleVideoInclude": {
+          "question": "What should the sample video include?",
+          "answer": "The sample video is a 3 to 5 mins video; you should represent the course content and ideas through this video. To be given full feedback, you will need to appear talking and some slide insertions or visual presentations following our guidelines."
+        },
+        "feedbackSampleVideo": {
+          "question": "When should I expect to get feedback on my sample video?",
+          "answer": "The content team will review the sample video and get back to you with feedback within 5 working days."
+        },
+        "processAfterSending": {
+          "question": "What is the process after sending the sample video?",
+          "answer": "After sending the sample video, you will go through the following steps: The content team will review the sample video and provide you with feedback, whether it's (Accepted, Rejected or Requires edits). If the sample video requires edits, you will be requested to consider those edits and provide a final sample. Once the sample video is approved, you will shoot the whole course following the same quality of the approved sample video. By completing the course, you will send us the following required files. (Course outline and mentor profile in both English and Arabic, High-quality photo with solid background)"
+        },
+        "reviewSignContract": {
+          "question": "When can I review and sign the contract?",
+          "answer": "Once you complete the course, we will share the contract to check and sign; you will receive a signed copy from our end."
+        },
+        "reviewContractEarlier": {
+          "question": "Can I request to review the contract at an earlier stage?",
+          "answer": "We can share a draft of the contract to view with you, and if you have any questions, our acquisitions team will be glad to assist."
+        },
+        "appearInCourse": {
+          "question": "Should I appear in the whole course, or can I use a screencast model with voice over?",
+          "answer": "It depends on the course content; if the course is practical, relying more on visual presentations and tools, you can produce the course using the screencast model."
+        },
+        "revenueShare": {
+          "question": "How do I get paid? What is the revenue share for the self-produced courses?",
+          "answer": "a. In the event that the number of enrollments is equal or less than 1,000 (one thousand) enrollments, you will have a 30% revenue share. b. In the event that the number of enrollments is between 1,001 (One Thousand and One) and 3,000 (Three Thousand) enrollments, you will have a 50% revenue share. c. In the event that the number of enrollments is 3,001 and higher, you will have a 75% revenue share."
+        },
+        "editingThroughCamtasia": {
+          "question": "Should the content be edited only through \"Camtasia\"?",
+          "answer": "Camtasia is a recommended tool, but you are free to use any other tool with high-quality production."
+        },
+        "mediaServicesEditingPhase": {
+          "question": "Do you provide media services? Can you assist with the editing phase?",
+          "answer": "We can recommend our media partners (Studios) to help with the shooting and editing."
+        },
+        "coursesAllowed": {
+          "question": "How many courses I'm allowed to produce through your platform?",
+          "answer": "There is no limit to the number of courses produced per mentor as long the course is approved."
+        },
+        "referInstructor": {
+          "question": "Can I refer another instructor to you?",
+          "answer": "Currently, the Selfie model doesn't include talks; however, we will direct the relevant team to assist with this matter."
+        },
+        "updateCourse": {
+          "question": "Can I do any updates to my course after release (add more lectures, material)?",
+          "answer": "You can definitely request to update your course anytime to maintain a rich and up-to-date content."
+        }
+      }
+    }
+  },
+  "close": "Close modal",
+  "logo_alt": "Almentor logo",
+  "mentorForm": {
+    "userInfo": "User Information",
+    "professionalTitle": "Professional Title",
+    "title": "Apply as a Mentor",
+    "socialMedia": "Social Media",
+    "biography": "Biography",
+    "expertiseAreas": "Areas of Expertise",
+    "subtitle": "Please tell us more about yourself and how we can reach you:",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "phone": "Mobile phone number",
+    "email": "Email",
+    "nationality": "Nationality",
+    "countryOfResidence": "Country of Residence",
+    "chooseCountry": "Please Select",
+    "egypt": "Egypt",
+    "uae": "UAE",
+    "saudiArabia": "Saudi Arabia",
+    "yearsExperience": "How many years of experience do you have in the field of training?",
+    "linkedin": "LinkedIn Profile",
+    "facebook": "Facebook Page",
+    "twitter": "Twitter Profile",
+    "youtube": "YouTube Channel",
+    "website": "Website",
+    "yearsOfExperience": "Years of Experience",
+    "company": "Company (if applying as partner)",
+    "topics": "What are the topics that you would like to introduce on the platform?",
+    "sampleVideo": "Sample video of you",
+    "cv": "CV (Company profile for companies)",
+    "submit": "Submit"
+  },
+  "home2": {
+    "banner": {
+      "title": "Home page banner Start your learning journey today!",
+      "subtitle": "Choose from subscription plans starting from 199 EGP/ month (Billed yearly)",
+      "subscribeButton": "Subscribe Now"
+    },
+    "programs": {
+      "title": "Explore Our Programs",
+      "subtitle": "Discover grouped courses designed to build essential skills."
+    },
+    "courses": {
+      "title": "Start with free courses"
+    }
+  },
+  "profile": {
+    "subscribe": "Subscribe",
+    "myCourses": "My Courses",
+    "myProgress": "My Progress",
+    "savedCourses": "Saved Courses",
+    "certificates": "Certificates",
+    "accountSettings": "Account Settings",
+    "becomeInstructor": "Become Instructor",
+    "personalInfo": "Personal Information",
+    "accountInfo": "Account Information",
+    "interests": "Interests",
+    "name": "Name",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "dateOfBirth": "Date of Birth",
+    "day": "Day",
+    "month": "Month",
+    "year": "Year",
+    "email": "Email",
+    "password": "Password",
+    "mobile": "Mobile Number",
+    "saveChanges": "Save Changes",
+    "selectInterests": "Select all that interest you",
+    "saveInterests": "Save Interests",
+    "interestList": {
+      "humanResources": "Human Resources",
+      "socialMedia": "Social Media",
+      "education": "Education",
+      "communication": "Communication",
+      "changeManagement": "Change Management",
+      "branding": "Branding",
+      "leadership": "Leadership",
+      "careerDevelopment": "Career Development",
+      "customerExperience": "Customer Experience",
+      "entrepreneurship": "Entrepreneurship",
+      "healthcare": "Healthcare",
+      "interviews": "Interviews",
+      "productivity": "Productivity",
+      "animation": "Animation",
+      "analytics": "Analytics",
+      "sports": "Sports",
+      "strategy": "Strategy",
+      "businessIntelligence": "Business Intelligence"
+    }
+  },
+  "payment": {
+    "title": "Payment",
+    "details": "Payment Details",
+    "loggedInWith": "Logged in with",
+    "buttons": {
+      "change": "Change",
+      "proceed": "Proceed"
+    },
+    "planDuration": "{{value}} {{unit}}",
+    "paymentMethods": {
+      "creditCard": "Credit Card",
+      "fawry": "Fawry",
+      "vodafone": "Vodafone Cash",
+      "valu": "Valu"
+    },
+    "forms": {
+      "phoneNumber": "Mobile Number",
+      "cardNumber": "Card Number",
+      "expiryDate": "Expiry Date",
+      "cvv": "CVV",
+      "cardholderName": "Cardholder Name"
+    },
+    "orderSummary": {
+      "price": "Price",
+      "total": "Total"
+    },
+    "success": {
+      "title": "Payment Successful!",
+      "message": "Your subscription has been activated successfully."
+    },
+    "processing": "Processing payment...",
+    "error": {
+      "title": "Payment Error",
+      "message": "An error occurred while processing your payment. Please try again.",
+      "unauthorized": "The payment could not be authorized. Please try again or use a different payment method.",
+      "insufficient": "Insufficient funds. Please check your balance and try again."
+    },
+    "cancelled": {
+      "title": "Payment Cancelled",
+      "message": "Payment process was cancelled successfully"
+    }
+  },
+  "subscription": {
+    "mainTitle": "Subscribe now and start learning",
+    "subtitle": "Choose a plan and get unlimited access to the best learning content in the Arab world for the best price",
+    "duration": "Duration: {{value}} {{unit}}",
+    "selectPlan": "Select plan",
+    "subscribe": "Subscribe",
+    "features": "What Every Plan Gets You",
+    "feature1": "Unlimited access to all courses",
+    "feature1Desc": "Enjoy unlimited access to all our courses. Learn at your own pace and explore new subjects anytime",
+    "feature2": "Ad-free learning journey",
+    "feature2Desc": "Focus on your studies without interruptions. Our platform is completely ad-free for a seamless experience",
+    "feature3": "Access on multiple devices",
+    "feature3Desc": "Learn on any device. Our platform works smoothly across laptops, tablets, and smartphones",
+    "feature4": "Download to watch offline",
+    "feature4Desc": "Download courses to watch offline. Learn wherever you are, even without an internet connection",
+    "paymentMethods": "Pay in various ways — Cancel anytime",
+    "units": {
+      "months": "months",
+      "years": "years",
+      "days": "days"
+    }
+  },
+  "ai": {
+    "chat": {
+      "welcome": "Welcome! How can I assist you today?",
+      "placeholder": "Type your message...",
+      "send": "Send",
+      "newChat": "New Chat",
+      "recentChats": "Recent Chats",
+      "chat": "Chat",
+      "deleteChatConfirm": "Are you sure you want to delete this chat?",
+      "copied": "Copied!",
+      "you": "You",
+      "aiAssistant": "AI Assistant",
+      "lightMode": "Light Mode",
+      "darkMode": "Dark Mode",
+      "welcomeDesc": "Ask me anything - from quick questions to complex problems, I'm here to help.",
+      "typeMessage": "Type your message...",
+      "errorProcessing": "Sorry, there was an error processing your request.",
+      "image": "Image",
+      "document": "Document"
+    }
+  },
+  "changePlan": "Change Plan",
+  "requestSession": {
+    "title": "Request a Session",
+    "titleLabel": "Session Title",
+    "titlePlaceholder": "Enter session title",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Describe what you'd like to discuss",
+    "dateLabel": "Requested Date & Time",
+    "durationLabel": "Session Duration",
+    "minutes": "minutes"
+  },
+  "sessionHistory": {
+    "title": "Session History",
+    "noSessions": "No sessions found",
+    "status": {
+      "all": "All Sessions",
+      "pending": "Pending",
+      "approved": "Approved",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "minutes": "minutes"
+  },
+  "sections": {
+    "categories": "Course Categories",
+    "picks": "Featured Picks",
+    "trending": "Trending Courses",
+    "newlyReleased": "Newly Released",
+    "instructors": "Our Instructors",
+    "subscription": {
+      "title": "Subscribe at a Special Price",
+      "description": "Get access to all courses whenever you want"
+    }
+  },
+  "labels": {
+    "bestValue": "Best Value"
+  },
+  "loading": {
+    "topics": "Loading topics...",
+    "general": "Loading..."
+  },
+  "badges": {
+    "new": "New"
+  },
+  "instructorDetails": {
+    "biography": "Biography",
+    "expertise": "Areas of Expertise",
+    "courses": "Courses",
+    "showMore": "Show More",
+    "showLess": "Show Less"
   }
 }

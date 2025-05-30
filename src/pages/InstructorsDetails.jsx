@@ -2,11 +2,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useTheme } from "../context/ThemeContext";
 import { useTranslation } from "react-i18next";
-import {
-  EyeIcon,
-  BookOpenIcon,
-  UserGroupIcon,
-} from "@heroicons/react/24/outline";
+import { EyeIcon, BookOpenIcon, UserGroupIcon } from "@heroicons/react/24/outline";
+import RequestSession from "../components/InstructorSession/RequestSession";
 
 function getLocalizedString(obj = {}, lang = "en", defaultStr = "") {
   if (typeof obj === "string") return obj;
@@ -17,14 +14,17 @@ export default function InstructorDetails() {
   const { id } = useParams();
   const { theme } = useTheme();
   const { t, i18n } = useTranslation();
-  const isRTL = i18n.language === "ar";
   const navigate = useNavigate();
 
   const [instructor, setInstructor] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [courses, setCourses] = useState([]);
+  const [loadingInstructor, setLoadingInstructor] = useState(true);
+  const [loadingCourses, setLoadingCourses] = useState(true);
   const [showFullBio, setShowFullBio] = useState(false);
+  const [showRequestSession, setShowRequestSession] = useState(false);
 
   useEffect(() => {
+    // Fetch the instructor details
     const fetchInstructor = async () => {
       try {
         const res = await fetch(`http://localhost:5000/api/instructors/${id}`);
@@ -34,14 +34,33 @@ export default function InstructorDetails() {
         console.error("Error loading instructor", err);
         setInstructor(null);
       } finally {
-        setLoading(false);
+        setLoadingInstructor(false);
       }
     };
 
     fetchInstructor();
   }, [id]);
 
-  if (loading)
+  useEffect(() => {
+    // Fetch courses by instructor id
+    if (!id) return;
+    const fetchCourses = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/courses/instructor/${id}`);
+        const data = await res.json();
+        setCourses(data || []);
+      } catch (err) {
+        console.error("Error loading instructor courses", err);
+        setCourses([]);
+      } finally {
+        setLoadingCourses(false);
+      }
+    };
+
+    fetchCourses();
+  }, [id]);
+
+  if (loadingInstructor || loadingCourses)
     return <div className="p-10 text-center">{t("messages.loading")}</div>;
 
   if (!instructor)
@@ -51,7 +70,6 @@ export default function InstructorDetails() {
   const professionalTitle = instructor.professionalTitle || {};
   const biography = instructor.biography || instructor.bio || {};
   const stats = instructor.stats || {};
-  const courses = instructor.courses || [];
 
   const lang = i18n.language;
 
@@ -83,137 +101,137 @@ export default function InstructorDetails() {
   const statBg = theme === "dark" ? "bg-[#141717]" : "bg-[#eeeeee]";
 
   return (
-    <div
-      className={`${bgColor} ${textColor} min-h-screen pt-24 pb-15 gap-50`}
-      dir={isRTL ? "rtl" : "ltr"}
-    >
-      <div className="max-w-5xl mx-auto px-4 space-y-10 bt-6">
-        <div className="md:flex md:items-center md:justify-between md:gap-8">
-          <div className="flex items-center gap-6">
-            <img
-              src={avatar}
-              alt={name}
-              className="w-32 h-32 rounded-full shadow-lg object-cover"
-              loading="lazy"
-            />
-            <div>
-              <h1 className="text-3xl font-semibold">{name}</h1>
-              <p className="mt-1 text-lg font-medium text-light">{title}</p>
-              {expertiseAreas && (
-                <p className="mt-2 text-sm text-light">{expertiseAreas.join(" • ")}</p>
+    <div className={`min-h-screen py-20 ${bgColor} ${textColor}`}>
+      {/* Request Session Modal */}
+      {showRequestSession && (
+        <RequestSession
+          instructorId={id}
+          onClose={() => setShowRequestSession(false)}
+        />
+      )}
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Left Column - Profile */}
+          <div className="flex-1">
+            <div className="flex flex-col items-center md:items-start">
+              <img
+                src={avatar}
+                alt={name}
+                className="w-48 h-48 rounded-full object-cover mb-6"
+              />
+              <h1 className="text-3xl font-bold mb-2">{name}</h1>
+              <p className={`text-xl ${mutedText} mb-6`}>{title}</p>
+
+              {/* Request Session Button */}
+              <button
+                onClick={() => setShowRequestSession(true)}
+                className="w-full md:w-auto px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                {t("buttons.requestSession")}
+              </button>
+            </div>
+
+            {/* Stats Box */}
+            <div
+              className={`${statBg} rounded-lg p-6 flex justify-around mt-6 md:mt-0 shadow-lg w-full md:w-[280px]`}
+              role="region"
+              aria-label={t("instructorStats.title")}
+            >
+              <div className="flex flex-col items-center">
+                <EyeIcon className={`${textColor} h-6 w-6`} />
+                <span className="mt-1 text-sm font-semibold">
+                  {stats.views?.toLocaleString() || 0}
+                </span>
+                <span className="text-xs text-gray-400">{t("instructorStats.views")}</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <BookOpenIcon className={`${textColor} h-6 w-6`} />
+                <span className="mt-1 text-sm font-semibold">{courses.length}</span>
+                <span className="text-xs text-gray-400">{t("instructorStats.courses")}</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <UserGroupIcon className={`${textColor} h-6 w-6`} />
+                <span className="mt-1 text-sm font-semibold">
+                  {stats.learners?.toLocaleString() || 0}
+                </span>
+                <span className="text-xs text-gray-400">{t("instructorStats.learners")}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column - Bio and Courses */}
+          <div className="flex-1">
+            {/* Biography */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold mb-4">{t("instructorDetails.biography")}</h2>
+              <p className={`${mutedText} leading-relaxed`}>{bioPreview}</p>
+              {bioText.length > 300 && (
+                <button
+                  onClick={() => setShowFullBio(!showFullBio)}
+                  className="text-red-600 hover:text-red-700 mt-2"
+                >
+                  {showFullBio ? t("buttons.showLess") : t("buttons.showMore")}
+                </button>
               )}
             </div>
-          </div>
 
-          {/* Stats Box */}
-          <div
-            className={`${statBg} rounded-lg p-6 flex justify-around mt-6 md:mt-0 shadow-lg w-full md:w-[280px]`}
-            role="region"
-            aria-label={t("instructorStats.title")}
-          >
-            <div className="flex flex-col items-center">
-              <EyeIcon className={`${textColor} h-6 w-6`} />
-              <span className="mt-1 text-sm font-semibold">
-                {stats.views?.toLocaleString() || 0}
-              </span>
-              <span className="text-xs text-gray-400">{t("instructorStats.views")}</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <BookOpenIcon className={`${textColor} h-6 w-6`} />
-              <span className="mt-1 text-sm font-semibold">{courses.length}</span>
-              <span className="text-xs text-gray-400">{t("instructorStats.courses")}</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <UserGroupIcon className={`${textColor} h-6 w-6`} />
-              <span className="mt-1 text-sm font-semibold">
-                {stats.learners?.toLocaleString() || 0}
-              </span>
-              <span className="text-xs text-gray-400">{t("instructorStats.learners")}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* CTA Subscribe */}
-        <div
-          className={`rounded-lg p-6 shadow-md ${
-            theme === "dark" ? "bg-[#0c1b20] text-[#afdde1]" : "bg-[#e6f3f7] text-[#000000]"
-          } text-center`}
-          role="region"
-          aria-label={t("subscriptionCTA.label")}
-        >
-          <div className="flex items-center justify-center gap-6 flex-wrap">
-            <p className="text-lg font-semibold m-0">{t("subscriptionCTA.label")}</p>
-            <button
-              className="inline-block px-8 py-3 font-bold rounded bg-red-600 hover:bg-red-700 transition-colors focus:outline-none focus:ring-4 focus:ring-red-400 focus:ring-opacity-50 text-white"
-              aria-label={t("subscriptionCTA.button")}
-              onClick={() => alert(t("subscriptionCTA.button") + " clicked!")}
-            >
-              {t("subscriptionCTA.button")}
-            </button>
-          </div>
-        </div>
-
-        {/* About Mentor with Read More */}
-        <div>
-          <h2 className="text-2xl font-semibold mb-4 border-b border-gray-300 pb-2">
-            {t("home.instructors.about")}
-          </h2>
-          <p className={`${mutedText} leading-relaxed whitespace-pre-line`}>
-            {bioPreview}
-            {bioText.length > 300 && (
-              <button
-                onClick={() => setShowFullBio(!showFullBio)}
-                className="text-[#fffbff] font-semibold ml-1 focus:outline-none"
-                aria-expanded={showFullBio}
-              >
-                {showFullBio ? t("messages.readLess") : t("messages.readMore")}
-              </button>
-            )}
-          </p>
-        </div>
-
-        {/* Courses Grid */}
-        <div>
-          <h2 className="text-2xl font-semibold mb-6 border-b border-gray-300 pb-2">
-            {t("courses.title")}
-          </h2>
-          {courses.length === 0 && (
-            <p className={mutedText}>{t("courses.noCoursesAvailable")}</p>
-          )}
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {courses.map((course) => {
-              const courseTitle = getLocalizedString(course.title, lang, t("messages.noResults"));
-              return (
-                <div
-                  key={course.id || course._id}
-                  className={`relative rounded-lg overflow-hidden shadow-lg group cursor-pointer ${
-                    theme === "dark" ? "bg-gray-800" : "bg-white"
-                  }`}
-                  onClick={() => {
-                    navigate(`/courses/${course.id || course._id}`);
-                  }}
-                  role="link"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      navigate(`/courses/${course.id || course._id}`);
+            {/* Expertise Areas */}
+            {expertiseAreas && (
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold mb-4">{t("instructorDetails.expertise")}</h2>
+                <div className="flex flex-wrap gap-2">
+                  {(() => {
+                    let areas = [];
+                    if (typeof expertiseAreas === 'string') {
+                      areas = expertiseAreas.split(',');
+                    } else if (Array.isArray(expertiseAreas)) {
+                      areas = expertiseAreas;
+                    } else if (typeof expertiseAreas === 'object') {
+                      areas = Object.values(expertiseAreas);
                     }
-                  }}
-                  aria-label={courseTitle}
-                >
-                  <img
-                    src={course.thumbnail || ""}
-                    alt={courseTitle}
-                    className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
-                    loading="lazy"
-                  />
-                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent text-white">
-                    <h3 className="text-lg font-semibold truncate">{courseTitle}</h3>
-                    <p className="text-sm opacity-75 truncate">{name}</p>
-                  </div>
+                    return areas.map((area, index) => (
+                      <span
+                        key={index}
+                        className={`px-3 py-1 rounded-full text-sm ${theme === "dark"
+                          ? "bg-gray-700 text-white"
+                          : "bg-gray-200 text-gray-800"
+                          }`}
+                      >
+                        {area.trim()}
+                      </span>
+                    ));
+                  })()}
                 </div>
-              );
-            })}
+              </div>
+            )}
+
+            {/* Courses */}
+            <div>
+              <h2 className="text-2xl font-bold mb-4">{t("instructorDetails.courses")}</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {courses.map((course) => (
+                  <div
+                    key={course._id}
+                    className={`p-4 rounded-lg shadow-lg cursor-pointer ${theme === "dark" ? "bg-gray-800" : "bg-white"
+                      }`}
+                    onClick={() => navigate(`/courses/${course._id}`)}
+                  >
+                    <img
+                      src={course.thumbnail || "/default-course.jpg"}
+                      alt={getLocalizedString(course.title, lang)}
+                      className="w-full h-40 object-cover rounded-lg mb-4"
+                    />
+                    <h3 className="font-semibold mb-2">
+                      {getLocalizedString(course.title, lang)}
+                    </h3>
+                    <p className={`text-sm ${mutedText}`}>
+                      {getLocalizedString(course.description, lang)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>

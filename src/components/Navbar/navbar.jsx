@@ -1,80 +1,209 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FaMoon, FaSun } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
-import { RiArrowDropDownLine } from 'react-icons/ri';
+import { Link, useNavigate } from 'react-router-dom';
+import { RiArrowDropDownLine, RiRobot2Line } from 'react-icons/ri';
 import { CiSearch } from 'react-icons/ci';
 import { useTranslation } from 'react-i18next';
-import { changeLanguage } from '../../i18n/config';
+import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { FaUserCircle } from "react-icons/fa";
 import './navbar.css';
+import { ChatBubbleLeftRightIcon, AcademicCapIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import axios from 'axios';
 
 const Navbar = () => {
   const { t, i18n } = useTranslation();
-  const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuth();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const [searchResults, setSearchResults] = useState({ courses: [], instructors: [], programs: [] });
+  const [allData, setAllData] = useState({ courses: [], instructors: [], programs: [] });
+  const searchDropdownRef = useRef(null);
+  const searchInputRef = useRef(null);
   const isRTL = i18n.language === 'ar';
-  const isLoggedIn = !!localStorage.getItem('token');
+  const { theme, toggleTheme } = useTheme();
+  const currentLang = i18n.language;
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const profileRef = useRef(null);
 
-  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [categoryCourses, setCategoryCourses] = useState([]);
-  const [allCourses, setAllCourses] = useState([]);
+  // Fetch all data on component mount
+  useEffect(() => {
+    const fetchAllData = async () => {
+      try {
+        const [coursesRes, instructorsRes, programsRes] = await Promise.all([
+          axios.get('/api/courses'),
+          axios.get('/api/instructors'),
+          axios.get('/api/programs')
+        ]);
+
+        setAllData({
+          courses: coursesRes.data.data || coursesRes.data,
+          instructors: instructorsRes.data.data || instructorsRes.data,
+          programs: programsRes.data.data || programsRes.data
+        });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchAllData();
+  }, []);
+
+  const getLocalizedText = (obj) => {
+    if (!obj) return '';
+    if (typeof obj === 'string') return obj;
+    return obj[currentLang] || obj.en || '';
+  };
+
+  const handleSearch = (query) => {
+    if (!query.trim()) {
+      setSearchResults({ courses: [], instructors: [], programs: [] });
+      setShowSearchDropdown(false);
+      return;
+    }
+
+    const searchLower = query.toLowerCase();
+
+    // Search in courses
+    const matchedCourses = allData.courses.filter(course => {
+      const title = getLocalizedText(course.title);
+      const description = getLocalizedText(course.description);
+      return title.toLowerCase().includes(searchLower) ||
+        description.toLowerCase().includes(searchLower);
+    });
+
+    // Search in instructors
+    const matchedInstructors = allData.instructors.filter(instructor => {
+      const profile = instructor.profile || instructor.user || instructor;
+      const firstName = getLocalizedText(profile.firstName);
+      const lastName = getLocalizedText(profile.lastName);
+      const title = getLocalizedText(instructor.professionalTitle);
+      return `${firstName} ${lastName}`.toLowerCase().includes(searchLower) ||
+        title.toLowerCase().includes(searchLower);
+    });
+
+    // Search in programs
+    const matchedPrograms = allData.programs.filter(program => {
+      const title = getLocalizedText(program.title);
+      const description = getLocalizedText(program.description);
+      return title.toLowerCase().includes(searchLower) ||
+        description.toLowerCase().includes(searchLower);
+    });
+
+    setSearchResults({
+      courses: matchedCourses.slice(0, 5),
+      instructors: matchedInstructors.slice(0, 5),
+      programs: matchedPrograms.slice(0, 5)
+    });
+    setShowSearchDropdown(true);
+  };
+
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      if (searchQuery) {
+        handleSearch(searchQuery);
+      }
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
+  }, [searchQuery]);
 
   const toggleLanguage = () => {
     const newLang = i18n.language === 'en' ? 'ar' : 'en';
-    changeLanguage(newLang);
+    i18n.changeLanguage(newLang);
   };
 
-  // FETCH CATEGORIES
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch('http://localhost:5000/api/category');
-        if (!res.ok) throw new Error('Failed to fetch categories');
-        const data = await res.json();
-        setCategories(data.data || []);
-      } catch (err) {
-        console.error('Error fetching categories:', err);
-        setCategories([]);
-      }
-    };
+  const navigationItems = [
+    {
+      name: t('navigation.courses'),
+      href: '/courses',
+      icon: RiArrowDropDownLine,
+      showWhen: 'authenticated',
+    },
+    {
+      name: t('navigation.instructors'),
+      href: '/instructors',
+      icon: RiRobot2Line,
+      showWhen: 'authenticated',
+    },
+    {
+      name: t('navigation.programs'),
+      href: '/programs',
+      icon: RiRobot2Line,
+      showWhen: 'authenticated',
+    },
+    {
+      name: t('navigation.aiChat'),
+      href: '/AIChatPage',
+      icon: RiRobot2Line,
+      showWhen: 'authenticated',
+      badge: t('badges.new'),
+    },
+    {
+      name: t('navigation.subscribe'),
+      href: '/subscribe',
+      icon: RiRobot2Line,
+      showWhen: 'authenticated',
+    },
+    {
+      name: t('navigation.mySessions'),
+      href: '/my-sessions',
+      icon: ChatBubbleLeftRightIcon,
+      showWhen: 'authenticated',
+      badge: t('badges.new'),
+    },
+    {
+      name: t('navigation.instructorSessions'),
+      href: '/instructor-sessions',
+      icon: AcademicCapIcon,
+      showWhen: 'instructor',
+    },
+  ];
 
-    fetchCategories();
-  }, []);
+  // Keep the same order for both English and Arabic - only change flex direction
+  const orderedNavigationItems = navigationItems;
 
-  // FETCH ALL COURSES ONCE
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const res = await fetch('http://localhost:5000/api/courses');
-        if (!res.ok) throw new Error('Failed to fetch courses');
-        const data = await res.json();
-        setAllCourses(data.data || data);
-      } catch (err) {
-        setAllCourses([]);
-      }
-    };
-    fetchCourses();
-  }, []);
-
-  // FILTER COURSES BY CATEGORY ON HOVER
-  const handleCategoryHover = (categoryId) => {
-    setSelectedCategory(categoryId);
-    const filteredCourses = allCourses.filter(course =>
-      course.category === categoryId ||
-      course.category?._id === categoryId ||
-      course.category?.toString() === categoryId
-    );
-    setCategoryCourses(filteredCourses);
+  const handleLogout = () => {
+    logout();
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/loginPage');
   };
 
-  const handleDropdownEnter = () => setIsDropdownVisible(true);
-  const handleDropdownLeave = () => setIsDropdownVisible(false);
+  const getLocalizedName = (nameObj) => {
+    if (!nameObj) return '';
+    if (typeof nameObj === 'string') return nameObj;
+    return nameObj[currentLang] || nameObj.en || '';
+  };
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        searchDropdownRef.current &&
+        !searchDropdownRef.current.contains(event.target) &&
+        searchInputRef.current &&
+        !searchInputRef.current.contains(event.target) &&
+        searchDropdownRef.current
+      ) {
+        setShowSearchDropdown(false);
+      }
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setIsProfileOpen(false);
+      }
+    }
+    if (showSearchDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showSearchDropdown, searchDropdownRef, searchInputRef]);
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 px-4 py-4 z-50 shadow transition-all duration-300 text-lg font-medium ${theme === 'dark' ? 'bg-[#1a1a1a] text-white' : 'bg-white text-black'
-        }`}
+      className={`fixed top-0 left-0 right-0 px-4 py-4 z-50 shadow transition-all duration-300 text-lg font-medium ${theme === 'dark' ? 'bg-[#1a1a1a] text-white' : 'bg-white text-black'}`}
     >
       <div className={`flex items-center justify-start gap-12 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
         {/* Logo */}
@@ -85,120 +214,34 @@ const Navbar = () => {
           </a>
         </div>
 
-        {/* Navigation */}
-        <ul className={`flex items-center ml-1 ${isRTL ? 'space-x-reverse space-x-6' : 'space-x-6'} text-3xl font-medium`}>
-          <li className="relative">
-            <button
-              onMouseEnter={handleDropdownEnter}
-              className="hover:text-red-500 flex items-center focus:outline-none"
-            >
-              {t('navigation.courses')}
-              <RiArrowDropDownLine className="text-5xl mt-3" />
-            </button>
+        <ul className={`flex items-center ml-1 ${isRTL ? 'space-x-reverse space-x-6' : 'space-x-6'} text-1xl font-medium`}>
+          {orderedNavigationItems.map((item) => (
+            <li key={item.name} className={`relative ${item.showWhen === 'authenticated' ? '' : 'hidden'}`}>
+              <Link to={item.href} className="hover:text-red-500 flex items-center relative">
+                {item.name}
+                {item.badge && (
+                  <span className="absolute -top-2 -right-2 px-1.5 py-0.5 text-[10px] font-bold bg-red-500 text-white rounded-full transform translate-x-1/2 -translate-y-1/2">
+                    {item.badge}
+                  </span>
+                )}
+              </Link>
+            </li>
+          ))}
 
-            {/* Dropdown */}
-            {isDropdownVisible && (
-              <div
-                className="absolute top-[80px] left-0 flex w-[800px] bg-white shadow-xl rounded-lg z-50 transition-all duration-300"
-                onMouseEnter={handleDropdownEnter}
-                onMouseLeave={handleDropdownLeave}
-              >
-                <div className="absolute -top-2 left-6 w-4 h-4 bg-white rotate-45 shadow-md z-40"></div>
-
-                <div className="w-1/2 border-r px-4 py-5">
-                  <ul>
-                    {categories.map((category) => (
-                      <li
-                        key={category._id}
-                        onMouseEnter={() => handleCategoryHover(category._id)}
-                        className="py-2 px-2 hover:bg-gray-100 cursor-pointer text-gray-800 text-sm font-medium rounded-md transition"
-                      >
-                        {category.name[i18n.language] || category.name.en}
-                      </li>
-                    ))}
-                  </ul>
-
-                  <div className="mt-6">
-                    <Link
-                      to="/courses"
-                      className="w-full flex items-center justify-center gap-2 bg-red-500 text-white py-2 rounded-md text-sm hover:bg-red-600 transition"
-                    >
-                      Browse Courses <span className="text-lg">→</span>
-                    </Link>
-                  </div>
-                </div>
-
-                <div className="w-1/2 p-5">
-                  {categoryCourses.length === 0 ? (
-                    <p className="text-gray-500">{t('common.noCourses')}</p>
-                  ) : (
-                    <ul>
-                      {categoryCourses.slice(0, 4).map((course) => {
-                        const lang = i18n.language;
-                        const title =
-                          typeof course.title === 'object'
-                            ? course.title[lang] || course.title.en || 'Untitled Course'
-                            : course.title || 'Untitled Course';
-
-                        const profile = course.instructor?.profile || course.instructor?.user || course.instructor || {};
-                        const instructorName =
-                          `${profile.firstName?.[lang] || profile.firstName?.en || ''} ${profile.lastName?.[lang] || profile.lastName?.en || ''}`.trim() || 'Unknown Instructor';
-
-                        return (
-                          <li key={course._id} className="flex items-center gap-4 mb-5">
-                            <img
-                              src={course.thumbnail || '/default-course-img.png'}
-                              alt={title}
-                              className="w-20 h-14 object-cover rounded"
-                            />
-                            <div>
-                              <h4 className="text-base font-semibold text-black text-red-600">
-                                {title}
-                              </h4>
-                              <p className="text-sm text-gray-600 dark:text-gray-400">
-                                {instructorName}
-                              </p>
-                            </div>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
-                </div>
-              </div>
-            )}
-          </li>
-
-          <li>
-            <Link to="/instructors" className="hover:text-red-500">
-              Instructors
-            </Link>
-          </li>
-
-          <li className="flex items-center">
-            <Link to="/programs" className="hover:text-red-500">
-              {t('navigation.programs')}
-            </Link>
-            <span className="ml-2 bg-red-500 text-white text-[10px] px-1 py-0.5 rounded-full">
-              NEW
-            </span>
-          </li>
-
-          <li>
-            <button
+          <li className={`${isRTL ? 'mx-10' : 'mx-10'}`}>
+            <Link
+              to="/subscribe"
               className={`rounded px-6 text-2xl py-2 border-2 transition ${theme === 'dark'
-                  ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
-                  : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
+                ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
+                : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
                 }`}
             >
-              Subscribe
-            </button>
+              {t('buttons.subscribe')}
+            </Link>
           </li>
         </ul>
 
-        {/* Right Side: Search + Theme + Language + Auth */}
-        <div className={`flex items-center ml-auto ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
-          {/* Search */}
+        <div className={`flex items-center ${isRTL ? 'mr-8' : 'ml-8'} ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
           <div className="relative">
             <input
               type="text"
@@ -206,14 +249,100 @@ const Navbar = () => {
               className={`text-lg px-5 py-3 w-[360px] focus:outline-none focus:ring-2 placeholder-gray-500 transition-all duration-300 rounded-md
                 ${theme === 'dark' ? 'bg-[#2a2a2a] text-white focus:ring-gray-600' : 'bg-gray-200 text-gray-700 focus:ring-gray-300'}`}
               dir={isRTL ? 'rtl' : 'ltr'}
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              onFocus={() => searchQuery && setShowSearchDropdown(true)}
+              ref={searchInputRef}
             />
             <button className={`absolute top-1/2 transform -translate-y-1/2 ${isRTL ? 'left-4' : 'right-4'} text-gray-400 hover:text-red-500`}>
               <CiSearch size={25} />
             </button>
+            {showSearchDropdown && (
+              <div
+                ref={searchDropdownRef}
+                className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 w-[360px] max-h-96 overflow-y-auto rounded-md shadow-lg z-50 ${theme === 'dark' ? 'bg-[#232323] text-white' : 'bg-white text-black'}`}
+                style={{ direction: isRTL ? 'rtl' : 'ltr' }}
+              >
+                {searchResults.courses.length === 0 && searchResults.instructors.length === 0 && searchResults.programs.length === 0 ? (
+                  <div className="p-4 text-center text-gray-400">{t('common.noResults') || 'No results found'}</div>
+                ) : (
+                  <>
+                    {searchResults.programs.length > 0 && (
+                      <div>
+                        <div className="px-4 pt-3 pb-1 text-xs font-bold uppercase text-gray-500">{t('navigation.programs')}</div>
+                        {searchResults.programs.map(program => {
+                          const title = getLocalizedText(program.title);
+                          return (
+                            <div
+                              key={program._id}
+                              className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#333] rounded"
+                              onClick={() => {
+                                setShowSearchDropdown(false);
+                                setSearchQuery('');
+                                navigate(`/programs/${program._id}`);
+                              }}
+                            >
+                              <img src={program.thumbnail || '/default-program-img.png'} alt={title} className="w-10 h-8 object-cover rounded" />
+                              <span className="font-medium">{title}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                    {searchResults.courses.length > 0 && (
+                      <div>
+                        <div className="px-4 pt-3 pb-1 text-xs font-bold uppercase text-gray-500">{t('navigation.courses')}</div>
+                        {searchResults.courses.map(course => {
+                          const title = getLocalizedText(course.title);
+                          return (
+                            <div
+                              key={course._id}
+                              className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#333] rounded"
+                              onClick={() => {
+                                setShowSearchDropdown(false);
+                                setSearchQuery('');
+                                navigate(`/courses/${course._id}`);
+                              }}
+                            >
+                              <img src={course.thumbnail || '/default-course-img.png'} alt={title} className="w-10 h-8 object-cover rounded" />
+                              <span className="font-medium">{title}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                    {searchResults.instructors.length > 0 && (
+                      <div>
+                        <div className="px-4 pt-3 pb-1 text-xs font-bold uppercase text-gray-500">{t('navigation.instructors')}</div>
+                        {searchResults.instructors.map(inst => {
+                          const profile = inst.profile || inst.user || inst;
+                          const instructorName = `${getLocalizedText(profile.firstName)} ${getLocalizedText(profile.lastName)}`.trim() || 'Unknown Instructor';
+                          const instructorImage = profile.profilePicture || '/default-profile.png';
+
+                          return (
+                            <div
+                              key={inst._id}
+                              className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#333] rounded"
+                              onClick={() => {
+                                setShowSearchDropdown(false);
+                                setSearchQuery('');
+                                navigate(`/instructors/${inst._id}`);
+                              }}
+                            >
+                              <img src={instructorImage} alt={instructorName} className="w-10 h-10 object-cover rounded-full" />
+                              <span className="font-medium">{instructorName}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* Theme + Language Switch */}
-          <div className="flex items-center space-x-2">
+          <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
             <button
               onClick={toggleTheme}
               className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors
@@ -231,26 +360,128 @@ const Navbar = () => {
             </button>
           </div>
 
-          {/* Auth Buttons */}
-          {isLoggedIn ? (
-            <button
-              onClick={() => {
-                localStorage.removeItem('token');
-                window.location.href = '/loginPage';
-              }}
-              className="bg-red-600 text-white px-4 py-1.5 rounded hover:bg-red-700 text-sm"
-            >
-              Logout
-            </button>
+          {isAuthenticated ? (
+            <div className="relative" ref={profileRef}>
+              <button
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="flex items-center hover:opacity-80 transition-opacity p-2"
+              >
+                {user?.profilePicture ? (
+                  <img
+                    src={user.profilePicture}
+                    alt={getLocalizedName(user.firstName)}
+                    className={`h-10 w-10 rounded-full object-cover border-2 ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}
+                  />
+                ) : (
+                  <FaUserCircle className={`text-4xl ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
+                )}
+              </button>
+
+              {isProfileOpen && (
+                <div className={`absolute top-full ${isRTL ? 'left-0' : 'right-0'} mt-2 w-72 rounded-lg shadow-xl z-50 overflow-hidden ${theme === 'dark' ? 'bg-[#1a1a1a] border border-gray-700' : 'bg-white border border-gray-200'}`}>
+                  <div className={`p-4 border-b ${theme === 'dark' ? 'bg-[#232323] border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                    <p className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      {user?.firstName ? getLocalizedName(user.firstName) : ''} {user?.lastName ? getLocalizedName(user.lastName) : ''}
+                    </p>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} truncate`}>
+                      {user?.email || ''}
+                    </p>
+                    <Link
+                      to="/subscribe"
+                      className="mt-3 block w-full text-center bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition-colors"
+                    >
+                      {t('profile.subscribe')}
+                    </Link>
+                  </div>
+
+                  <div className="py-2">
+                    <Link
+                      to="/my-progress"
+                      className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                        } ${isRTL ? 'flex-row-reverse' : ''}`}
+                    >
+                      <svg className={`w-5 h-5 ${isRTL ? 'ml-3' : 'mr-3'} ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                      {t('profile.myProgress')}
+                    </Link>
+
+                    <Link
+                      to="/saved-courses"
+                      className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                        } ${isRTL ? 'flex-row-reverse' : ''}`}
+                    >
+                      <svg className={`w-5 h-5 ${isRTL ? 'ml-3' : 'mr-3'} ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5h14v14H5z" />
+                      </svg>
+                      {t('profile.savedCourses')}
+                    </Link>
+
+                    <Link
+                      to="/certificates"
+                      className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                        } ${isRTL ? 'flex-row-reverse' : ''}`}
+                    >
+                      <svg className={`w-5 h-5 ${isRTL ? 'ml-3' : 'mr-3'} ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v8m-4-4h8" />
+                      </svg>
+                      {t('profile.certificates')}
+                    </Link>
+
+                    <Link
+                      to="/profile"
+                      className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                        } ${isRTL ? 'flex-row-reverse' : ''}`}
+                    >
+                      <svg className={`w-5 h-5 ${isRTL ? 'ml-3' : 'mr-3'} ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      {t('profile.accountSettings')}
+                    </Link>
+
+                    <Link
+                      to="/become-instructor"
+                      className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                        } ${isRTL ? 'flex-row-reverse' : ''}`}
+                    >
+                      <svg className={`w-5 h-5 ${isRTL ? 'ml-3' : 'mr-3'} ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      {t('profile.becomeInstructor')}
+                    </Link>
+
+                    <button
+                      onClick={handleLogout}
+                      className={`w-full flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'text-red-400 hover:bg-[#232323] hover:text-red-300' : 'text-red-500 hover:bg-red-50'
+                        } ${isRTL ? 'flex-row-reverse' : ''}`}
+                    >
+                      <svg className={`w-5 h-5 ${isRTL ? 'ml-3' : 'mr-3'} ${theme === 'dark' ? 'text-red-400' : 'text-red-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                      {t('logout')}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           ) : (
-            <>
-              <Link to="/loginPage" className={`text-sm ${theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-black'}`}>
+            <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
+              <Link
+                to="/loginPage"
+                className={`text-sm transition-colors ${theme === 'dark'
+                  ? 'text-gray-300 hover:text-white'
+                  : 'text-gray-600 hover:text-black'
+                  }`}
+              >
                 {t('common.login')}
               </Link>
-              <Link to="/signup" className="bg-red-500 text-white px-4 py-1.5 rounded hover:bg-red-600 text-sm">
+              <Link
+                to="/subscribe"
+                className={`bg-red-500 text-white px-5 py-2 rounded transition-colors hover:bg-red-600 text-sm text-center`}
+              >
                 {t('common.signup')}
               </Link>
-            </>
+            </div>
           )}
         </div>
       </div>

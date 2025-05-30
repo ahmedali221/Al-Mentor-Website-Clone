@@ -12,7 +12,21 @@ nav button:hover {
   transition: all 0.2s ease;
 }
 
-.dark-theme-nav {
+/* Update dark theme styles */
+[data-theme='dark'] nav {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='light'] nav {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Remove old theme classes */
+/* .dark-theme-nav {
   background-color: #1A1A1A;
   color: #ffffff;
   border-bottom: 1px solid #333;
@@ -22,7 +36,7 @@ nav button:hover {
   background-color: #ffffff;
   color: #333333;
   border-bottom: 1px solid #eaeaea;
-}
+} */
 
 @media (max-width: 1024px) {
   nav ul {
@@ -36,4 +50,15 @@ nav button:hover {
 
 nav button {
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Add hover states for dark mode */
+[data-theme='dark'] nav a:hover,
+[data-theme='dark'] nav button:hover {
+  color: #ef4444; /* red-500 */
+}
+
+[data-theme='light'] nav a:hover,
+[data-theme='light'] nav button:hover {
+  color: #dc2626; /* red-600 */
 }

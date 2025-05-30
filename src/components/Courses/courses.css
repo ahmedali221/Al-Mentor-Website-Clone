@@ -1,20 +1,29 @@
 /* Base styling */
+:root {
+  /* color-scheme: dark; */
+}
+
 body {
-  margin: 15px;
-  padding: 15px;
+  margin-top: 10px;
+  padding: 0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  background-color: #000;
-  color: #fff;
-  /* Remove max-width and large horizontal padding */
   box-sizing: border-box;
+  background: unset;
+}
+
+:root[class~='dark'] body {
+  background-color: #000 !important;
+}
+
+:root:not([class~='dark']) body {
+  background-color: #fff !important;
 }
 
 /* Main content wrapper for horizontal breathing room */
 .main-content, .courses-main, .page-content, .container, .content-wrapper {
-  padding-left: 32px;
-  padding-right: 32px;
-  padding-top: 24px;
-  padding-bottom: 24px;
+  padding: 0;
+  margin: 0;
+  background: unset;
 }
 
 @media (max-width: 768px) {

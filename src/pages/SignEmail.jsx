@@ -14,14 +14,12 @@ function SignEmail() {
     const { theme } = useTheme();
     const [email, setEmail] = useState("")
     const [error, setError] = useState("")
-    
+
     const isRTL = i18n.language === 'ar';
 
     const handleChange = (e) => {
         if (e.target.id === "email") {
             setEmail(e.target.value)
-        } else if (e.target.id === "password") {
-            setPassword(e.target.value)
         }
     }
 
@@ -29,7 +27,7 @@ function SignEmail() {
         e.preventDefault();
         try {
             const response = await axios.post('/api/auth/checkEmail', { email });
-            if(!response.data.exists) {
+            if (!response.data.exists) {
                 navigate('/signup', { state: { email } });
             } else {
                 setError(t('auth.emailExists', 'Email already exists. Please login instead.'));
@@ -68,7 +66,7 @@ function SignEmail() {
                             value={email}
                             placeholder={t('auth.emailPlaceholder', 'Type Your Email...')}
                         ></Custom_Input_Field>
-                      
+
                     </div>
 
                     {error && <p className="text-red-600 text-center">{error}</p>}

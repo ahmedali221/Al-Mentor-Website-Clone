@@ -1,0 +1,45 @@
+{
+  "home": {
+    "categories": {
+      "title": "Course Categories"
+    },
+    "courses": {
+      "title": "Featured Courses",
+      "picks": "Picks",
+      "loadingTopics": "Loading topics...",
+      "noCoursesForTopic": "No courses found for this topic",
+      "noCoursesAvailable": "No courses available",
+      "viewAll": "View all",
+      "seeAllCourses": "See all courses"
+    }
+  },
+
+"sections": {
+  "categories": "Course Categories",
+  "picks": "Picks",
+  "trending": "Trending Courses",
+  "newlyReleased": "Newly Released",
+  "instructors": "Our Instructors",
+  "subscription": {
+    "title": "Subscribe for a great price",
+    "description": "Get access to all courses whenever you like"
+  }
+},
+"buttons": {
+  "viewAll": "View all",
+  "choosePlan": "Choose Plan",
+  "seeAllInstructors": "See all instructors"
+},
+"loading": {
+  "topics": "Loading topics...",
+  "general": "Loading..."
+},
+"messages": {
+  "noCoursesForTopic": "No courses available for this topic",
+  "noCoursesAvailable": "No courses available",
+  "noSubscriptionPlans": "No subscription plans available"
+},
+"labels": {
+  "bestValue": "Best Value"
+}
+}

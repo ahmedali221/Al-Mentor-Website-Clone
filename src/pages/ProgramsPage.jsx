@@ -54,7 +54,7 @@ function ProgramsPage() {
     }
 
     return (
-        <div className={`w-full pt-12 ${theme === 'dark' ? 'bg-[#1A1A1A] text-white' : 'bg-gray-50 text-gray-900'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className={`w-full pt-25 ${theme === 'dark' ? 'bg-[#1A1A1A] text-white' : 'bg-gray-50 text-gray-900'}`} dir={isRTL ? 'rtl' : 'ltr'}>
             <div className="w-full px-8 py-6">
                 <div className={`${isRTL ? 'text-right' : 'text-left'} mb-8`}>
                     <h1 className="text-5xl font-bold">{t('navigation.programs')}</h1>

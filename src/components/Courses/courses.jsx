@@ -9,6 +9,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { FaSearch, FaBell, FaShoppingCart, FaUserCircle, FaBookmark, FaPlayCircle, FaSpinner } from 'react-icons/fa';
 import { Route } from 'react-router-dom';
 import CourseDetailsPage from '../CourseDetails/CourseDetails';
+import { useAuth } from '../../context/AuthContext';
+import { toast } from 'react-toastify';
 
 const Courses = () => {
   const { t, i18n } = useTranslation();
@@ -17,6 +19,7 @@ const Courses = () => {
   const currentLang = i18n.language;
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [instructors, setInstructors] = useState([]);
   const [allCourses, setAllCourses] = useState([]);
@@ -36,11 +39,8 @@ const Courses = () => {
   const [subscriptionLoading, setSubscriptionLoading] = useState(true);
   const [subscriptionError, setSubscriptionError] = useState(null);
 
-  const [savedCourses, setSavedCourses] = useState(() => {
-    // Load from localStorage or start with empty array
-    const saved = localStorage.getItem('savedCourses');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [savedCourses, setSavedCourses] = useState([]);
+  const [savingCourse, setSavingCourse] = useState(false);
 
   const [topics, setTopics] = useState([]);
   const [selectedTopic, setSelectedTopic] = useState(null);
@@ -55,15 +55,102 @@ const Courses = () => {
   });
 
   useEffect(() => {
-    localStorage.setItem('savedCourses', JSON.stringify(savedCourses));
-  }, [savedCourses]);
+    const fetchSavedCourses = async () => {
+      if (!user) return;
+      
+      try {
+        const response = await fetch(`http://localhost:5000/api/saved-courses/user/${user._id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        
+        if (!response.ok) throw new Error('Failed to fetch saved courses');
+        
+        const data = await response.json();
+        setSavedCourses(data.map(item => item.courseId._id));
+      } catch (err) {
+        toast.error(t('Failed to fetch saved courses'));
+      }
+    };
 
-  const toggleSaveCourse = (courseId) => {
-    setSavedCourses(prev =>
-      prev.includes(courseId)
-        ? prev.filter(id => id !== courseId)
-        : [...prev, courseId]
-    );
+    fetchSavedCourses();
+  }, [user, t]);
+
+  const toggleSaveCourse = async (courseId, e) => {
+    e.stopPropagation();
+    
+    if (!user) {
+      navigate('/loginPage');
+      return;
+    }
+
+    if (savingCourse) return;
+
+    // Debug logs
+    console.log('DEBUG: user =', user);
+    console.log('DEBUG: courseId =', courseId);
+    console.log('DEBUG: token =', localStorage.getItem('token'));
+    const payload = {
+      userId: user?._id,
+      courseId,
+      savedAt: new Date().toISOString()
+    };
+    console.log('DEBUG: payload =', payload);
+
+    try {
+      setSavingCourse(true);
+      const isCurrentlySaved = savedCourses.includes(courseId);
+
+      if (isCurrentlySaved) {
+        // Unsave course
+        const response = await fetch(`http://localhost:5000/api/saved-courses/${user._id}/${courseId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('DEBUG: Unsave error response:', errorData);
+          throw new Error('Failed to unsave course');
+        }
+
+        setSavedCourses(prev => prev.filter(id => id !== courseId));
+        toast.success(t('Course removed from saved courses'));
+      } else {
+        // Save course
+        const response = await fetch('http://localhost:5000/api/saved-courses', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          console.error('DEBUG: Save error response:', data);
+          if (
+            response.status === 409 ||
+            (response.status === 400 && data.message && data.message.toLowerCase().includes('already saved'))
+          ) {
+            toast.info(t('Course is already in your saved courses'));
+            return;
+          }
+          throw new Error(data.message || 'Failed to save course');
+        }
+
+        setSavedCourses(prev => [...prev, courseId]);
+        toast.success(t('Course added to saved courses'));
+      }
+    } catch (err) {
+      toast.error(err.message || t('Failed to update saved courses'));
+    } finally {
+      setSavingCourse(false);
+    }
   };
 
   useEffect(() => {
@@ -160,7 +247,6 @@ const Courses = () => {
         // If no topic selected, fetch all courses
         try {
           const response = await axios.get('/api/courses');
-          console.log('All courses response:', response.data);
           setFilteredPicks(response.data);
         } catch (err) {
           console.error('Error fetching courses:', err);
@@ -173,33 +259,18 @@ const Courses = () => {
         setTopicCoursesLoading(true);
         // Get courses for the selected topic
         const topicResponse = await axios.get(`/api/topics/${selectedTopic}`);
-        console.log('Topic response:', topicResponse.data);
 
         // Get all courses and filter by topic
         const coursesResponse = await axios.get('/api/courses');
-        console.log('Courses response:', coursesResponse.data);
-
-        // Debug the first course structure
-        if (coursesResponse.data.length > 0) {
-          console.log('First course structure:', coursesResponse.data[0]);
-        }
 
         // Filter courses based on topic
         const coursesWithTopic = coursesResponse.data.filter(course => {
           // Check if course has category field that matches topic's category
           const courseCategory = course.category?._id || course.category;
           const topicCategory = topicResponse.data.category;
-
-          console.log('Comparing categories:', {
-            courseCategory,
-            topicCategory,
-            matches: courseCategory === topicCategory
-          });
-
           return courseCategory === topicCategory;
         });
 
-        console.log('Filtered courses:', coursesWithTopic);
         setFilteredPicks(coursesWithTopic);
       } catch (err) {
         console.error('Error filtering courses by topic:', err);
@@ -270,9 +341,9 @@ const Courses = () => {
     prevArrow: <CustomPrevArrow />,
     nextArrow: <CustomNextArrow />,
     responsive: [
-      { breakpoint: 1024, settings: { slidesToShow: 3 } },
-      { breakpoint: 768, settings: { slidesToShow: 2 } },
-      { breakpoint: 480, settings: { slidesToShow: 1 } },
+      { breakpoint: 1280, settings: { slidesToShow: 3 } },
+      { breakpoint: 1024, settings: { slidesToShow: 2 } },
+      { breakpoint: 640, settings: { slidesToShow: 1 } },
     ],
   };
 
@@ -281,10 +352,11 @@ const Courses = () => {
     ...sliderSettings,
     slidesToShow: 6,
     responsive: [
-      { breakpoint: 1280, settings: { slidesToShow: 5 } },
-      { breakpoint: 1024, settings: { slidesToShow: 4 } },
-      { breakpoint: 768, settings: { slidesToShow: 3 } },
-      { breakpoint: 480, settings: { slidesToShow: 2 } },
+      { breakpoint: 1536, settings: { slidesToShow: 5 } },
+      { breakpoint: 1280, settings: { slidesToShow: 4 } },
+      { breakpoint: 1024, settings: { slidesToShow: 3 } },
+      { breakpoint: 768, settings: { slidesToShow: 2 } },
+      { breakpoint: 640, settings: { slidesToShow: 1 } },
     ],
   };
 
@@ -299,8 +371,10 @@ const Courses = () => {
     prevArrow: <CustomPrevArrow />,
     nextArrow: <CustomNextArrow />,
     responsive: [
+      { breakpoint: 1280, settings: { slidesToShow: 2, rows: 2 } },
       { breakpoint: 1024, settings: { slidesToShow: 1, rows: 2 } },
       { breakpoint: 768, settings: { slidesToShow: 1, rows: 1 } },
+      { breakpoint: 640, settings: { slidesToShow: 1, rows: 1 } },
     ],
   };
 
@@ -308,7 +382,15 @@ const Courses = () => {
   const getLocalizedText = (obj) => {
     if (!obj) return '';
     if (typeof obj === 'string') return obj;
-    return obj[currentLang] || obj.en || '';
+    if (obj && typeof obj === 'object') {
+      // Handle translation objects with en/ar keys
+      if (obj.en || obj.ar) {
+        return obj[currentLang] || obj.en || obj.ar || '';
+      }
+      // Handle other object types
+      return obj[currentLang] || obj.en || '';
+    }
+    return '';
   };
 
   // Course card
@@ -319,49 +401,43 @@ const Courses = () => {
     const instructorProfile = course.instructorDetails?.profile || {};
     const instructorName = instructorProfile
       ? `${instructorProfile.firstName?.[currentLang] || instructorProfile.firstName?.en || ''} ${instructorProfile.lastName?.[currentLang] || instructorProfile.lastName?.en || ''}`
-      : 'Unknown Instructor';
+      : t('Unknown Instructor');
     const image = course.thumbnail || 'https://placehold.co/280x160';
     const isNew = course.isNew || false;
 
-    // After you have course and allInstructors loaded:
-    const courseInstructorIds = Array.isArray(course?.instructors)
-      ? course.instructors.map(inst => inst._id || inst)
-      : course?.instructorDetails
-        ? [course.instructorDetails._id || course.instructorDetails]
-        : [];
-    const instructorDetails = instructors.filter(inst => courseInstructorIds.includes(inst._id));
-
     return (
       <div
-        className="course-card mx-1 relative mt-10 cursor-pointer"
+        className={`course-card mx-2 relative rounded-xl overflow-hidden transform transition-all duration-300 hover:scale-105 cursor-pointer shadow-lg ${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-white'}`}
         onClick={() => navigate(`/courses/${course._id}`)}
       >
-        <div className="rounded overflow-hidden bg-[#1a1a1a] shadow-lg mt-10">
-          <div className="relative">
-            <img src={image} alt={title} className="w-full h-40 object-cover" />
-            {isNew && (
-              <span className="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-1 rounded">
-                New
-              </span>
-            )}
-          </div>
-          <div className="p-3 mt-10">
-            <h3 className="text-base font-semibold text-white mb-1 h-12 overflow-hidden">{title}</h3>
-            <p className="text-gray-400 text-sm">{instructorName}</p>
-            <div className="flex justify-between items-center mt-2">
-              <div className="flex items-center">
-                <span className="text-yellow-500 mr-1">★★★★★</span>
-              </div>
-              <button
-                className={`bg-transparent border-none p-0 ml-2`}
-                onClick={e => {
-                  e.stopPropagation();
-                  toggleSaveCourse(course._id);
-                }}
-              >
-                <FaBookmark className={savedCourses.includes(course._id) ? "text-red-600" : "text-white"} />
-              </button>
+        <div className="relative">
+          <img src={image} alt={title} className="w-full h-48 object-cover" />
+          {isNew && (
+            <span className="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-1 rounded">
+              {t('New')}
+            </span>
+          )}
+        </div>
+        <div className="p-4">
+          <h3 className={`text-base font-semibold mb-2 h-12 overflow-hidden ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{title}</h3>
+          <p className={`text-sm font-medium ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>{instructorName}</p>
+          <div className="flex justify-between items-center mt-3">
+            <div className="flex items-center">
+              <span className="text-yellow-500 mr-1">★★★★★</span>
             </div>
+            <button
+              className={`bg-transparent border-none p-0 ml-2 ${savingCourse ? 'opacity-50 cursor-not-allowed' : ''}`}
+              onClick={e => toggleSaveCourse(course._id, e)}
+              disabled={savingCourse}
+            >
+              <FaBookmark className={
+                savedCourses.includes(course._id)
+                  ? 'text-red-600'
+                  : theme === 'dark'
+                    ? 'text-white'
+                    : 'text-gray-400'
+              } />
+            </button>
           </div>
         </div>
       </div>
@@ -371,87 +447,45 @@ const Courses = () => {
   // Instructor card
   const InstructorCard = ({ instructor }) => {
     if (!instructor) return null;
-    // Support both .user and direct fields
-    const user = instructor.user || instructor;
-    const name =
-      (user.firstName?.[currentLang] || user.firstName?.en || user.firstName || '') +
-      ' ' +
-      (user.lastName?.[currentLang] || user.lastName?.en || user.lastName || '');
-    const title =
-      instructor.professionalTitle?.[currentLang] ||
-      instructor.professionalTitle?.en ||
-      instructor.professionalTitle ||
-      'Instructor Title';
-    const image = user.profilePicture || 'https://placehold.co/150x150';
+    // Try to get the profile object, fallback to user, fallback to instructor itself
+    const profile = instructor.profile || instructor.user || instructor;
+    const name = `${profile.firstName?.[currentLang] || profile.firstName?.en || profile.firstName || ''} ${profile.lastName?.[currentLang] || profile.lastName?.en || profile.lastName || ''}`.trim() || 'Unknown Instructor';
+    const title = instructor.professionalTitle?.[currentLang] || instructor.professionalTitle?.en || instructor.professionalTitle || '';
+    const image = profile.profilePicture || '/default-profile.png';
 
     return (
-      <div className="flex flex-col items-center justify-start px-3">
-        <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-gray-700">
+      <div className="px-4 min-h-72 flex flex-col items-center justify-start">
+        <div className={`w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden shadow transition-all duration-300 hover:scale-105 ${
+          theme === 'dark' ? 'shadow-gray-800' : 'shadow-gray-200'
+        }`}>
           <img src={image} alt={name} className="w-full h-full object-cover" />
         </div>
-        <h3 className="text-base font-semibold mt-3 text-white text-center">{name.trim() || 'Unknown Instructor'}</h3>
-        <p className="text-gray-400 text-xs text-center">{title}</p>
+        <h3 className={`text-lg font-semibold mt-4 text-center ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{name}</h3>
+        <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} text-sm text-center mt-1`}>
+          {title}
+        </p>
       </div>
     );
-  };
-
-  // Category card
-  const CategoryCard = ({ title, image }) => {
-    return (
-      <div className="mx-1">
-        <div className="relative rounded overflow-hidden">
-          <img src={image} alt={title} className="w-full h-28 object-cover" />
-          <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-            <h3 className="text-white text-center font-semibold">{title}</h3>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Category data
-  const categoryData = [
-    { title: "Business & Professional Skills", image: "https://via.placeholder.com/280x160" },
-    { title: "Technology & Innovation", image: "https://via.placeholder.com/280x160" },
-    { title: "Marketing", image: "https://via.placeholder.com/280x160" },
-    { title: "Lifestyle", image: "https://via.placeholder.com/280x160" },
-    { title: "Education & Academics", image: "https://via.placeholder.com/280x160" },
-    { title: "Family & Relationships", image: "https://via.placeholder.com/280x160" },
-    { title: "Arts, Design & Media", image: "https://via.placeholder.com/280x160" }
-  ];
-
-  const handlePlanSelection = (planId) => {
-    setSelectedPlan(planId);
-  };
-
-  const handleSubscribe = async () => {
-    if (!selectedPlan) return;
-
-    try {
-      // Navigate to subscription page with selected plan
-      navigate(`/subscription/${selectedPlan}`);
-    } catch (err) {
-      console.error('Error handling subscription:', err);
-    }
   };
 
   // Category Hero Card (for the top section)
   const CategoryHeroCard = ({ category }) => {
-    const title = category.name?.ar || category.name?.en || category.name;
+    const title = getLocalizedText(category.name);
     const image = category.thumbnailImgUrl || 'https://placehold.co/400x300';
     return (
+      
       <div
-        className="relative cursor-pointer rounded-xl overflow-hidden group h-[340px] flex items-end transition-all duration-300 shadow-lg"
-        style={{ minWidth: 320, maxWidth: 400 }}
+        className="relative cursor-pointer rounded-xl overflow-hidden group h-60 sm:h-72 md:h-80 flex items-end transition-all duration-300 shadow-lg hover:shadow-xl"
         onClick={() => navigate(`/categories/${category._id}`)}
       >
         <img
           src={image}
           alt={title}
-          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
-        <div className="relative z-10 p-6 w-full flex items-end justify-center h-full">
-          <h3 className="text-white text-2xl font-bold text-center drop-shadow-lg" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.7)' }}>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+        <div className="relative z-10 p-6 w-full flex items-end justify-center">
+          <h3 className="text-white text-xl sm:text-2xl font-bold text-center drop-shadow-lg" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.7)' }}>
             {title}
           </h3>
         </div>
@@ -467,37 +501,41 @@ const Courses = () => {
     const instructorProfile = course.instructorDetails?.profile || {};
     const instructorName = instructorProfile
       ? `${instructorProfile.firstName?.[currentLang] || instructorProfile.firstName?.en || ''} ${instructorProfile.lastName?.[currentLang] || instructorProfile.lastName?.en || ''}`
-      : 'Unknown Instructor';
+      : t('Unknown Instructor');
     const image = course.thumbnail || 'https://placehold.co/280x160';
     const isNew = course.isNew || false;
     return (
       <div
-        className="flex bg-[#181f1f] hover:bg-[#232b2b] transition rounded-2xl overflow-hidden shadow-lg min-h-[160px] max-h-[200px] w-full cursor-pointer"
+        className={`flex rounded-2xl overflow-hidden shadow-lg transform transition-all duration-300 hover:shadow-xl hover:scale-102 cursor-pointer
+        ${theme === 'dark' ? 'bg-[#181f1f] hover:bg-[#232b2b]' : 'bg-white hover:bg-gray-50'}`}
         onClick={() => navigate(`/courses/${course._id}`)}
       >
-        <div className="relative min-w-[260px] max-w-[300px] h-[180px] flex-shrink-0 border-2 border-gray-700 shadow-xl">
+        <div className="relative w-2/5 md:w-1/3 h-40 flex-shrink-0">
           <img
             src={image}
             alt={title}
             className="w-full h-full object-cover"
-            style={{ borderRadius: '16px 0 0 16px' }}
           />
           {isNew && (
-            <span className="absolute top-2 left-2 bg-[#ff5722] text-white text-xs px-2 py-1 rounded">New</span>
+            <span className="absolute top-2 left-2 bg-[#ff5722] text-white text-xs px-2 py-1 rounded">{t('New')}</span>
           )}
         </div>
-        <div className="flex flex-col justify-center p-6 flex-1 min-w-0">
-          <h3 className="text-lg font-bold text-white mb-2 truncate" title={title}>{title}</h3>
-          <div className="flex items-center justify-between">
-            <p className="text-gray-400 text-sm truncate">{instructorName}</p>
+        <div className="flex flex-col justify-center p-3 sm:p-4 flex-1 min-w-0">
+          <h3 className={`text-base sm:text-lg font-bold mb-1 sm:mb-2 line-clamp-2 ${theme === 'dark' ? 'text-white' : 'text-black'}`} title={title}>{title}</h3>
+          <div className="flex items-center justify-between mt-1">
+            <p className={`text-sm sm:text-base font-medium truncate ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>{instructorName}</p>
             <button
-              className={`bg-transparent border-none p-0 ml-2`}
-              onClick={e => {
-                e.stopPropagation();
-                toggleSaveCourse(course._id);
-              }}
+              className={`bg-transparent border-none p-0 ml-2 ${savingCourse ? 'opacity-50 cursor-not-allowed' : ''}`}
+              onClick={e => toggleSaveCourse(course._id, e)}
+              disabled={savingCourse}
             >
-              <FaBookmark className={savedCourses.includes(course._id) ? "text-red-600" : "text-white"} />
+              <FaBookmark className={
+                savedCourses.includes(course._id)
+                  ? 'text-red-600'
+                  : theme === 'dark'
+                    ? 'text-white'
+                    : 'text-gray-400'
+              } />
             </button>
           </div>
         </div>
@@ -505,13 +543,27 @@ const Courses = () => {
     );
   };
 
-  console.log('newlyReleased:', newlyReleased);
+  const handleSubscribe = async () => {
+    if (!selectedPlan) return;
+    try {
+      navigate(`/subscription/${selectedPlan}`);
+    } catch (err) {
+      console.error('Error handling subscription:', err);
+    }
+  };
+
+  // Add plan selection handler
+  const handlePlanSelection = (planId) => {
+    setSelectedPlan(planId);
+  };
 
   return (
-    <div className={`${theme === 'dark' ? 'bg-[#121212] text-white' : 'bg-white text-black'} min-h-screen`} dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Category Hero Carousel (NEW) */}
-      <section className="py-12 px-6 mt-10">
-        <h2 className="text-3xl font-bold mb-8 text-right">تصنيفات الدورات التدريبية</h2>
+    <div className={`${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-black'} min-h-screen transition-colors duration-200`} dir={isRTL ? 'rtl' : 'ltr'}>
+      {/* Category Hero Carousel */}
+      <section className="mt-8 py-8 md:py-12 px-2 sm:px-4 md:px-8">
+        <h2 className={`text-2xl md:text-3xl font-bold mb-12 md:mb-16 ${isRTL ? 'text-right' : 'text-left'} ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+          {t('sections.categories')}
+        </h2>
         <div className="relative">
           <Slider {...categorySliderSettings}>
             {categories.map((category) => (
@@ -522,54 +574,39 @@ const Courses = () => {
           </Slider>
         </div>
       </section>
-      {/* Course Categories */}
-      {/* <section className="py-8 px-6">
-        <h2 className="text-2xl font-bold mb-4">Course Categories</h2>
-        <div className="flex overflow-x-auto space-x-4 scrollbar-hide pb-2">
-          {categories.map((category) => (
-            <button
-              key={category._id}
-              onClick={() => handleCategoryClick(category._id)}
-              className={`whitespace-nowrap px-6 py-3 rounded-full font-semibold text-base transition border-2 focus:outline-none ${selectedCategory === category._id ? 'bg-white text-black border-white' : 'bg-black text-white border-gray-700 hover:bg-gray-800'}`}
-            >
-              {category.name?.[currentLang] || category.name?.en || category.name}
-            </button>
-          ))}
-        </div>
-      </section> */}
-      {/* Picks Section */}
-      <section id="course-list-section" className="py-6 px-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">{t('Picks')}</h2>
-          <div className="flex items-center">
+
+      {/* Course List Section */}
+      <section id="course-list-section" className="py-8 md:py-12 px-2 sm:px-4 md:px-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-12">
+          <h2 className={`text-xl md:text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+            {t('sections.picks')}
+          </h2>
+          <div className="flex items-center w-full md:w-auto overflow-x-auto scrollbar-hide">
             {topicLoading ? (
               <div className="flex items-center gap-2">
                 <FaSpinner className="animate-spin" />
-                <span className="text-sm text-gray-400">{t('Loading topics...')}</span>
+                <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  {t('loading.topics')}
+                </span>
               </div>
             ) : topicError ? (
               <div className="text-red-500 text-sm">{topicError}</div>
             ) : (
-              <div className="flex items-center overflow-x-auto scrollbar-hide">
+              <div className="flex items-center gap-2 pb-2">
                 {topics.map((topic, index) => (
                   <React.Fragment key={topic._id}>
                     <button
-                      onClick={() => {
-                        console.log('Selected topic:', topic);
-                        handleTopicClick(topic._id);
-                      }}
-                      className={`
-                        text-sm mx-3 whitespace-nowrap transition-colors
-                        ${selectedTopic === topic._id
-                          ? 'text-[#00ffd0] font-semibold'
-                          : 'text-white hover:text-gray-300'}
+                      onClick={() => handleTopicClick(topic._id)}
+                      className={`whitespace-nowrap px-3 py-1 rounded-full transition-colors duration-300
+                        ${selectedTopic === topic._id 
+                          ? 'bg-[#00ffd0] text-black font-semibold' 
+                          : theme === 'dark' 
+                            ? 'text-white hover:bg-gray-800' 
+                            : 'text-gray-800 hover:bg-gray-100'}
                       `}
                     >
                       {getLocalizedText(topic.name)}
                     </button>
-                    {index < topics.length - 1 && (
-                      <div className="border-r border-gray-600 h-4" />
-                    )}
                   </React.Fragment>
                 ))}
               </div>
@@ -577,18 +614,16 @@ const Courses = () => {
           </div>
         </div>
         {topicCoursesLoading ? (
-          <div className="flex justify-center items-center py-8">
-            <FaSpinner className="animate-spin text-2xl text-[#00ffd0]" />
+          <div className="flex justify-center items-center py-12">
+            <FaSpinner className="animate-spin text-3xl text-[#00ffd0]" />
           </div>
         ) : filteredPicks.length === 0 ? (
-          <div className="text-center py-8 text-gray-400">
-            {selectedTopic
-              ? t('No courses found for this topic')
-              : t('No courses available')}
+          <div className={`text-center py-12 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+            {selectedTopic ? t('messages.noCoursesForTopic') : t('messages.noCoursesAvailable')}
           </div>
         ) : (
           filteredPicks.length < 4 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredPicks.map((course, idx) => (
                 <CourseCard key={idx} course={course} />
               ))}
@@ -602,87 +637,85 @@ const Courses = () => {
           )
         )}
       </section>
+
       {/* Trending Courses */}
-      <section className="py-6 px-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">{t('Trending Courses')}</h2>
-          <button onClick={() => navigate('/all-courses')} className="text-gray-400 hover:text-white">
-            {t('View all')}
+      <section className="py-8 md:py-12 px-2 sm:px-4 md:px-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-12">
+          <h2 className={`text-xl md:text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+            {t('sections.trending')}
+          </h2>
+          <button 
+            onClick={() => navigate('/all-courses')} 
+            className={`${theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors duration-200 flex items-center gap-1`}
+          >
+            {t('buttons.viewAll')} <span className="ml-1">&rarr;</span>
           </button>
         </div>
         <Slider {...sliderSettings}>
           {getFiltered(trending).map((course, idx) => <CourseCard key={idx} course={course} />)}
         </Slider>
       </section>
+
       {/* Newly Released */}
-      <section className="py-6 px-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">{t('Newly Released')}</h2>
-          <button onClick={() => navigate('/all-courses')} className="text-gray-400 hover:text-white flex items-center gap-1">
-            {t('View all')} <span className="ml-1">&rarr;</span>
+      <section className="py-8 md:py-12 px-2 sm:px-4 md:px-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-12">
+          <h2 className={`text-xl md:text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+            {t('sections.newlyReleased')}
+          </h2>
+          <button 
+            onClick={() => navigate('/all-courses')} 
+            className={`${theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors duration-200 flex items-center gap-1`}
+          >
+            {t('buttons.viewAll')} <span className="ml-1">&rarr;</span>
           </button>
         </div>
-        <Slider {...newlyReleasedSliderSettings} className="newly-released-slider">
-          {getFiltered(newlyReleased).map((course, idx) => (
-            <div key={idx} className="px-3 py-3">
-              <NewlyReleasedCard course={course} />
-            </div>
-          ))}
-        </Slider>
-      </section>
-      {/* Start with Free Courses */}
-      <section className="py-6 px-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">{t('Start with free courses')}</h2>
-          <button onClick={() => navigate('/all-courses')} className="text-gray-400 hover:text-white">
-            {t('View all')}
-          </button>
+        <div className="newly-released-slider">
+          <Slider {...newlyReleasedSliderSettings}>
+            {getFiltered(newlyReleased).map((course, idx) => (
+              <div key={idx} className="p-2">
+                <NewlyReleasedCard course={course} />
+              </div>
+            ))}
+          </Slider>
         </div>
-        <Slider {...sliderSettings}>
-          {getFiltered(freeCourses).map((course, idx) => <CourseCard key={idx} course={course} />)}
-        </Slider>
       </section>
+
       {/* Subscription Section */}
-      <section className="py-8 px-6 bg-[#101c1c] my-8 rounded-xl max-w-6xl mx-auto flex items-center justify-between relative overflow-visible">
-        {/* Left: Title, subtitle, button */}
-        <div className="flex-1 min-w-[260px]">
-          <h2 className="text-lg md:text-xl font-bold mb-1">{t('Subscribe for a great price')}</h2>
-          <p className="text-gray-400 mb-4 text-sm md:text-base">
-            {t('And get access to all almentor courses whenever you like')}
+      <section className={`${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-gray-100'} rounded-xl p-6 md:p-10 my-8 max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 transition-colors duration-200`}>
+        <div className="flex-1 min-w-[260px] mb-12 md:mb-16">
+          <h2 className={`text-lg md:text-xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+            {t('sections.subscription.title')}
+          </h2>
+          <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} mb-4 text-sm md:text-base`}>
+            {t('sections.subscription.description')}
           </p>
           <button
             onClick={handleSubscribe}
             disabled={!selectedPlan || subscriptionLoading}
-            className={`
-              bg-transparent border border-gray-400 text-white px-4 py-2 rounded 
-              transition hover:bg-gray-800
-              ${(!selectedPlan || subscriptionLoading) ? 'opacity-50 cursor-not-allowed' : ''}
-            `}
+            className={`px-6 py-3 rounded-lg border-2 transition font-semibold text-base
+              ${theme === 'dark' ? 'bg-transparent border-[#00ffd0] text-[#00ffd0] hover:bg-[#00ffd0]/10' : 'bg-transparent border-[#00ffd0] text-black hover:bg-[#00ffd0]/10'}
+              ${(!selectedPlan || subscriptionLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             {subscriptionLoading ? (
               <span className="flex items-center gap-2">
                 <FaSpinner className="animate-spin" />
-                {t('Loading...')}
+                {t('loading.general')}
               </span>
             ) : (
-              t('Choose Plan')
+              t('buttons.choosePlan')
             )}
           </button>
         </div>
-
-        {/* Center: Plans */}
-        <div className="flex-1 flex justify-center items-center gap-2 md:gap-4">
+        <div className="flex-1 flex flex-wrap justify-center gap-4">
           {subscriptionLoading ? (
             <div className="flex items-center justify-center w-full py-8">
               <FaSpinner className="animate-spin text-2xl text-[#00ffd0]" />
             </div>
           ) : subscriptionError ? (
-            <div className="text-red-500 text-center w-full">
-              {subscriptionError}
-            </div>
+            <div className="text-red-500 text-center w-full">{subscriptionError}</div>
           ) : subscriptionPlans.length === 0 ? (
-            <div className="text-gray-400 text-center w-full">
-              {t('No subscription plans available')}
+            <div className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} text-center w-full`}>
+              {t('messages.noSubscriptionPlans')}
             </div>
           ) : (
             subscriptionPlans.map((plan) => {
@@ -691,37 +724,38 @@ const Courses = () => {
               const oldPrice = typeof plan.oldPrice === 'object' ? plan.oldPrice.amount : plan.oldPrice;
               const currency = typeof plan.price === 'object' ? plan.price.currency : plan.currency || 'EGP';
               const period = plan.period || 'mo';
-
               return (
                 <div
                   key={plan._id}
                   onClick={() => handlePlanSelection(plan._id)}
-                  className={`
-                    cursor-pointer transition
-                    ${isSelected
-                      ? 'bg-[#1e2b2b] border-2 border-[#00ffd0] shadow-lg'
-                      : 'bg-[#181f1f] border-2 border-transparent'}
-                    rounded-lg p-4 w-32 md:w-40 flex flex-col items-center relative
-                  `}
+                  className={`cursor-pointer transition-all duration-300 rounded-lg p-4 w-32 md:w-40 flex flex-col items-center relative
+                    ${isSelected ? (theme === 'dark' ? 'bg-[#1e2b2b] border-2 border-[#00ffd0] shadow-lg' : 'bg-white border-2 border-[#00ffd0] shadow-lg') : (theme === 'dark' ? 'bg-[#181f1f] border-2 border-transparent' : 'bg-gray-100 border-2 border-transparent')}`}
+                  tabIndex={0}
+                  aria-pressed={isSelected}
+                  onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') handlePlanSelection(plan._id); }}
                 >
-                  <p className="text-xs mb-1 text-gray-300">{getLocalizedText(plan.name)}</p>
+                  <p className={`text-xs mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {getLocalizedText(plan.name)}
+                  </p>
                   <div className="flex items-baseline mb-1">
                     {oldPrice && (
-                      <span className="text-xs text-gray-500 line-through mr-1">
+                      <span className={`text-xs line-through mr-1 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
                         {oldPrice} {currency}
                       </span>
                     )}
-                    <span className={`text-xl md:text-2xl font-bold ${isSelected ? 'text-[#00ffd0]' : ''}`}>
+                    <span className={`text-xl md:text-2xl font-bold ${isSelected ? 'text-[#00ffd0]' : (theme === 'dark' ? 'text-white' : 'text-black')}`}>
                       {price}
                     </span>
-                    <span className="text-xs text-gray-400 ml-1">
+                    <span className={`text-xs ml-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                       {currency}/{period}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-400">{getLocalizedText(plan.description)}</p>
+                  <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                    {getLocalizedText(plan.description)}
+                  </p>
                   {plan.isBestValue && isSelected && (
                     <span className="absolute top-2 right-2 bg-[#00ffd0] text-black text-[10px] font-bold px-2 py-0.5 rounded-full">
-                      {t('Best Value')}
+                      {t('labels.bestValue')}
                     </span>
                   )}
                 </div>
@@ -730,19 +764,12 @@ const Courses = () => {
           )}
         </div>
       </section>
-      {/* Popular Courses */}
-      <section className="py-6 px-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">Popular Courses</h2>
-          <button onClick={() => navigate('/all-courses')} className="text-gray-400 hover:text-white">View all</button>
-        </div>
-        <Slider {...sliderSettings}>
-          {getFiltered(allCourses).map((course, idx) => <CourseCard key={idx} course={course} />)}
-        </Slider>
-      </section>
+
       {/* Instructors Section */}
-      <section className="py-10 px-6 mx-auto mt-6">
-        <h2 className="text-2xl font-bold mb-6">Our Instructors</h2>
+      <section className="py-8 md:py-12 px-2 sm:px-4 md:px-8">
+        <h2 className={`text-2xl font-bold mb-12 md:mb-16 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+          {t('sections.instructors')}
+        </h2>
         <div className="max-w-6xl mx-auto">
           <Slider {...sliderSettings}>
             {instructors.map((instructor, index) => (
@@ -751,11 +778,11 @@ const Courses = () => {
           </Slider>
         </div>
         <div className="text-center mt-8">
-          <button
-            className="rounded px-6 py-2 border border-white text-white hover:bg-white hover:text-black transition"
+          <button 
             onClick={() => navigate('/instructors')}
+            className={`rounded px-6 py-2 border transition-all duration-200 ${theme === 'dark' ? 'border-white text-white hover:bg-white hover:text-black' : 'border-black text-black hover:bg-black hover:text-white'}`}
           >
-            See all instructors
+            {t('buttons.seeAllInstructors')}
           </button>
         </div>
       </section>
