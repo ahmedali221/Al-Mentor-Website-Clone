@@ -7,8 +7,8 @@ import LoginPage from './pages/LoginPage.jsx';
 import PasswordPage from './pages/PasswordPage.jsx';
 import SignupPage from './pages/SignupPage.jsx';
 import SignEmail from './pages/SignEmail.jsx';
-import Home from './components/Home/home.jsx';
-import Instructors from './pages/Instructors.jsx';
+import Home from './components/Home/Home.jsx'; // Update Home casing
+import Instructors from './pages/Instructors'; // Remove .jsx extension
 import { ThemeProvider } from './context/ThemeContext.jsx';
 import { MyCoursesProvider } from './context/MyCoursesContext.jsx';
 import './i18n/config';
@@ -26,14 +26,14 @@ import CertificatePage from './components/Certificate/CertificatePage.jsx';
 import SavedCourses from './components/Courses/SavedCourses.jsx';
 import Profile from './components/Profile/Profile.jsx';
 import BecomeInstructor from './pages/BecomeInstructor.jsx';
-import Home2 from './components/Home2/home2.jsx';
+import Home2 from './components/Home2/Home2.jsx'; // Update Home2 casing
 import ProgramDetailPage from './pages/ProgramDetailPage.jsx';
 import InstructorDetails from './pages/InstructorDetails.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 import AIChatPage from './pages/AIChatPage.jsx';
 import Subscribe from './pages/Subscribe.jsx';
-import InstructorDashboard from './pages/InstructorDashbaord.jsx';
+import InstructorDashboard from './pages/InstructorDashboard.jsx'; // Fix typo in filename
 import PaymentPage from './pages/PaymentPage.jsx';
 import InstructorSessionChat from './components/InstructorSession/InstructorSessionChat.jsx';
 import SessionHistory from './components/InstructorSession/SessionHistory.jsx';
