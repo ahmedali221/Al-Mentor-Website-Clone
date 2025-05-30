@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
-import { RiArrowDropDownLine, RiRobot2Line } from 'react-icons/ri';
+import { RiArrowDropDownLine, RiRobot2Line, RiArrowDropLeftLine, RiArrowDropRightLine } from 'react-icons/ri';
 import { CiSearch } from 'react-icons/ci';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
@@ -20,6 +20,9 @@ const Navbar = () => {
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const [searchResults, setSearchResults] = useState({ courses: [], instructors: [], programs: [] });
   const [allData, setAllData] = useState({ courses: [], instructors: [], programs: [] });
+  const [categories, setCategories] = useState([]);
+  const [showCoursesDropdown, setShowCoursesDropdown] = useState(false);
+  const coursesDropdownRef = useRef(null);
   const searchDropdownRef = useRef(null);
   const searchInputRef = useRef(null);
   const isRTL = i18n.language === 'ar';
@@ -27,15 +30,21 @@ const Navbar = () => {
   const currentLang = i18n.language;
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef(null);
+  const [hoveredCategory, setHoveredCategory] = useState(null);
+  const [isDropdownHovered, setIsDropdownHovered] = useState(false);
+  const panelWidth = 440;
+  const coursesPanelWidth = 700;
+  const panelHeight = 750;
 
   // Fetch all data on component mount
   useEffect(() => {
     const fetchAllData = async () => {
       try {
-        const [coursesRes, instructorsRes, programsRes] = await Promise.all([
+        const [coursesRes, instructorsRes, programsRes, categoriesRes] = await Promise.all([
           axios.get('/api/courses'),
           axios.get('/api/instructors'),
-          axios.get('/api/programs')
+          axios.get('/api/programs'),
+          axios.get('/api/category')
         ]);
 
         setAllData({
@@ -43,6 +52,7 @@ const Navbar = () => {
           instructors: instructorsRes.data.data || instructorsRes.data,
           programs: programsRes.data.data || programsRes.data
         });
+        setCategories(categoriesRes.data.data || categoriesRes.data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -115,56 +125,6 @@ const Navbar = () => {
     i18n.changeLanguage(newLang);
   };
 
-  const navigationItems = [
-    {
-      name: t('navigation.courses'),
-      href: '/courses',
-      icon: RiArrowDropDownLine,
-      showWhen: 'authenticated',
-    },
-    {
-      name: t('navigation.instructors'),
-      href: '/instructors',
-      icon: RiRobot2Line,
-      showWhen: 'authenticated',
-    },
-    {
-      name: t('navigation.programs'),
-      href: '/programs',
-      icon: RiRobot2Line,
-      showWhen: 'authenticated',
-    },
-    {
-      name: t('navigation.aiChat'),
-      href: '/AIChatPage',
-      icon: RiRobot2Line,
-      showWhen: 'authenticated',
-      badge: t('badges.new'),
-    },
-    {
-      name: t('navigation.subscribe'),
-      href: '/subscribe',
-      icon: RiRobot2Line,
-      showWhen: 'authenticated',
-    },
-    {
-      name: t('navigation.mySessions'),
-      href: '/my-sessions',
-      icon: ChatBubbleLeftRightIcon,
-      showWhen: 'authenticated',
-      badge: t('badges.new'),
-    },
-    {
-      name: t('navigation.instructorSessions'),
-      href: '/instructor-sessions',
-      icon: AcademicCapIcon,
-      showWhen: 'instructor',
-    },
-  ];
-
-  // Keep the same order for both English and Arabic - only change flex direction
-  const orderedNavigationItems = navigationItems;
-
   const handleLogout = () => {
     logout();
     localStorage.removeItem('token');
@@ -184,64 +144,170 @@ const Navbar = () => {
         searchDropdownRef.current &&
         !searchDropdownRef.current.contains(event.target) &&
         searchInputRef.current &&
-        !searchInputRef.current.contains(event.target) &&
-        searchDropdownRef.current
+        !searchInputRef.current.contains(event.target)
       ) {
         setShowSearchDropdown(false);
+      }
+      if (
+        coursesDropdownRef.current &&
+        !coursesDropdownRef.current.contains(event.target)
+      ) {
+        setShowCoursesDropdown(false);
       }
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setIsProfileOpen(false);
       }
     }
-    if (showSearchDropdown) {
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
+    document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showSearchDropdown, searchDropdownRef, searchInputRef]);
+  }, []);
 
   return (
     <nav
       className={`fixed top-0 left-0 right-0 px-4 py-4 z-50 shadow transition-all duration-300 text-lg font-medium ${theme === 'dark' ? 'bg-[#1a1a1a] text-white' : 'bg-white text-black'}`}
     >
-      <div className={`flex items-center justify-start gap-12 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
+      <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
         {/* Logo */}
-        <div className="flex items-center text-3xl ml-4">
+        <div className="flex items-center text-3xl">
           <img src="/logo.jpeg" alt="Almentor Logo" className={`h-12 w-auto ${isRTL ? 'ml-2' : 'mr-2'}`} />
           <a href="/" className="text-3xl font-semibold">
             Almentor
           </a>
         </div>
 
-        <ul className={`flex items-center ml-1 ${isRTL ? 'space-x-reverse space-x-6' : 'space-x-6'} text-1xl font-medium`}>
-          {orderedNavigationItems.map((item) => (
-            <li key={item.name} className={`relative ${item.showWhen === 'authenticated' ? '' : 'hidden'}`}>
-              <Link to={item.href} className="hover:text-red-500 flex items-center relative">
-                {item.name}
-                {item.badge && (
-                  <span className="absolute -top-2 -right-2 px-1.5 py-0.5 text-[10px] font-bold bg-red-500 text-white rounded-full transform translate-x-1/2 -translate-y-1/2">
-                    {item.badge}
-                  </span>
-                )}
-              </Link>
-            </li>
-          ))}
-
-          <li className={`${isRTL ? 'mx-10' : 'mx-10'}`}>
-            <Link
-              to="/subscribe"
-              className={`rounded px-6 text-2xl py-2 border-2 transition ${theme === 'dark'
-                ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
-                : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
-                }`}
+        {/* Navigation Items */}
+        <ul className={`flex items-center ${isRTL ? 'flex-row-reverse space-x-reverse space-x-6' : 'flex-row space-x-6'} text-1xl font-medium`}>
+          {/* Courses Dropdown */}
+          <li>
+            <div
+              ref={coursesDropdownRef}
+              className="relative"
+              onMouseEnter={() => { setShowCoursesDropdown(true); setIsDropdownHovered(true); }}
+              onMouseLeave={() => { setIsDropdownHovered(false); setTimeout(() => { if (!isDropdownHovered) { setShowCoursesDropdown(false); setHoveredCategory(null); } }, 100); }}
             >
-              {t('buttons.subscribe')}
+              <Link to="/courses" className="hover:text-red-500 flex items-center relative">
+                {t('navigation.courses')}
+                <RiArrowDropDownLine className="ml-1" />
+              </Link>
+              {showCoursesDropdown && (
+                <div
+                  className={`absolute ${isRTL ? 'right-0' : 'left-0'} mt-2 z-50 flex rounded-2xl shadow-2xl`
+                    + ` ${theme === 'dark' ? 'bg-[#232323] text-white' : 'bg-white text-black'}`}
+                  style={{ minWidth: `${panelWidth + coursesPanelWidth}px`, height: `${panelHeight}px`, width: `${panelWidth + coursesPanelWidth}px` }}
+                  onMouseEnter={() => setIsDropdownHovered(true)}
+                  onMouseLeave={() => { setIsDropdownHovered(false); setHoveredCategory(null); setShowCoursesDropdown(false); }}
+                >
+                  {/* Categories Panel */}
+                  <div className={`flex flex-col justify-between ${theme === 'dark' ? 'bg-[#232323]' : 'bg-white'}`}
+                    style={{ width: `${panelWidth}px`, height: `${panelHeight}px`, borderTopRightRadius: '20px', borderBottomRightRadius: '20px' }}>
+                    <div>
+                      <div className={`px-10 pt-8 pb-6 text-2xl font-bold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{t('navigation.categories')}</div>
+                      <div className="flex flex-col overflow-y-auto" style={{ maxHeight: `${panelHeight - 140}px` }}>
+                        {categories.map((category) => (
+                          <div
+                            key={category._id}
+                            className={`flex items-center justify-between px-10 py-5 text-xl cursor-pointer transition-colors ${theme === 'dark' ? 'hover:bg-[#18191a]' : 'hover:bg-gray-100'}`}
+                            onMouseEnter={() => setHoveredCategory(category._id)}
+                            style={{ color: theme === 'dark' ? '#fff' : '#222', background: theme === 'dark' ? 'inherit' : 'inherit' }}
+                          >
+                            <span>{getLocalizedText(category.name)}</span>
+                            {isRTL ? (
+                              <RiArrowDropLeftLine size={32} className={theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} />
+                            ) : (
+                              <RiArrowDropRightLine size={32} className={theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="px-10 pb-8">
+                      <Link
+                        to="/courses"
+                        className={`block w-full text-center py-4 rounded-lg text-xl font-semibold transition-colors ${theme === 'dark' ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-red-600 hover:bg-red-700 text-white'}`}
+                        onClick={() => { setShowCoursesDropdown(false); setHoveredCategory(null); }}
+                      >
+                        {t('navigation.viewAllCourses')}
+                      </Link>
+                    </div>
+                  </div>
+                  {/* Courses Panel */}
+                  <div className={`flex flex-col justify-between ${theme === 'dark' ? 'bg-[#18191a]' : 'bg-gray-50'}`}
+                    style={{ width: `${coursesPanelWidth}px`, height: `${panelHeight}px`, borderTopLeftRadius: '20px', borderBottomLeftRadius: '20px' }}>
+                    <div>
+                      <div className={`px-10 pt-8 pb-6 text-2xl font-bold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{hoveredCategory ? getLocalizedText(categories.find(c => c._id === hoveredCategory)?.name) : t('navigation.courses')}</div>
+                      <div className="flex flex-col gap-3 max-h-[570px] overflow-y-auto px-6">
+                        {(hoveredCategory && allData.courses.filter(course => course.category === hoveredCategory).length === 0) ? (
+                          <div className="px-4 py-12 text-gray-400 text-center text-lg">{t('messages.noCoursesForTopic') || 'No courses available for this category'}</div>
+                        ) : (
+                          allData.courses.filter(course => course.category === hoveredCategory).slice(0, 8).map(course => {
+                            const instructor = course.instructorDetails?.profile || course.instructorDetails || {};
+                            const instructorName = `${getLocalizedText(instructor.firstName)} ${getLocalizedText(instructor.lastName)}`.trim();
+                            return (
+                              <Link
+                                key={course._id}
+                                to={`/courses/${course._id}`}
+                                className={`flex items-center gap-5 px-2 py-4 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-[#232323]' : 'hover:bg-gray-100'} ${isRTL ? 'flex-row-reverse' : ''}`}
+                                onClick={() => { setShowCoursesDropdown(false); setHoveredCategory(null); }}
+                                style={{ color: theme === 'dark' ? '#fff' : '#222', background: theme === 'dark' ? 'inherit' : 'inherit' }}
+                              >
+                                <div className="flex-shrink-0 w-64 h-36 bg-white rounded-xl flex items-center justify-center overflow-hidden">
+                                  <img src={course.thumbnail || '/default-course-img.png'} alt={getLocalizedText(course.title)} className="w-full h-full object-cover rounded-xl" />
+                                </div>
+                                <div className={`flex flex-col flex-1 ${isRTL ? 'items-end' : ''}`}>
+                                  <span className="font-semibold text-lg line-clamp-1">{getLocalizedText(course.title)}</span>
+                                  <span className="text-sm text-gray-400 mt-1 line-clamp-1">{instructorName}</span>
+                                </div>
+                              </Link>
+                            );
+                          })
+                        )}
+                      </div>
+                    </div>
+                    <div className="px-10 pb-8 text-center">
+                      <Link
+                        to={hoveredCategory ? `/categories/${hoveredCategory}` : '/courses'}
+                        className={`text-blue-400 hover:underline text-lg font-medium`}
+                        onClick={() => { setShowCoursesDropdown(false); setHoveredCategory(null); }}
+                      >
+                        {t('navigation.showAll') || 'اعرض الكل'}
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </li>
+          {/* Instructors */}
+          <li><Link to="/instructors" className="hover:text-red-500">{t('navigation.instructors')}</Link></li>
+          {/* Programs with badge */}
+          <li className="relative">
+            <Link to="/programs" className="hover:text-red-500 flex items-center">
+              {t('navigation.programs')}
+              <span className="ml-1 px-2 py-0.5 text-xs font-bold bg-red-500 text-white rounded-full">{t('badges.new')}</span>
             </Link>
+          </li>
+          {/* Sessions with badge */}
+          <li className="relative">
+            <Link to="/my-sessions" className="hover:text-red-500 flex items-center">
+              {t('navigation.mySessions')}
+              <span className="ml-1 px-2 py-0.5 text-xs font-bold bg-red-500 text-white rounded-full">{t('badges.new')}</span>
+            </Link>
+          </li>
+          {/* AI Chat with badge */}
+          <li className="relative">
+            <Link to="/AIChatPage" className="hover:text-red-500 flex items-center">
+              {t('navigation.aiChat')}
+              <span className="ml-1 px-2 py-0.5 text-xs font-bold bg-red-500 text-white rounded-full">{t('badges.new')}</span>
+            </Link>
+          </li>
+          {/* Subscribe outlined button */}
+          <li>
+            <Link to="/subscribe" className={`rounded px-6 text-2xl py-2 border-2 transition ${theme === 'dark' ? 'bg-transparent text-white border-white hover:bg-white hover:text-black' : 'bg-transparent text-black border-black hover:bg-black hover:text-white'}`}>{t('navigation.subscribe')}</Link>
           </li>
         </ul>
 
-        <div className={`flex items-center ${isRTL ? 'mr-8' : 'ml-8'} ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
+        {/* Search Bar */}
+        <div className="mx-6 flex-1 max-w-xl">
           <div className="relative">
             <input
               type="text"
@@ -260,7 +326,7 @@ const Navbar = () => {
             {showSearchDropdown && (
               <div
                 ref={searchDropdownRef}
-                className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 w-[360px] max-h-96 overflow-y-auto rounded-md shadow-lg z-50 ${theme === 'dark' ? 'bg-[#232323] text-white' : 'bg-white text-black'}`}
+                className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 w-[520px] max-h-[520px] overflow-y-auto rounded-md shadow-lg z-50 ${theme === 'dark' ? 'bg-[#232323] text-white' : 'bg-white text-black'}`}
                 style={{ direction: isRTL ? 'rtl' : 'ltr' }}
               >
                 {searchResults.courses.length === 0 && searchResults.instructors.length === 0 && searchResults.programs.length === 0 ? (
@@ -341,26 +407,21 @@ const Navbar = () => {
               </div>
             )}
           </div>
+        </div>
 
-          <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
-            <button
-              onClick={toggleTheme}
-              className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors
-                ${theme === 'dark' ? 'bg-gray-800 hover:bg-gray-700' : 'bg-gray-100 hover:bg-gray-200'}`}
-            >
-              {theme === 'dark' ? <FaSun className="text-yellow-400" /> : <FaMoon className="text-gray-700" />}
-            </button>
-
-            <button
-              onClick={toggleLanguage}
-              className={`w-10 h-10 rounded-full text-xl font-medium flex items-center justify-center transition-colors
-                ${theme === 'dark' ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-            >
-              {i18n.language === 'en' ? 'ع' : 'EN'}
-            </button>
-          </div>
-
-          {isAuthenticated ? (
+        {/* Actions: Language, Theme, Auth */}
+        <div className={`flex items-center ${isRTL ? 'flex-row-reverse space-x-reverse space-x-4' : 'flex-row space-x-4'}`}>
+          {/* Language Toggle */}
+          <button onClick={toggleLanguage} className={`w-10 h-10 rounded-full text-xl font-medium flex items-center justify-center transition-colors ${theme === 'dark' ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>{i18n.language === 'en' ? 'ع' : 'EN'}</button>
+          {/* Theme Toggle */}
+          <button onClick={toggleTheme} className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${theme === 'dark' ? 'bg-gray-800 hover:bg-gray-700' : 'bg-gray-100 hover:bg-gray-200'}`}>{theme === 'dark' ? <FaSun className="text-yellow-400" /> : <FaMoon className="text-gray-700" />}</button>
+          {/* Auth Buttons */}
+          {!isAuthenticated ? (
+            <>
+              <Link to="/loginPage" className={`text-sm transition-colors ${theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-black'}`}>{t('common.login')}</Link>
+              <Link to="/subscribe" className={`bg-red-500 text-white px-5 py-2 rounded transition-colors hover:bg-red-600 text-sm text-center`}>{t('common.signup')}</Link>
+            </>
+          ) : (
             <div className="relative" ref={profileRef}>
               <button
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -463,24 +524,6 @@ const Navbar = () => {
                   </div>
                 </div>
               )}
-            </div>
-          ) : (
-            <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
-              <Link
-                to="/loginPage"
-                className={`text-sm transition-colors ${theme === 'dark'
-                  ? 'text-gray-300 hover:text-white'
-                  : 'text-gray-600 hover:text-black'
-                  }`}
-              >
-                {t('common.login')}
-              </Link>
-              <Link
-                to="/subscribe"
-                className={`bg-red-500 text-white px-5 py-2 rounded transition-colors hover:bg-red-600 text-sm text-center`}
-              >
-                {t('common.signup')}
-              </Link>
             </div>
           )}
         </div>
