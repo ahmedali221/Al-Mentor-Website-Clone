@@ -75,7 +75,7 @@ function PasswordPage() {
 
     return (
         <>
-            <div className={`flex justify-center items-center min-h-screen pt-16 ${theme === 'dark' ? 'bg-[#1A1A1A] text-white' : 'bg-gray-50 text-gray-900'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+            <div className={`flex justify-center items-center min-h-screen pt-28 pb-12 ${theme === 'dark' ? 'bg-[#1A1A1A] text-white' : 'bg-gray-50 text-gray-900'}`} dir={isRTL ? 'rtl' : 'ltr'}>
                 <form onSubmit={handleSubmit} className='flex flex-col gap-3 w-100'>
                     <h1 className='text-3xl font-semibold mb-4 text-center w-96 mx-auto'>{t('auth.welcomeBack', 'Welcome back!')}</h1>
 

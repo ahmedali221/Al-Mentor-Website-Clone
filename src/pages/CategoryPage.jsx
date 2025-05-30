@@ -148,10 +148,10 @@ const CategoryPage = () => {
   const bannerImage = category?.image || defaultIllustration;
 
   return (
-    <div className={`${theme === 'dark' ? 'bg-[#121212] text-white' : 'bg-gray-50 text-black'} min-h-screen pt-24`} dir="ltr">
+    <div className={`${theme === 'dark' ? 'bg-[#121212] text-white' : 'bg-gray-50 text-black'} min-h-screen pt-28 pb-12`} dir="ltr">
       {/* Gradient Banner */}
       <div className={`w-full bg-gradient-to-b ${theme === 'dark' ? 'from-[#23272F] to-[#121212]' : 'from-[#eaf6fa] to-[#fff]'} pb-8`}>
-        <div className="max-w-6xl mx-auto pt-12 px-6">
+        <div className="max-w-6xl mx-auto pt-12 px-2">
           <h1 className="text-4xl font-bold mb-8 text-left">{category?.name?.en || category?.name?.ar || ''}</h1>
         </div>
         {/* Promo Card */}
@@ -165,12 +165,12 @@ const CategoryPage = () => {
         </div>
       </div>
       {/* Filters and Sort */}
-      <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-4 mt-12 px-6">
+      <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-4 mt-12 px-2">
         <div className="flex items-center gap-4">
           <span className="text-lg font-semibold">Filter by</span>
-          <select 
-            value={level} 
-            onChange={e => setLevel(e.target.value)} 
+          <select
+            value={level}
+            onChange={e => setLevel(e.target.value)}
             className={`${theme === 'dark' ? 'bg-[#23272F] text-white' : 'bg-gray-200 text-black'} rounded-full px-6 py-2 text-base focus:outline-none`}
           >
             <option value="all">Course Level</option>
@@ -178,9 +178,9 @@ const CategoryPage = () => {
             <option value="intermediate">Intermediate</option>
             <option value="advanced">Advanced</option>
           </select>
-          <select 
-            value={language} 
-            onChange={e => setLanguage(e.target.value)} 
+          <select
+            value={language}
+            onChange={e => setLanguage(e.target.value)}
             className={`${theme === 'dark' ? 'bg-[#23272F] text-white' : 'bg-gray-200 text-black'} rounded-full px-6 py-2 text-base focus:outline-none`}
           >
             <option value="all">Language</option>
@@ -190,9 +190,9 @@ const CategoryPage = () => {
         </div>
         <div className="flex items-center gap-4">
           <span className="text-lg font-semibold">Sort by</span>
-          <select 
-            value={sort} 
-            onChange={e => setSort(e.target.value)} 
+          <select
+            value={sort}
+            onChange={e => setSort(e.target.value)}
             className={`${theme === 'dark' ? 'bg-[#23272F] text-white' : 'bg-gray-200 text-black'} rounded-full px-6 py-2 text-base focus:outline-none`}
           >
             <option value="newest">Newest to oldest</option>
@@ -201,15 +201,15 @@ const CategoryPage = () => {
         </div>
       </div>
       {/* Courses Grid */}
-      <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-12 px-6">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-12 px-2">
         {filteredCourses.map(course => {
           const title = course.title?.en || course.title?.ar || '';
           const instructorName = course.instructorDetails?.profile?.firstName?.en || course.instructorDetails?.profile?.firstName?.ar || '';
           const instructorLast = course.instructorDetails?.profile?.lastName?.en || course.instructorDetails?.profile?.lastName?.ar || '';
           const isSaved = savedCourses.includes(course._id);
           return (
-            <div 
-              key={course._id} 
+            <div
+              key={course._id}
               className={`${theme === 'dark' ? 'bg-[#181f1f]' : 'bg-white'} rounded-2xl overflow-hidden shadow-lg flex flex-col transition hover:scale-[1.03] hover:shadow-2xl cursor-pointer`}
               onClick={() => navigate(`/courses/${course._id}`)}
             >

@@ -28,7 +28,7 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [savedCourses, setSavedCourses] = useState([]);
   const [savingCourse, setSavingCourse] = useState(false);
-  
+
   const [freeCourses, setFreeCourses] = useState([]);
   const [trendingCourses, setTrendingCourses] = useState([]);
   const [loadingFreeCourses, setLoadingFreeCourses] = useState(true);
@@ -38,19 +38,19 @@ const Home = () => {
   useEffect(() => {
     const fetchSavedCourses = async () => {
       if (!user) return;
-      
+
       try {
         const response = await fetch(`http://localhost:5000/api/saved-courses/user/${user._id}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
-        
+
         if (!response.ok) throw new Error('Failed to fetch saved courses');
-        
+
         const data = await response.json();
         setSavedCourses(data.map(item => item.courseId._id));
-      // eslint-disable-next-line no-unused-vars
+        // eslint-disable-next-line no-unused-vars
       } catch (err) {
         toast.error(t('Failed to fetch saved courses'));
       }
@@ -62,7 +62,7 @@ const Home = () => {
   // Toggle save/unsave course
   const toggleSaveCourse = async (courseId, e) => {
     e.stopPropagation();
-    
+
     if (!user) {
       navigate('/loginPage');
       return;
@@ -155,13 +155,13 @@ const Home = () => {
         const courseData = res.data.data || res.data;
         setAllCourses(courseData);
         setCourses(courseData);
-        
+
         // Filter for free courses
         setLoadingFreeCourses(true);
         const free = courseData.filter(course => course.isFree);
         setFreeCourses(free);
         setLoadingFreeCourses(false);
-        
+
         // Filter for trending courses
         setLoadingTrendingCourses(true);
         const trending = courseData.slice(0, 10);
@@ -262,8 +262,8 @@ const Home = () => {
     if (!course) return null;
 
     const title = getLocalizedText(course?.title);
-    const instructorProfile = course.instructorDetails?.profile || 
-                             (course.instructor?.user || course.instructor || {});
+    const instructorProfile = course.instructorDetails?.profile ||
+      (course.instructor?.user || course.instructor || {});
     const instructorName = instructorProfile
       ? `${getLocalizedText(instructorProfile.firstName)} ${getLocalizedText(instructorProfile.lastName)}`
       : 'Unknown Instructor';
@@ -320,19 +320,16 @@ const Home = () => {
   return (
     <div className={containerClassName} dir={isRTL ? "rtl" : "ltr"}>
       {/* Banner Section */}
-      <section className={`relative px-6 pt-32 ${theme === "dark" ? "bg-[#121212]" : "bg-white"}`}>
+      <section className={`relative px-20 pt-32 ${theme === "dark" ? "bg-[#121212]" : "bg-white"}`}>
         <div
-          className="relative rounded-xl overflow-hidden mx-auto"
-          style={{
-            maxWidth: "1200px",
-            margin: "auto",
-          }}
+          className="relative rounded-xl overflow-hidden max-w-[1500] mx-auto"
+
         >
           <img
             src="/authorized-home-banner.jpg"
             alt="banner"
             className="w-full h-auto object-cover opacity-60 rounded-xl"
-            style={{ maxHeight: "500px" }}
+            style={{ maxHeight: "800px" }}
           />
           <div className="absolute inset-0 flex flex-col justify-center items-start p-10 text-white z-10">
             <h1 className={`text-4xl font-bold mb-4 leading-none ${theme === "dark" ? "text-white" : "text-black"}`}>
@@ -350,14 +347,14 @@ const Home = () => {
       </section>
 
       {/* Trending Courses Section */}
-      <section className="py-20 px-6">
-        <div className="flex justify-between items-center mb-6 max-w-6xl mx-auto">
+      <section className="py-20 px-20">
+        <div className="flex justify-between items-center mb-6 max-w-[1500] mx-auto">
           <h2 className="text-3xl font-bold px-10">{t('home.trend')}</h2>
-          <button 
-            onClick={() => navigate('/all-courses')} 
+          <button
+            onClick={() => navigate('/all-courses')}
             className={`text-sm px-10 py-2 rounded transition ${theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-700 hover:text-black'}`}
           >
-            {t('buttons.viewAll')} 
+            {t('buttons.viewAll')}
           </button>
         </div>
         {loadingTrendingCourses ? (
@@ -369,7 +366,7 @@ const Home = () => {
             <p>{t('No trending courses available')}</p>
           </div>
         ) : (
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-[1500] mx-auto">
             <Slider className="px-10" {...courseSliderSettings}>
               {trendingCourses.map((course, idx) => (
                 <CourseCard key={idx} course={course} />
@@ -380,11 +377,11 @@ const Home = () => {
       </section>
 
       {/* Free Courses Section */}
-      <section className="py-15 px-5 bg-opacity-5">
-        <div className="flex justify-between items-center mb-6 max-w-6xl mx-auto">
+      <section className="py-15 px-20 bg-opacity-5">
+        <div className="flex justify-between items-center mb-6 max-w-[1500] mx-auto">
           <h2 className="text-3xl font-bold px-10">{t('home.free')}</h2>
-          <button 
-            onClick={() => navigate('/all-courses')} 
+          <button
+            onClick={() => navigate('/all-courses')}
             className={`text-sm px-10 py-2 rounded transition ${theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-700 hover:text-black'}`}
           >
             {t('buttons.viewAll')}
@@ -399,7 +396,7 @@ const Home = () => {
             <p>{t('No free courses available')}</p>
           </div>
         ) : (
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-[1500] mx-auto">
             <Slider className="px-10" {...courseSliderSettings}>
               {freeCourses.map((course, idx) => (
                 <CourseCard key={idx} course={course} />
@@ -410,17 +407,17 @@ const Home = () => {
       </section>
 
       {/* Programs Section */}
-      <section className={`py-10 px-6`}>
+      <section className={`py-10 px-20`}>
         <h2 className={`text-4xl font-bold mb-6 ${isRTL ? 'mr-20' : 'ml-20'}`}>{t('home2.programs.title')}</h2>
         <h5 className={`text-2xl mb-6 ${isRTL ? 'mr-20' : 'ml-20'}`}>{t('home2.programs.subtitle')}</h5>
-        <div className="max-w-6xl mx-auto">
-          <Slider 
+        <div className="max-w-[1500] mx-auto">
+          <Slider
             gap={20}
             dots={false}
             infinite={true}
             speed={500}
-            slidesToShow={2}  
-            slidesToScroll={1} 
+            slidesToShow={2}
+            slidesToScroll={1}
             arrows={true}
             prevArrow={<CustomPrevArrow />}
             nextArrow={<CustomNextArrow />}
@@ -429,7 +426,7 @@ const Home = () => {
               { breakpoint: 768, settings: { slidesToShow: 1 } },
               { breakpoint: 480, settings: { slidesToShow: 1 } },
             ]}
-            className="px-10" 
+            className="px-10"
           >
             {programs.slice(0, 2).map((program, idx) => (
               <div key={idx} className={`rounded-lg shadow-md overflow-hidden ${theme === 'dark' ? 'bg-[#141717]' : 'bg-white'} py-10 min-h-[420px]`}>
@@ -454,7 +451,7 @@ const Home = () => {
                     </p>
                     <button
                       onClick={() => navigate(`/programs/${program._id}`)}
-                      className={`inline-block border-2 px-6 py-2 rounded-md transition-colors ${theme === 'dark'
+                      className={`inline-block border-2 px-20 py-2 rounded-md transition-colors ${theme === 'dark'
                         ? 'border-gray-300 text-gray-300 hover:bg-gray-700'
                         : ' border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white'
                         }`}
@@ -464,21 +461,20 @@ const Home = () => {
                   </div>
                 </div>
               </div>
-            ))} 
+            ))}
           </Slider>
         </div>
       </section>
 
       {/* Courses Section */}
-      <section className="py-1 px-6">
-        <div className="flex justify-center gap-3 mb-8 flex-wrap max-w-4xl mx-auto text-2xl">
+      <section className="py-1 px-20">
+        <div className="flex justify-center gap-3 mb-8 flex-wrap max-w-[1500] mx-auto text-2xl">
           <button
             onClick={() => handleCategoryClick(null)}
             className={`px-4 py-2 rounded font-semibold transition-colors duration-200
-              ${
-                !selectedCategory
-                  ? "bg-red-600 text-white"
-                  : theme === "dark"
+              ${!selectedCategory
+                ? "bg-red-600 text-white"
+                : theme === "dark"
                   ? "bg-[#252a2a] text-white hover:bg-gray-700"
                   : "bg-[#D4D4D4] text-black hover:bg-gray-300"
               }`}
@@ -491,10 +487,9 @@ const Home = () => {
               key={category._id}
               onClick={() => handleCategoryClick(category._id)}
               className={`px-4 py-2 rounded transition-colors duration-200
-                ${
-                  selectedCategory === category._id
-                    ? "bg-red-600 text-white"
-                    : theme === "dark"
+                ${selectedCategory === category._id
+                  ? "bg-red-600 text-white"
+                  : theme === "dark"
                     ? "bg-[#252a2a] text-white hover:bg-gray-700"
                     : "bg-[#D4D4D4] text-black hover:bg-gray-300"
                 }`}
@@ -504,11 +499,11 @@ const Home = () => {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-[1500] mx-auto">
           {courses.map((course, index) => {
             const title = course.title?.[currentLang] || course.title?.en;
-            const instructorProfile = course.instructorDetails?.profile || 
-            (course.instructor?.user || course.instructor || {});
+            const instructorProfile = course.instructorDetails?.profile ||
+              (course.instructor?.user || course.instructor || {});
             const instructorName = instructorProfile
               ? `${getLocalizedText(instructorProfile.firstName)} ${getLocalizedText(instructorProfile.lastName)}`
               : 'Unknown Instructor';
@@ -518,11 +513,10 @@ const Home = () => {
               <div
                 key={index}
                 className={`rounded shadow-sm overflow-hidden border transition-all duration-200 cursor-pointer
-                ${
-                  theme === "dark"
+                ${theme === "dark"
                     ? "bg-[#2a2a2a] border-gray-700 text-white"
                     : "bg-gray-100 border-gray-200 text-black"
-                }`}
+                  }`}
                 onClick={() => navigate(`/courses/${course._id}`)}
               >
                 <div className="relative">
@@ -563,11 +557,10 @@ const Home = () => {
         <div className="text-center mt-8">
           <button
             onClick={() => navigate("/courses")}
-            className={`rounded px-6 py-2 border-2 transition text-3xl ${
-              theme === "dark"
-                ? "bg-transparent text-white border-white hover:bg-white hover:text-black"
-                : "bg-transparent text-black border-black hover:bg-black hover:text-white"
-            }`}
+            className={`rounded px-20 py-2 border-2 transition text-3xl ${theme === "dark"
+              ? "bg-transparent text-white border-white hover:bg-white hover:text-black"
+              : "bg-transparent text-black border-black hover:bg-black hover:text-white"
+              }`}
           >
             {t("buttons.courses")}
           </button>
@@ -592,7 +585,7 @@ const Home = () => {
       </section>
 
       {/* Instructors Section */}
-      <section className="py-10 px-6 mx-auto mt-10">
+      <section className="py-10 px-20 mx-auto mt-10">
         <h2 className="text-4xl font-bold mb-6 text-center">
           {t("home.instructors.title")}
         </h2>
@@ -606,7 +599,7 @@ const Home = () => {
             {t("Failed to load instructors")}: {errorInstructors}
           </p>
         ) : (
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-[1500] mx-auto">
             <Slider className="px-10" {...sliderSettings}>
               {instructors.map((instructor, index) => {
                 const profile = instructor.profile || instructor.user || instructor;
@@ -640,11 +633,10 @@ const Home = () => {
         <div className="text-center mt-8">
           <button
             onClick={() => navigate("/instructors")}
-            className={`rounded px-6 py-2 border-2 transition text-3xl ${
-              theme === "dark"
-                ? "bg-transparent text-white border-white hover:bg-white hover:text-black"
-                : "bg-transparent text-black border-black hover:bg-black hover:text-white"
-            }`}
+            className={`rounded px-20 py-2 border-2 transition text-3xl ${theme === "dark"
+              ? "bg-transparent text-white border-white hover:bg-white hover:text-black"
+              : "bg-transparent text-black border-black hover:bg-black hover:text-white"
+              }`}
           >
             {t("buttons.instructors")}
           </button>

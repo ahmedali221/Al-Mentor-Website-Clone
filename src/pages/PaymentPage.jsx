@@ -27,7 +27,7 @@ function PaymentPage() {
   // Static data
   const userEmail = user?.email || "";
   const isLoggedIn = !!user;
-  
+
   const handlePayment = async (details) => {
     if (!user) {
       navigate("/loginPage");
@@ -64,26 +64,26 @@ function PaymentPage() {
       // Validate amount matches plan price
       const paypalAmount = Number(details.purchase_units[0].amount.value);
       const planAmount = Number(planDetails.price.amount);
-      
+
       if (paypalAmount !== planAmount) {
         throw new Error("payment.error.amountMismatch");
       }
 
       // Create payment data object matching the required format exactly
       const paymentData = {
-      user: user._id,
-      subscription: planId,
-      amount: Number(planDetails.price.amount), 
-      transactionId: details.id,
-      currency: details.purchase_units[0].amount.currency_code,
-      paymentMethod: "paypal",
-      status: {
-        en: statusEn,
-        ar: statusAr,
-      },
-    };
+        user: user._id,
+        subscription: planId,
+        amount: Number(planDetails.price.amount),
+        transactionId: details.id,
+        currency: details.purchase_units[0].amount.currency_code,
+        paymentMethod: "paypal",
+        status: {
+          en: statusEn,
+          ar: statusAr,
+        },
+      };
 
-    
+
 
       const response = await axios.post("http://localhost:5000/api/payments/", paymentData, {
         headers: {
@@ -116,7 +116,7 @@ function PaymentPage() {
           text: t("payment.success.message"),
           confirmButtonText: t("buttons.submit"),
         });
-        
+
         // Redirect to home page after successful payment
         navigate("/");
       }
@@ -124,9 +124,9 @@ function PaymentPage() {
       console.error(t("messages.error"), err);
       console.log("err.response:", err.response);
       Swal.close();
-      
+
       let errorMessage = t("payment.error.message");
-      
+
       if (err.message === "payment.error.declined") {
         errorMessage = t("payment.error.declined");
       } else if (err.message === "payment.error.amountMismatch") {
@@ -140,7 +140,7 @@ function PaymentPage() {
         // Redirect to login if unauthorized
         setTimeout(() => navigate("/loginPage"), 2000);
       }
-      
+
       // Show error message
       await Swal.fire({
         icon: "error",
@@ -149,16 +149,16 @@ function PaymentPage() {
         confirmButtonText: t("buttons.submit"),
       });
     }
-   };
+  };
   useEffect(() => {
     if (authLoading) return;
 
     if (!user) {
-      navigate("/loginPage", { 
-        state: { 
+      navigate("/loginPage", {
+        state: {
           from: location.pathname,
           message: t("messages.loginRequired")
-        } 
+        }
       });
       return;
     }
@@ -205,9 +205,9 @@ function PaymentPage() {
     // Here you would handle the payment submission
     console.log("Payment data:", data);
     // Add your payment processing logic here
-    
 
-    
+
+
   };
 
   const paymentMethods = [
@@ -245,11 +245,10 @@ function PaymentPage() {
   if (authLoading || planLoading) {
     return (
       <div
-        className={`min-h-screen flex items-center justify-center ${
-          theme === "dark"
+        className={`min-h-screen flex items-center justify-center ${theme === "dark"
             ? "bg-[#1A1A1A] text-white"
             : "bg-gray-50 text-gray-900"
-        }`}>
+          }`}>
         <div className='text-center'>
           <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600 mx-auto'></div>
           <p className='mt-4'>{t("messages.loading")}</p>
@@ -261,11 +260,10 @@ function PaymentPage() {
   if (error) {
     return (
       <div
-        className={`min-h-screen flex items-center justify-center ${
-          theme === "dark"
+        className={`min-h-screen flex items-center justify-center ${theme === "dark"
             ? "bg-[#1A1A1A] text-white"
             : "bg-gray-50 text-gray-900"
-        }`}>
+          }`}>
         <div className='text-center'>
           <p className='text-red-500 text-xl mb-4'>{error}</p>
           <p className={theme === "dark" ? "text-gray-400" : "text-gray-600"}>
@@ -282,13 +280,12 @@ function PaymentPage() {
 
   return (
     <div
-      className={`min-h-screen flex items-center justify-center mt-16 ${
-        theme === "dark"
+      className={`min-h-screen flex items-center justify-center mt-16 ${theme === "dark"
           ? "bg-[#1A1A1A] text-white"
           : "bg-gray-50 text-gray-900"
-      }`}
+        }`}
       dir={isRTL ? "rtl" : "ltr"}>
-      <div className='w-full max-w-[1200px] px-4 sm:px-6 py-8'>
+      <div className='w-full max-w-[1200px] px-2 pt-28 pb-12'>
         <div className='flex flex-col lg:flex-row gap-8'>
           {/* Left Section */}
           <div className='flex-1'>
@@ -299,9 +296,8 @@ function PaymentPage() {
 
             {/* Email Section */}
             <div
-              className={`mb-6 ${
-                theme === "dark" ? "bg-[#222222]" : "bg-white"
-              } rounded-lg p-6`}>
+              className={`mb-6 ${theme === "dark" ? "bg-[#222222]" : "bg-white"
+                } rounded-lg p-6`}>
               <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
                 <div className='flex flex-col gap-1'>
                   <span
@@ -311,9 +307,8 @@ function PaymentPage() {
                     {t("payment.loggedInWith")}
                   </span>
                   <span
-                    className={`font-medium ${
-                      theme === "dark" ? "text-white" : "text-gray-900"
-                    }`}>
+                    className={`font-medium ${theme === "dark" ? "text-white" : "text-gray-900"
+                      }`}>
                     {userEmail}
                   </span>
                 </div>
@@ -339,22 +334,19 @@ function PaymentPage() {
                   <div key={method.id} className='rounded-lg overflow-hidden'>
                     <div
                       onClick={() => handlePaymentMethodClick(method.id)}
-                      className={`flex items-center justify-between p-4 cursor-pointer ${
-                        selectedPaymentMethod === method.id
-                          ? `${
-                              theme === "dark" ? "bg-[#2C2C2C]" : "bg-white"
-                            } border border-red-500`
+                      className={`flex items-center justify-between p-4 cursor-pointer ${selectedPaymentMethod === method.id
+                          ? `${theme === "dark" ? "bg-[#2C2C2C]" : "bg-white"
+                          } border border-red-500`
                           : theme === "dark"
-                          ? "bg-[#222222]"
-                          : "bg-gray-100"
-                      }`}>
+                            ? "bg-[#222222]"
+                            : "bg-gray-100"
+                        }`}>
                       <div className='flex items-center gap-4'>
                         <div
-                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                            selectedPaymentMethod === method.id
+                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedPaymentMethod === method.id
                               ? "border-red-500"
                               : "border-gray-400"
-                          }`}>
+                            }`}>
                           {selectedPaymentMethod === method.id && (
                             <div className='w-2.5 h-2.5 rounded-full bg-red-500' />
                           )}
@@ -374,9 +366,8 @@ function PaymentPage() {
                     </div>
                     {selectedPaymentMethod === method.id && (
                       <div
-                        className={`p-4 ${
-                          theme === "dark" ? "bg-[#2C2C2C]" : "bg-white"
-                        }`}>
+                        className={`p-4 ${theme === "dark" ? "bg-[#2C2C2C]" : "bg-white"
+                          }`}>
                         {renderPaymentForm()}
                       </div>
                     )}
@@ -396,14 +387,12 @@ function PaymentPage() {
           {/* Right Section - Order Summary */}
           <div className='w-full lg:w-[400px]'>
             <div
-              className={`${
-                theme === "dark" ? "bg-[#1A1A1A]" : "bg-white"
-              } rounded-lg p-6`}>
+              className={`${theme === "dark" ? "bg-[#1A1A1A]" : "bg-white"
+                } rounded-lg p-6`}>
               {/* Plan Header */}
               <div
-                className={`${
-                  theme === "dark" ? "bg-[#222222]" : "bg-gray-100"
-                } -mx-6 -mt-6 p-6 rounded-lg mb-6`}>
+                className={`${theme === "dark" ? "bg-[#222222]" : "bg-gray-100"
+                  } -mx-6 -mt-6 p-6 rounded-lg mb-6`}>
                 <div className='flex justify-between items-center'>
                   <div>
                     <h2 className='text-xl text-white'>

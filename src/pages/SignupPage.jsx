@@ -55,7 +55,7 @@ function SignupPage() {
     };
 
     return (
-        <div className={`flex justify-center items-center min-h-screen pt-16 ${theme === 'dark' ? 'bg-[#1A1A1A] text-white' : 'bg-gray-50 text-gray-900'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className={`flex justify-center items-center min-h-screen pt-28 pb-12 ${theme === 'dark' ? 'bg-[#1A1A1A] text-white' : 'bg-gray-50 text-gray-900'}`} dir={isRTL ? 'rtl' : 'ltr'}>
             <form onSubmit={handleSubmit} className='flex flex-col gap-3 w-100'>
                 <div className="text-center mb-6">
                     <h1 className='text-3xl font-semibold'>{t('auth.createAccount', 'Create Your Account')}</h1>

@@ -79,7 +79,7 @@ function Subscribe() {
         console.error("Error fetching subscriptions:", err);
         setError(
           err.response?.data?.message ||
-            t("messages.error", "Failed to load subscriptions")
+          t("messages.error", "Failed to load subscriptions")
         );
       } finally {
         setLoading(false);
@@ -92,11 +92,10 @@ function Subscribe() {
   if (loading) {
     return (
       <div
-        className={`min-h-screen flex items-center justify-center ${
-          theme === "dark"
+        className={`min-h-screen flex items-center justify-center ${theme === "dark"
             ? "bg-[#1A1A1A] text-white"
             : "bg-gray-50 text-gray-900"
-        }`}>
+          }`}>
         <div className='text-center'>
           <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600 mx-auto'></div>
           <p className='mt-4'>{t("messages.loading", "Loading...")}</p>
@@ -108,11 +107,10 @@ function Subscribe() {
   if (error) {
     return (
       <div
-        className={`min-h-screen flex items-center justify-center ${
-          theme === "dark"
+        className={`min-h-screen flex items-center justify-center ${theme === "dark"
             ? "bg-[#1A1A1A] text-white"
             : "bg-gray-50 text-gray-900"
-        }`}>
+          }`}>
         <div className='text-center'>
           <p className='text-red-600 text-xl'>{error}</p>
         </div>
@@ -122,21 +120,19 @@ function Subscribe() {
 
   return (
     <div
-      className={`min-h-screen flex items-center justify-center ${
-        theme === "dark"
+      className={`min-h-screen flex items-center justify-center ${theme === "dark"
           ? "bg-[#1A1A1A] text-white"
           : "bg-gray-50 text-gray-900"
-      }`}
+        }`}
       dir={isRTL ? "rtl" : "ltr"}>
-      <div className='w-full max-w-7xl px-4 py-8 sm:py-12'>
+      <div className='w-full max-w-7xl px-2 pt-28 pb-12'>
         <div className='text-center mb-8 sm:mb-16'>
           <h1 className='text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 px-4'>
             {t("subscription.mainTitle", "Subscribe now and start learning")}
           </h1>
           <p
-            className={`text-lg sm:text-xl ${
-              theme === "dark" ? "text-gray-300" : "text-gray-600"
-            } max-w-3xl mx-auto px-4`}>
+            className={`text-lg sm:text-xl ${theme === "dark" ? "text-gray-300" : "text-gray-600"
+              } max-w-3xl mx-auto px-4`}>
             {t(
               "subscription.subtitle",
               "Choose a plan and get unlimited access to the best learning content in the Arab world for the best price."
@@ -158,9 +154,8 @@ function Subscribe() {
             {subscriptions.map((plan) => (
               <div
                 key={plan._id}
-                className={`rounded-lg p-4 sm:p-6 ${
-                  theme === "dark" ? "bg-[#2C2C2C]" : "bg-white"
-                } shadow-lg transform transition-transform duration-300 hover:scale-105`}>
+                className={`rounded-lg p-4 sm:p-6 ${theme === "dark" ? "bg-[#2C2C2C]" : "bg-white"
+                  } shadow-lg transform transition-transform duration-300 hover:scale-105`}>
                 <div className='text-center'>
                   <h3 className='text-xl sm:text-2xl font-bold mb-2'>
                     {getLocalizedContent(plan.displayName, plan.name)}
@@ -169,9 +164,8 @@ function Subscribe() {
                     {formatPrice(plan.price)}
                   </p>
                   <p
-                    className={`mb-4 sm:mb-6 ${
-                      theme === "dark" ? "text-gray-400" : "text-gray-600"
-                    }`}>
+                    className={`mb-4 sm:mb-6 ${theme === "dark" ? "text-gray-400" : "text-gray-600"
+                      }`}>
                     {getDurationText(plan.duration)}
                   </p>
                   {plan.features && (

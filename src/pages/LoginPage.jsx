@@ -44,7 +44,7 @@ function LoginPage() {
     }, [navigate]);
 
     if (isLoading) {
-        return <div className={`flex justify-center items-center min-h-screen ${theme === 'dark' ? 'bg-[#1A1A1A] text-white' : 'bg-gray-50 text-gray-900'}`}>
+        return <div className={`flex justify-center items-center min-h-screen pt-28 pb-12 ${theme === 'dark' ? 'bg-[#1A1A1A] text-white' : 'bg-gray-50 text-gray-900'}`}>
             {t('messages.loading', 'Loading...')}
         </div>;
     }

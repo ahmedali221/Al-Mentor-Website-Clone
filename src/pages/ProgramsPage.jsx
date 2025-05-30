@@ -54,8 +54,8 @@ function ProgramsPage() {
     }
 
     return (
-        <div className={`w-full pt-25 ${theme === 'dark' ? 'bg-[#1A1A1A] text-white' : 'bg-gray-50 text-gray-900'}`} dir={isRTL ? 'rtl' : 'ltr'}>
-            <div className="w-full px-8 py-6">
+        <div className={`w-full min-h-screen pt-28 pb-12 ${theme === 'dark' ? 'bg-[#1A1A1A] text-white' : 'bg-gray-50 text-gray-900'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+            <div className="w-full px-2">
                 <div className={`${isRTL ? 'text-right' : 'text-left'} mb-8`}>
                     <h1 className="text-5xl font-bold">{t('navigation.programs')}</h1>
                     <p className="text-2xl mt-2">{t('programs.subtitle', 'Structured Learning for Deeper Skill Mastery')}</p>
@@ -90,8 +90,8 @@ function ProgramsPage() {
                                     <Link
                                         to={`/programs/${program._id}`}
                                         className={`inline-block border-2 px-6 py-2 rounded-md transition-colors ${theme === 'dark'
-                                                ? 'border-gray-300 text-gray-300 hover:bg-gray-700'
-                                                : 'border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white'
+                                            ? 'border-gray-300 text-gray-300 hover:bg-gray-700'
+                                            : 'border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white'
                                             }`}
                                     >
                                         {t('courses.viewDetails')}

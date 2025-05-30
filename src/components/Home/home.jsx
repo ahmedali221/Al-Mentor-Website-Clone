@@ -146,7 +146,7 @@ const Home = () => {
 
   return (
     <div className={`${theme === 'dark' ? 'bg-[#1A1A1A] text-white' : 'bg-white text-black'}`} dir={isRTL ? 'rtl' : 'ltr'}>
-      
+
       {/* Banner Section */}
       <main className="relative flex items-start justify-start min-h-screen px-6 pt-32" style={{
         backgroundImage: `url(/banner.webp)`,
@@ -160,7 +160,7 @@ const Home = () => {
         <div className={`relative z-20 px-5 py-30 max-w-2xl text-white leading-none font-semibold text-xl ${isRTL ? 'mr-10' : 'ml-10'}`}>
           <h1 className="text-6xl font-bold mb-4 leading-none">{t('home.banner.title')}</h1>
           <p className="text-2xl mb-8 text-gray-300">{t('home.banner.subtitle')}</p>
-          <button 
+          <button
             onClick={handleSubscribeClick}
             className="bg-red-500 hover:bg-red-700 text-white px-8 py-6 rounded font-semibold text-xl transition-colors"
           >
@@ -183,8 +183,8 @@ const Home = () => {
               ${!selectedCategory
                 ? 'bg-red-600 text-white'
                 : theme === 'dark'
-                ? 'bg-gray-800 text-white hover:bg-gray-700'
-                : 'bg-[#D4D4D4] text-black hover:bg-gray-300'}`}
+                  ? 'bg-gray-800 text-white hover:bg-gray-700'
+                  : 'bg-[#D4D4D4] text-black hover:bg-gray-300'}`}
           >
             {t('Featured Courses')}
           </button>
@@ -197,8 +197,8 @@ const Home = () => {
                 ${selectedCategory === category._id
                   ? 'bg-red-600 text-white'
                   : theme === 'dark'
-                  ? 'bg-gray-800 text-white hover:bg-gray-700'
-                  : 'bg-[#D4D4D4] text-black hover:bg-gray-300'}`}
+                    ? 'bg-gray-800 text-white hover:bg-gray-700'
+                    : 'bg-[#D4D4D4] text-black hover:bg-gray-300'}`}
             >
               {category.name?.[currentLang] || category.name?.en}
             </button>
@@ -227,8 +227,8 @@ const Home = () => {
               const image = course.thumbnail || '/default-course-img.png';
 
               return (
-                <div 
-                  key={index} 
+                <div
+                  key={index}
                   onClick={() => handleCourseClick(course._id)}
                   className={`rounded shadow-sm overflow-hidden border transition-all duration-200 cursor-pointer hover:shadow-lg
                     ${theme === 'dark'
@@ -249,11 +249,10 @@ const Home = () => {
         <div className="text-center mt-8">
           <button
             onClick={handleViewAllCourses}
-            className={`rounded px-6 py-2 border-2 transition text-3xl cursor-pointer ${
-              theme === 'dark'
+            className={`rounded px-6 py-2 border-2 transition text-3xl cursor-pointer ${theme === 'dark'
                 ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
                 : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
-            }`}
+              }`}
           >
             {t('buttons.courses')}
           </button>
@@ -269,7 +268,7 @@ const Home = () => {
         ) : errorInstructors ? (
           <p className="text-center text-red-500 my-10">{t('Failed to load instructors')}: {errorInstructors}</p>
         ) : (
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-7xl mx-auto">
             <Slider {...sliderSettings}>
               {instructors.map((instructor, index) => {
                 const profile = instructor.profile || instructor.user || instructor;
@@ -278,8 +277,8 @@ const Home = () => {
                 const image = profile.profilePicture || '/default-profile.png';
 
                 return (
-                  <div 
-                    key={index} 
+                  <div
+                    key={index}
                     onClick={() => handleCourseClick(instructor._id)}
                     className="px-4 min-h-72 flex flex-col items-center justify-start cursor-pointer hover:opacity-80 transition-opacity"
                   >
@@ -300,11 +299,10 @@ const Home = () => {
         <div className="text-center mt-8">
           <button
             onClick={handleViewAllInstructors}
-            className={`rounded px-6 py-2 border-2 transition text-3xl cursor-pointer ${
-              theme === 'dark'
+            className={`rounded px-6 py-2 border-2 transition text-3xl cursor-pointer ${theme === 'dark'
                 ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
                 : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
-            }`}
+              }`}
           >
             {t('buttons.instructors')}
           </button>
