@@ -181,7 +181,8 @@
     "viewChat": "View Chat",
     "send": "Send",
     "retry": "Retry",
-    "goBack": "Go Back"
+    "goBack": "Go Back",
+    "choosePlan": "Choose Plan"
   },
   "messages": {
     "pleaseLogin": "You Must log in to continue.",

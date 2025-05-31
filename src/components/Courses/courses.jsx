@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import Slider from 'react-slick';
 import './courses.css';
@@ -58,16 +57,16 @@ const Courses = () => {
   useEffect(() => {
     const fetchSavedCourses = async () => {
       if (!user) return;
-
+      
       try {
         const response = await fetch(`https://al-mentor-database-production.up.railway.app/api/saved-courses/user/${user._id}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
-
+        
         if (!response.ok) throw new Error('Failed to fetch saved courses');
-
+        
         const data = await response.json();
         setSavedCourses(data.map(item => item.courseId._id));
       } catch (err) {
@@ -80,7 +79,7 @@ const Courses = () => {
 
   const toggleSaveCourse = async (courseId, e) => {
     e.stopPropagation();
-
+    
     if (!user) {
       navigate('/loginPage');
       return;
@@ -166,7 +165,7 @@ const Courses = () => {
     const search = params.get('search');
     setSearchQuery(search || '');
 
-    axios.get('https://al-mentor-database-production.up.railway.app/api/courses')
+    axios.get('/api/courses')
       .then((res) => {
         const coursesData = res.data;
         setAllCourses(coursesData);
@@ -456,8 +455,9 @@ const Courses = () => {
 
     return (
       <div className="px-4 min-h-72 flex flex-col items-center justify-start">
-        <div className={`w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden shadow transition-all duration-300 hover:scale-105 ${theme === 'dark' ? 'shadow-gray-800' : 'shadow-gray-200'
-          }`}>
+        <div className={`w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden shadow transition-all duration-300 hover:scale-105 ${
+          theme === 'dark' ? 'shadow-gray-800' : 'shadow-gray-200'
+        }`}>
           <img src={image} alt={name} className="w-full h-full object-cover" />
         </div>
         <h3 className={`text-lg font-semibold mt-4 text-center ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{name}</h3>
@@ -473,7 +473,7 @@ const Courses = () => {
     const title = getLocalizedText(category.name);
     const image = category.thumbnailImgUrl || 'https://placehold.co/400x300';
     return (
-
+      
       <div
         className="relative cursor-pointer rounded-xl overflow-hidden group h-60 sm:h-72 md:h-80 flex items-end transition-all duration-300 shadow-lg hover:shadow-xl"
         onClick={() => navigate(`/categories/${category._id}`)}
@@ -558,7 +558,7 @@ const Courses = () => {
   };
 
   return (
-    <div className="bg-white text-black min-h-screen transition-colors duration-200" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className={`${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-black'} min-h-screen transition-colors duration-200`} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Category Hero Carousel */}
       <section className="mt-8 py-8 md:py-12 px-2 sm:px-4 md:px-8">
         <h2 className={`text-2xl md:text-3xl font-bold mb-12 md:mb-16 ${isRTL ? 'text-right' : 'text-left'} ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
@@ -598,10 +598,10 @@ const Courses = () => {
                     <button
                       onClick={() => handleTopicClick(topic._id)}
                       className={`whitespace-nowrap px-3 py-1 rounded-full transition-colors duration-300
-                        ${selectedTopic === topic._id
-                          ? 'bg-[#00ffd0] text-black font-semibold'
-                          : theme === 'dark'
-                            ? 'text-white hover:bg-gray-800'
+                        ${selectedTopic === topic._id 
+                          ? 'bg-[#00ffd0] text-black font-semibold' 
+                          : theme === 'dark' 
+                            ? 'text-white hover:bg-gray-800' 
                             : 'text-gray-800 hover:bg-gray-100'}
                       `}
                     >
@@ -644,8 +644,8 @@ const Courses = () => {
           <h2 className={`text-xl md:text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
             {t('sections.trending')}
           </h2>
-          <button
-            onClick={() => navigate('/all-courses')}
+          <button 
+            onClick={() => navigate('/all-courses')} 
             className={`${theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors duration-200 flex items-center gap-1`}
           >
             {t('buttons.viewAll')} <span className="ml-1">&rarr;</span>
@@ -662,8 +662,8 @@ const Courses = () => {
           <h2 className={`text-xl md:text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
             {t('sections.newlyReleased')}
           </h2>
-          <button
-            onClick={() => navigate('/all-courses')}
+          <button 
+            onClick={() => navigate('/all-courses')} 
             className={`${theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors duration-200 flex items-center gap-1`}
           >
             {t('buttons.viewAll')} <span className="ml-1">&rarr;</span>
@@ -778,11 +778,11 @@ const Courses = () => {
           </Slider>
         </div>
         <div className="text-center mt-8">
-          <button
+          <button 
             onClick={() => navigate('/instructors')}
             className={`rounded px-6 py-2 border transition-all duration-200 ${theme === 'dark' ? 'border-white text-white hover:bg-white hover:text-black' : 'border-black text-black hover:bg-black hover:text-white'}`}
           >
-            {t('buttons.seeAllInstructors')}
+            {t('buttons.instructors')}
           </button>
         </div>
       </section>
