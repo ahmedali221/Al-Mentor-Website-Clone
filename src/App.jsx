@@ -36,6 +36,9 @@ import Subscribe from './pages/Subscribe';
 import PaymentPage from './pages/PaymentPage';
 import InstructorSessionChat from './components/InstructorSession/InstructorSessionChat';
 import SessionHistory from './components/InstructorSession/SessionHistory';
+import CreateCourseForm from './components/Instructor/CreateCourseForm';
+import CreateModuleForm from './components/Instructor/CreateModuleForm';
+import CreateLessonForm from './components/Instructor/CreateLessonForm';
 
 // Create a separate component for routes
 const AppRoutes = () => {
@@ -48,6 +51,9 @@ const AppRoutes = () => {
         <Route path="/signup-Email" element={<SignEmail />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/password" element={<PasswordPage />} />
+        <Route path="/instructor-form" element={<CreateCourseForm />} />
+        <Route path="/instructor-module-form/:courseId" element={<CreateModuleForm />} />
+        <Route path="/instructor-lesson-form/:moduleId" element={<CreateLessonForm />} />
       </Route>
 
       {/* Main Routes */}
@@ -189,6 +195,8 @@ const AppRoutes = () => {
             <SessionHistory isInstructor={true} />
           </ProtectedRoute>
         } />
+
+      
       </Route>
     </Routes>
   );
