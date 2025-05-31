@@ -8,6 +8,8 @@ import { useTheme } from '../../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { useMyCourses } from '../../context/MyCoursesContext';
+import { useAuth } from '../../context/AuthContext';
+import { toast } from 'react-hot-toast';
 
 function getUserIdFromToken() {
   const token = localStorage.getItem('token');
@@ -27,6 +29,8 @@ const CourseDetails = () => {
   const currentLang = i18n.language;
   const navigate = useNavigate();
   const { myCourses, addCourse, removeCourse, isCourseAdded } = useMyCourses();
+  const { user } = useAuth();
+  const isRTL = currentLang === 'ar';
 
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -321,7 +325,7 @@ const CourseDetails = () => {
     } catch (error) {
       console.error('Error submitting comment:', error);
       if (error.message === 'No authentication token found') {
-        navigate('/loginPage');
+        navigate('/login');
       } else {
         showToast(t('messages.error'));
       }
@@ -338,6 +342,15 @@ const CourseDetails = () => {
         courseId: id
       }
     });
+  };
+
+  const handleSubscribe = () => {
+    if (!user) {
+      toast.info(t('messages.pleaseLogin'));
+      navigate('/login');
+      return;
+    }
+    navigate('/subscribe');
   };
 
   if (loading) return <div>{t('messages.loading')}</div>;
@@ -948,7 +961,11 @@ const CourseDetails = () => {
               <div className="flex items-center gap-2"><FaLayerGroup className="text-[#00bcd4]" /> {t('Level')}: {level}</div>
               <div className="flex items-center gap-2"><FaLanguage className="text-[#00bcd4]" /> {t('Language')}: {language}</div>
             </div>
-            <button className="bg-red-600 text-white py-3 rounded-lg text-lg font-bold hover:bg-red-700 transition mb-2" aria-label={t('Subscribe Now')}>
+            <button 
+              onClick={handleSubscribe}
+              className="bg-red-600 text-white py-3 rounded-lg text-lg font-bold hover:bg-red-700 transition mb-2" 
+              aria-label={t('Subscribe Now')}
+            >
               {t('Subscribe Now')}
             </button>
             <button

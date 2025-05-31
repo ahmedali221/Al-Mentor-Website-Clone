@@ -5,6 +5,7 @@ import { FaBookmark } from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
+import { toast as hotToast } from 'react-hot-toast';
 
 const defaultIllustration = 'https://t3.ftcdn.net/jpg/08/29/92/34/360_F_829923473_EOUovuUUuhuCtOLPwchtUFKIPzQCg1ZX.jpg'; // Replace with your illustration
 
@@ -145,6 +146,15 @@ const CategoryPage = () => {
     }
   };
 
+  const handleSubscribe = () => {
+    if (!user) {
+      hotToast.info('Please log in to subscribe');
+      navigate('/login');
+      return;
+    }
+    navigate('/subscribe');
+  };
+
   const bannerImage = category?.image || defaultIllustration;
 
   return (
@@ -160,7 +170,12 @@ const CategoryPage = () => {
             <span className="text-2xl font-bold" style={{ color: theme === 'dark' ? '#fff' : '#23272F' }}>Only at <span className="text-[#00ffd0]">199 EGP /month!</span></span>
             <span className="block text-lg" style={{ color: theme === 'dark' ? '#b3c2d1' : '#23272F' }}>Get all of this and more when you subscribe to almentor.</span>
           </div>
-          <button className="bg-red-600 text-white px-8 py-3 rounded-lg text-lg font-bold ml-6 hover:bg-red-700 transition">Subscribe</button>
+          <button 
+            onClick={handleSubscribe}
+            className="bg-red-600 text-white px-8 py-3 rounded-lg text-lg font-bold ml-6 hover:bg-red-700 transition"
+          >
+            Subscribe
+          </button>
           {/* <img src="https://t3.ftcdn.net/jpg/08/29/92/34/360_F_829923473_EOUovuUUuhuCtOLPwchtUFKIPzQCg1ZX.jpg" alt="illustration" className="absolute right-4 bottom-0 h-24 hidden md:block" style={{zIndex:0}} /> */}
         </div>
       </div>

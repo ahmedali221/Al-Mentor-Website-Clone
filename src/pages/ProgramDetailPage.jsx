@@ -4,12 +4,15 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
 import axios from 'axios';
 import { FaRegBookmark, FaBookmark, FaClock, FaVideo } from 'react-icons/fa';
+import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-hot-toast';
 
 function ProgramDetailPage() {
   const { programId } = useParams();
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [program, setProgram] = useState(null);
   const [courses, setCourses] = useState([]);
@@ -83,6 +86,15 @@ function ProgramDetailPage() {
     }
   };
 
+  const handleSubscribe = () => {
+    if (!user) {
+      toast.info(t('messages.pleaseLogin'));
+      navigate('/login');
+      return;
+    }
+    navigate('/subscribe');
+  };
+
   if (loading) {
     return (
       <div className={`min-h-screen flex items-center justify-center ${theme === 'dark' ? 'bg-[#1A1A1A] text-white' : 'bg-gray-50 text-gray-900'}`}>
@@ -139,7 +151,10 @@ function ProgramDetailPage() {
               </span>{' • '}
               <span className="capitalize">{program.level[currentLanguage]}</span>
             </p>
-            <button className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-md text-lg font-semibold transition-colors">
+            <button 
+              onClick={handleSubscribe}
+              className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-md text-lg font-semibold transition-colors"
+            >
               {t('home.banner.subscribeButton')}
             </button>
           </div>
