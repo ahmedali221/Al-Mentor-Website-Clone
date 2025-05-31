@@ -62,7 +62,7 @@ function Subscribe() {
         setLoading(true);
         setError(null);
         const response = await axios.get(
-          "http://localhost:5000/api/subscriptions",
+          "/api/subscriptions",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -93,8 +93,8 @@ function Subscribe() {
     return (
       <div
         className={`min-h-screen flex items-center justify-center ${theme === "dark"
-            ? "bg-[#1A1A1A] text-white"
-            : "bg-gray-50 text-gray-900"
+          ? "bg-[#1A1A1A] text-white"
+          : "bg-gray-50 text-gray-900"
           }`}>
         <div className='text-center'>
           <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600 mx-auto'></div>
@@ -108,8 +108,8 @@ function Subscribe() {
     return (
       <div
         className={`min-h-screen flex items-center justify-center ${theme === "dark"
-            ? "bg-[#1A1A1A] text-white"
-            : "bg-gray-50 text-gray-900"
+          ? "bg-[#1A1A1A] text-white"
+          : "bg-gray-50 text-gray-900"
           }`}>
         <div className='text-center'>
           <p className='text-red-600 text-xl'>{error}</p>
@@ -121,8 +121,8 @@ function Subscribe() {
   return (
     <div
       className={`min-h-screen flex items-center justify-center ${theme === "dark"
-          ? "bg-[#1A1A1A] text-white"
-          : "bg-gray-50 text-gray-900"
+        ? "bg-[#1A1A1A] text-white"
+        : "bg-gray-50 text-gray-900"
         }`}
       dir={isRTL ? "rtl" : "ltr"}>
       <div className='w-full max-w-7xl px-2 pt-28 pb-12'>

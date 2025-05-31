@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useMemo, createContext, useContext } from 'react';
-import { ChevronRight, ChevronDown, ChevronLeft, Star, Clock, FileText, 
-         Bell, X, PlayCircle, Volume2, Maximize, Settings, Book, 
-         BookOpen, Menu, Bookmark, Video, Share, Download, ExternalLink,
-         Award, Lock } from 'lucide-react';
+import {
+  ChevronRight, ChevronDown, ChevronLeft, Star, Clock, FileText,
+  Bell, X, PlayCircle, Volume2, Maximize, Settings, Book,
+  BookOpen, Menu, Bookmark, Video, Share, Download, ExternalLink,
+  Award, Lock
+} from 'lucide-react';
 import axios from 'axios';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Route } from 'react-router-dom';
@@ -63,7 +65,7 @@ export default function EnhancedLessonViewer() {
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
   const [subscriptionLoading, setSubscriptionLoading] = useState(true);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
-  
+
   // Fetch course data
   useEffect(() => {
     const fetchCourseData = async () => {
@@ -71,11 +73,11 @@ export default function EnhancedLessonViewer() {
         setLoading(true);
         const response = await axios.get(`/api/courses/${courseId}`);
         setCourseData(response.data);
-        
+
         if (response.data.lessons && response.data.lessons.length > 0) {
-          setCurrentLesson({ 
-            lessonId: response.data.lessons[0]._id, 
-            title: response.data.lessons[0].title 
+          setCurrentLesson({
+            lessonId: response.data.lessons[0]._id,
+            title: response.data.lessons[0].title
           });
         }
       } catch (err) {
@@ -89,7 +91,7 @@ export default function EnhancedLessonViewer() {
       fetchCourseData();
     }
   }, [courseId]);
-  
+
   // Fetch lessons for the course
   useEffect(() => {
     const fetchLessons = async () => {
@@ -108,7 +110,7 @@ export default function EnhancedLessonViewer() {
       fetchLessons();
     }
   }, [courseId]);
-  
+
   // Load watched lessons from localStorage
   useEffect(() => {
     const stored = localStorage.getItem(`course_${courseId}_watched`);
@@ -116,32 +118,32 @@ export default function EnhancedLessonViewer() {
       setWatchedLessons(JSON.parse(stored));
     }
   }, [courseId]);
-  
+
   // Save watched lessons to localStorage
   useEffect(() => {
     localStorage.setItem(`course_${courseId}_watched`, JSON.stringify(watchedLessons));
   }, [watchedLessons, courseId]);
-  
+
   // Persist favoriteLessons to localStorage
   useEffect(() => {
     localStorage.setItem('favoriteLessons', JSON.stringify(favoriteLessons));
   }, [favoriteLessons]);
-  
+
   // Save notes to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem(`course_${courseId}_notes`, JSON.stringify(notes));
   }, [notes, courseId]);
-  
+
   // Fetch saved courses when component mounts
   useEffect(() => {
     if (user) {
       fetchSavedCourses();
     }
   }, [user]);
-  
+
   const fetchSavedCourses = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/saved-courses/user/${user._id}`);
+      const response = await fetch(`/api/saved-courses/user/${user._id}`);
       if (!response.ok) throw new Error('Failed to fetch saved courses');
       const data = await response.json();
       setSavedCourses(data.map(item => item.courseId._id));
@@ -149,13 +151,13 @@ export default function EnhancedLessonViewer() {
       console.error('Error fetching saved courses:', err);
     }
   };
-  
+
   // Toast message helper
   const showToast = (message) => {
     setToastMessage(message);
     setTimeout(() => setToastMessage(null), 3000);
   };
-  
+
   // Favorite lessons toggle
   const toggleFavoriteLesson = (lessonId) => {
     setFavoriteLessons(prev =>
@@ -165,11 +167,11 @@ export default function EnhancedLessonViewer() {
     );
     showToast(favoriteLessons.includes(lessonId) ? "Removed from favorites" : "Added to favorites");
   };
-  
+
   // Save note
   const saveNote = () => {
     if (!newNote.trim() || !currentLesson?.lessonId) return;
-    
+
     const note = {
       id: Date.now(),
       lessonId: currentLesson.lessonId,
@@ -199,8 +201,8 @@ export default function EnhancedLessonViewer() {
   const updateNote = () => {
     if (!newNote.trim() || !activeNote) return;
 
-    setNotes(prev => prev.map(note => 
-      note.id === activeNote.id 
+    setNotes(prev => prev.map(note =>
+      note.id === activeNote.id
         ? { ...note, content: newNote.trim(), timestamp: new Date().toISOString() }
         : note
     ));
@@ -221,25 +223,25 @@ export default function EnhancedLessonViewer() {
     if (!currentLesson?.lessonId) return [];
     return notes.filter(note => note.lessonId === currentLesson.lessonId);
   }, [notes, currentLesson]);
-  
+
   // Mark announcement as read
   const markAnnouncementAsRead = async (announcementId) => {
     try {
       await axios.patch(`/api/courses/${courseId}/announcements/${announcementId}/read`);
-      
+
       setCourseData(prev => ({
         ...prev,
         announcements: prev.announcements.map(a =>
           a._id === announcementId ? { ...a, read: true } : a
         )
       }));
-      
+
       showToast('Marked as read');
     } catch (err) {
       showToast('Failed to mark announcement as read');
     }
   };
-  
+
   // Helper for localization
   const getLocalizedText = (obj) => {
     if (!obj) return '';
@@ -252,14 +254,14 @@ export default function EnhancedLessonViewer() {
     }
     return '';
   };
-  
+
   // Set first lesson as current if none selected
   useEffect(() => {
     if (!currentLesson && lessons && lessons.length > 0) {
       setCurrentLesson({ lessonId: lessons[0]._id, title: getLocalizedText(lessons[0].title) });
     }
   }, [lessons, currentLesson]);
-  
+
   // Navigation functions
   const goToNextLesson = () => {
     if (!currentLesson || !lessons) return;
@@ -272,7 +274,7 @@ export default function EnhancedLessonViewer() {
       showToast(`Now viewing: ${getLocalizedText(next.title)}`);
     }
   };
-  
+
   const goToPreviousLesson = () => {
     if (!currentLesson || !lessons) return;
     const idx = lessons.findIndex(l => l._id === currentLesson.lessonId);
@@ -284,18 +286,18 @@ export default function EnhancedLessonViewer() {
       showToast(`Now viewing: ${getLocalizedText(prev.title)}`);
     }
   };
-  
+
   // Toggle play state
   const togglePlay = () => {
     setIsPlaying(!isPlaying);
   };
-  
+
   // Current lesson data
   const currentLessonData = useMemo(() => {
     if (!currentLesson?.lessonId || !lessons) return null;
     return lessons.find(l => l._id === currentLesson.lessonId) || null;
   }, [lessons, currentLesson]);
-  
+
   // Mark lesson as watched
   const markLessonAsWatched = (lessonId) => {
     if (!watchedLessons.includes(lessonId)) {
@@ -303,19 +305,19 @@ export default function EnhancedLessonViewer() {
       showToast('Lesson marked as watched');
     }
   };
-  
+
   // Calculate progress for a lesson
   const calculateLessonProgress = (lessonId) => {
     return watchedLessons.includes(lessonId) ? 100 : 0;
   };
-  
+
   // Calculate overall course progress
   const calculateCourseProgress = () => {
     if (!lessons.length) return 0;
     const watchedCount = watchedLessons.length;
     return Math.round((watchedCount / lessons.length) * 100);
   };
-  
+
   // Toggle save course
   const toggleSaveCourse = async (e) => {
     if (e) e.stopPropagation();
@@ -326,8 +328,8 @@ export default function EnhancedLessonViewer() {
 
     try {
       setSavingCourse(true);
-      
-      const response = await fetch(`http://localhost:5000/api/saved-courses/${user._id}/${courseId}`, {
+
+      const response = await fetch(`/api/saved-courses/${user._id}/${courseId}`, {
         method: isSaved ? 'DELETE' : 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -345,20 +347,20 @@ export default function EnhancedLessonViewer() {
       setSavingCourse(false);
     }
   };
-  
+
   // Check if course is already saved
   useEffect(() => {
     const checkIfCourseSaved = async () => {
       if (!user || !courseId) return;
-      
+
       try {
         // Get all saved courses for the user
-        const response = await fetch(`http://localhost:5000/api/saved-courses/user/${user._id}`, {
+        const response = await fetch(`/api/saved-courses/user/${user._id}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
-        
+
         if (response.ok) {
           const data = await response.json();
           // Check if current course is in the saved courses
@@ -372,7 +374,7 @@ export default function EnhancedLessonViewer() {
 
     checkIfCourseSaved();
   }, [user, courseId]);
-  
+
   // Add course to saved courses
   const handleAddToMyCourses = async () => {
     if (!user) {
@@ -382,14 +384,14 @@ export default function EnhancedLessonViewer() {
 
     try {
       setSavingCourse(true);
-      
+
       console.log({
         userId: user?._id,
         courseId,
         savedAt: new Date().toISOString()
       });
-      
-      const response = await fetch('http://localhost:5000/api/saved-courses', {
+
+      const response = await fetch('/api/saved-courses', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -432,13 +434,13 @@ export default function EnhancedLessonViewer() {
       }
 
       try {
-    setSubscriptionLoading(true);
-const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/${user._id}`);
-    if (!response.ok) throw new Error('Failed to fetch subscription');
-    const data = await response.json();
-    console.log('User subscriptions:', data);
+        setSubscriptionLoading(true);
+        const response = await fetch(`/api/user-subscriptions/user/${user._id}`);
+        if (!response.ok) throw new Error('Failed to fetch subscription');
+        const data = await response.json();
+        console.log('User subscriptions:', data);
         const currentDate = new Date();
-        
+
         // Check if user has any active subscriptions
         const activeSubscription = data.find(sub => {
           const endDate = new Date(sub.endDate);
@@ -473,10 +475,10 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
       setShowSubscriptionModal(true);
       return;
     }
-    
-    setCurrentLesson({ 
-      lessonId: lesson._id, 
-      title: getLocalizedText(lesson.title) 
+
+    setCurrentLesson({
+      lessonId: lesson._id,
+      title: getLocalizedText(lesson.title)
     });
     markLessonAsWatched(lesson._id);
   };
@@ -506,7 +508,7 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
     savedCourses,
     toggleSaveCourse
   };
-  
+
   // Check if all lessons are watched
   useEffect(() => {
     const allLessonsWatched = lessons.length > 0 && watchedLessons.length === lessons.length;
@@ -526,12 +528,12 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
       }
     }
   }, [watchedLessons, lessons, showCompletionModal, modalDismissed, courseId]);
-  
+
   // Handle getting certificate
   const handleGetCertificate = () => {
     navigate(`/certificate/${courseId}`);
   };
-  
+
   // Render loading state
   if (loading) {
     return (
@@ -543,7 +545,7 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
       </div>
     );
   }
-  
+
   // Render error state
   if (error) {
     return (
@@ -552,8 +554,8 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
           <div className="bg-red-500 text-white p-4 rounded-lg mb-4">
             <p>Error loading course: {error}</p>
           </div>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             className="px-4 py-2 bg-black-600 rounded-lg hover:bg-blue-700 transition-colors"
           >
             Try Again
@@ -577,7 +579,7 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
   // Completion Modal
   const CompletionModal = () => {
     if (!showCompletionModal) return null;
-    
+
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className={`${theme === 'dark' ? 'bg-[#232323]' : 'bg-white'} p-8 rounded-lg max-w-md w-full mx-4`}>
@@ -617,7 +619,7 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
         <div className={`${theme === 'dark' ? 'bg-[#232323]' : 'bg-white'} p-8 rounded-lg max-w-md w-full mx-4`}>
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-4">
-              {subscriptionStatus === SUBSCRIPTION_STATUS.EXPIRED 
+              {subscriptionStatus === SUBSCRIPTION_STATUS.EXPIRED
                 ? t('lessonViewer.subscriptionExpired')
                 : t('lessonViewer.subscriptionRequired')}
             </h2>
@@ -655,7 +657,7 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
         {/* Header */}
         <header className={`${theme === 'dark' ? 'bg-[#181818] border-[#222]' : 'bg-white border-gray-200'} border-b p-4 flex items-center justify-between`}>
           <div className="flex items-center space-x-4">
-            <button 
+            <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className={`text-${theme === 'dark' ? 'gray-400' : 'gray-600'} hover:text-${theme === 'dark' ? 'white' : 'gray-900'} transition-colors`}
             >
@@ -676,13 +678,13 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
                 <span>{t('lessonViewer.getCertificate')}</span>
               </button>
             )}
-            <button 
+            <button
               onClick={handleAddToMyCourses}
               disabled={savingCourse || isCourseSaved}
               className={`
                 flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors
-                ${isCourseSaved 
-                  ? 'bg-gray-600 text-gray-300 cursor-not-allowed' 
+                ${isCourseSaved
+                  ? 'bg-gray-600 text-gray-300 cursor-not-allowed'
                   : savingCourse
                     ? 'bg-gray-600 text-gray-300 cursor-not-allowed'
                     : 'bg-[#ff3a30] hover:bg-[#ff1a1a] text-white'
@@ -691,10 +693,10 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
             >
               <Bookmark size={20} className={isCourseSaved ? "fill-current" : ""} />
               <span>
-                {savingCourse 
-                  ? 'Saving...' 
-                  : isCourseSaved 
-                    ? 'Added to my courses' 
+                {savingCourse
+                  ? 'Saving...'
+                  : isCourseSaved
+                    ? 'Added to my courses'
                     : 'Add to my courses'
                 }
               </span>
@@ -704,7 +706,7 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
             </button>
           </div>
         </header>
-        
+
         {/* Main Content */}
         <div className="flex flex-1 overflow-hidden">
           {/* Sidebar */}
@@ -712,21 +714,21 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
             <div className={`w-80 ${theme === 'dark' ? 'bg-[#232323] border-[#222]' : 'bg-white border-gray-200'} border-r flex flex-col overflow-hidden`}>
               {/* Tabs */}
               <div className={`flex border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-                <button 
+                <button
                   className={`flex-1 p-4 text-sm font-medium ${activeTab === 'Course Viewer' ? 'text-[#ff3a30] border-b-2 border-[#ff3a30]' : `text-${theme === 'dark' ? 'gray-400' : 'gray-600'}`}`}
                   onClick={() => setActiveTab('Course Viewer')}
                 >
                   <BookOpen size={16} className="inline-block mr-2" />
                   {t('lessonViewer.course')}
                 </button>
-                <button 
+                <button
                   className={`flex-1 p-4 text-sm font-medium ${activeTab === 'Starred' ? 'text-yellow-400 border-b-2 border-yellow-400' : `text-${theme === 'dark' ? 'gray-400' : 'gray-600'}`}`}
                   onClick={() => setActiveTab('Starred')}
                 >
                   <Star size={16} className="inline-block mr-2" />
                   {t('lessonViewer.starred')}
                 </button>
-                <button 
+                <button
                   className={`flex-1 p-4 text-sm font-medium ${activeTab === 'Notes' ? 'text-blue-400 border-b-2 border-blue-400' : `text-${theme === 'dark' ? 'gray-400' : 'gray-600'}`}`}
                   onClick={() => setActiveTab('Notes')}
                 >
@@ -734,7 +736,7 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
                   {t('lessonViewer.notes')}
                 </button>
               </div>
-              
+
               {/* Lessons List */}
               <div className="flex-1 overflow-y-auto p-4">
                 {activeTab === 'Course Viewer' && (
@@ -745,14 +747,14 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
                         {watchedLessons.length}/{lessons.length} {t('lessonViewer.complete')} ({calculateCourseProgress()}%)
                       </span>
                     </div>
-                    
+
                     {lessonsLoading ? (
                       <div>{t('lessonViewer.loadingLessons')}</div>
                     ) : lessons.length === 0 ? (
                       <div>{t('lessonViewer.noLessons')}</div>
                     ) : (
                       lessons.map(lesson => (
-                        <div 
+                        <div
                           key={lesson._id}
                           className={`p-3 rounded-lg ${currentLesson?.lessonId === lesson._id ? 'bg-blue-500 bg-opacity-20 border border-blue-500' : `hover:bg-${theme === 'dark' ? 'gray-700' : 'gray-100'} border border-transparent`} cursor-pointer transition-colors`}
                           onClick={() => handleLessonView(lesson)}
@@ -771,8 +773,8 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
                             <span className={`text-xs text-${theme === 'dark' ? 'gray-400' : 'gray-600'}`}>{calculateLessonProgress(lesson._id)}% {t('lessonViewer.complete')}</span>
                           </div>
                           <div className={`mt-2 h-1 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} rounded-full overflow-hidden`}>
-                            <div 
-                              className="h-full bg-[#00bcd4] rounded-full" 
+                            <div
+                              className="h-full bg-[#00bcd4] rounded-full"
                               style={{ width: `${calculateLessonProgress(lesson._id)}%` }}
                             ></div>
                           </div>
@@ -781,7 +783,7 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
                     )}
                   </div>
                 )}
-                
+
                 {activeTab === 'Starred' && (
                   <div className="space-y-2">
                     <div className="flex justify-between items-center mb-4">
@@ -792,12 +794,12 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
                     </div>
                     {lessons.filter(lesson => favoriteLessons.includes(lesson._id)).length > 0 ? (
                       lessons.filter(lesson => favoriteLessons.includes(lesson._id)).map(lesson => (
-                        <div 
+                        <div
                           key={lesson._id}
                           className={`p-3 rounded-lg ${currentLesson?.lessonId === lesson._id ? 'bg-blue-500 bg-opacity-20 border border-blue-500' : `hover:bg-${theme === 'dark' ? 'gray-700' : 'gray-100'} border border-transparent`} cursor-pointer transition-colors`}
-                          onClick={() => setCurrentLesson({ 
-                            lessonId: lesson._id, 
-                            title: getLocalizedText(lesson.title) 
+                          onClick={() => setCurrentLesson({
+                            lessonId: lesson._id,
+                            title: getLocalizedText(lesson.title)
                           })}
                         >
                           <div className="flex justify-between mb-1">
@@ -814,8 +816,8 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
                             <span className={`text-xs text-${theme === 'dark' ? 'gray-400' : 'gray-600'}`}>{lesson.progress}% {t('lessonViewer.complete')}</span>
                           </div>
                           <div className={`mt-2 h-1 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} rounded-full overflow-hidden`}>
-                            <div 
-                              className="h-full bg-[#00bcd4] rounded-full" 
+                            <div
+                              className="h-full bg-[#00bcd4] rounded-full"
                               style={{ width: `${lesson.progress}%` }}
                             ></div>
                           </div>
@@ -826,7 +828,7 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
                     )}
                   </div>
                 )}
-                
+
                 {activeTab === 'Notes' && (
                   <div>
                     <h2 className="font-bold mb-4">{t('lessonViewer.myNotes')}</h2>
@@ -841,13 +843,13 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
                       <div className="flex gap-2">
                         {activeNote ? (
                           <>
-                            <button 
+                            <button
                               onClick={updateNote}
                               className="px-4 py-2 bg-[#ff3a30] rounded-lg hover:bg-blue-700 transition-colors text-white"
                             >
                               {t('lessonViewer.updateNote')}
                             </button>
-                            <button 
+                            <button
                               onClick={cancelEdit}
                               className={`px-4 py-2 ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-200'} rounded-lg hover:${theme === 'dark' ? 'bg-gray-500' : 'bg-gray-300'} transition-colors`}
                             >
@@ -855,7 +857,7 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
                             </button>
                           </>
                         ) : (
-                          <button 
+                          <button
                             onClick={saveNote}
                             className="px-4 py-2 bg-[#ff3a30] rounded-lg hover:bg-blue-700 transition-colors text-white"
                           >
@@ -864,7 +866,7 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
                         )}
                       </div>
                     </div>
-                    
+
                     <div className="mt-6 space-y-3">
                       {currentLessonNotes.length > 0 ? (
                         currentLessonNotes.map(note => (
@@ -900,7 +902,7 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
               </div>
             </div>
           )}
-          
+
           {/* Content Area */}
           <div className="flex-1 overflow-y-auto">
             {currentLessonData && (
@@ -911,8 +913,8 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
                   <div className={`flex items-center text-${theme === 'dark' ? 'gray-400' : 'gray-600'} text-sm`}>
                     <Clock size={14} className="mr-1" />
                     <span className="mr-4">{currentLessonData.duration}</span>
-                    
-                    <button 
+
+                    <button
                       onClick={() => toggleFavoriteLesson(currentLessonData._id)}
                       className="flex items-center hover:text-yellow-400 transition-colors"
                     >
@@ -921,7 +923,7 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
                     </button>
                   </div>
                 </div>
-                
+
                 {/* Video Player */}
                 <div className={`aspect-video ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'} rounded-lg mb-8 relative overflow-hidden flex items-center justify-center group`}>
                   {subscriptionStatus === SUBSCRIPTION_STATUS.ACTIVE ? (
@@ -936,7 +938,7 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
                           allowFullScreen
                         ></iframe>
                       ) : (
-                        <video 
+                        <video
                           className="w-full h-full object-cover"
                           controls
                           autoPlay={false}
@@ -953,7 +955,7 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
                       <div className="text-center p-8">
                         <Lock size={48} className="mx-auto mb-4 text-[#ff3a30]" />
                         <h3 className="text-xl font-bold mb-2 text-white">
-                          {subscriptionStatus === SUBSCRIPTION_STATUS.EXPIRED 
+                          {subscriptionStatus === SUBSCRIPTION_STATUS.EXPIRED
                             ? t('lessonViewer.subscriptionExpired')
                             : t('lessonViewer.subscriptionRequired')}
                         </h3>
@@ -978,7 +980,7 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
 
                 {/* Navigation */}
                 <div className="flex justify-between mb-8">
-                  <button 
+                  <button
                     onClick={goToPreviousLesson}
                     className={`px-6 py-3 rounded-lg flex items-center ${currentLessonData && currentLessonData._id === lessons[0]?._id ? `${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} text-gray-400 cursor-not-allowed` : `${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} hover:${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'} text-${theme === 'dark' ? 'white' : 'gray-900'}`}`}
                     disabled={currentLessonData && currentLessonData._id === lessons[0]?._id}
@@ -986,8 +988,8 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
                     <ChevronLeft size={20} className="mr-2" />
                     {t('lessonViewer.previousLesson')}
                   </button>
-                  
-                  <button 
+
+                  <button
                     onClick={goToNextLesson}
                     className={`px-6 py-3 rounded-lg flex items-center ${currentLessonData && currentLessonData._id === lessons[lessons.length - 1]?._id ? `${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} text-gray-400 cursor-not-allowed` : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
                     disabled={currentLessonData && currentLessonData._id === lessons[lessons.length - 1]?._id}
@@ -996,13 +998,13 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
                     <ChevronRight size={20} className="ml-2" />
                   </button>
                 </div>
-                
+
                 {/* Lesson Description */}
                 <div className={`prose ${theme === 'dark' ? 'prose-invert' : ''} max-w-none mb-8`}>
                   <h2 className="text-2xl font-bold mb-4">{t('lessonViewer.description')}</h2>
                   <p className={`text-${theme === 'dark' ? 'gray-300' : 'gray-700'}`}>{getLocalizedText(currentLessonData.description)}</p>
                 </div>
-                
+
                 {/* Resources */}
                 <div className="mb-8">
                   <h2 className="text-2xl font-bold mb-4">{t('lessonViewer.resources')}</h2>
@@ -1032,23 +1034,23 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
           </div>
         </div>
       </div>
-      
+
       {/* Toast */}
       {toastMessage && (
         <div className={`fixed bottom-6 right-6 ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border text-${theme === 'dark' ? 'white' : 'gray-900'} px-4 py-3 rounded-lg shadow-lg animate-fade-in flex items-center`}>
           {toastMessage}
-          <button 
-            onClick={() => setToastMessage(null)} 
+          <button
+            onClick={() => setToastMessage(null)}
             className={`ml-4 text-${theme === 'dark' ? 'gray-400' : 'gray-600'} hover:text-${theme === 'dark' ? 'white' : 'gray-900'} transition-colors`}
           >
             <X size={16} />
           </button>
         </div>
       )}
-      
+
       {/* Completion Modal */}
       <CompletionModal />
-      
+
       {/* Add Subscription Modal */}
       <SubscriptionModal />
     </CourseContext.Provider>

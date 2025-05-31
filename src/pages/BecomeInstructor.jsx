@@ -38,7 +38,7 @@ function BecomeInstructor() {
     // Check if user is already an instructor
     const checkInstructorStatus = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/instructors?page=1&limit=100`);
+        const response = await fetch(`/api/instructors?page=1&limit=100`);
         const data = await response.json();
 
         if (data.success) {
@@ -84,7 +84,7 @@ function BecomeInstructor() {
       formData.append("resume", data.resume[0]);
       formData.append("profilePicture", data.profilePicture[0]);
 
-      const response = await fetch("http://localhost:5000/api/instructors", {
+      const response = await fetch("/api/instructors", {
         method: "POST",
         body: formData,
       });
@@ -618,7 +618,7 @@ function MentorApplicationModal({ isOpen, onClose }) {
 
       console.log("📤 البيانات المرسلة:", instructorData);
 
-      const response = await fetch("http://localhost:5000/api/instructors", {
+      const response = await fetch("/api/instructors", {
         method: "POST",
         headers: {
           'Content-Type': 'application/json'

@@ -57,16 +57,16 @@ const Courses = () => {
   useEffect(() => {
     const fetchSavedCourses = async () => {
       if (!user) return;
-      
+
       try {
-        const response = await fetch(`http://localhost:5000/api/saved-courses/user/${user._id}`, {
+        const response = await fetch(`/api/saved-courses/user/${user._id}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
-        
+
         if (!response.ok) throw new Error('Failed to fetch saved courses');
-        
+
         const data = await response.json();
         setSavedCourses(data.map(item => item.courseId._id));
       } catch (err) {
@@ -79,7 +79,7 @@ const Courses = () => {
 
   const toggleSaveCourse = async (courseId, e) => {
     e.stopPropagation();
-    
+
     if (!user) {
       navigate('/loginPage');
       return;
@@ -104,7 +104,7 @@ const Courses = () => {
 
       if (isCurrentlySaved) {
         // Unsave course
-        const response = await fetch(`http://localhost:5000/api/saved-courses/${user._id}/${courseId}`, {
+        const response = await fetch(`/api/saved-courses/${user._id}/${courseId}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -121,7 +121,7 @@ const Courses = () => {
         toast.success(t('Course removed from saved courses'));
       } else {
         // Save course
-        const response = await fetch('http://localhost:5000/api/saved-courses', {
+        const response = await fetch('/api/saved-courses', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -455,9 +455,8 @@ const Courses = () => {
 
     return (
       <div className="px-4 min-h-72 flex flex-col items-center justify-start">
-        <div className={`w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden shadow transition-all duration-300 hover:scale-105 ${
-          theme === 'dark' ? 'shadow-gray-800' : 'shadow-gray-200'
-        }`}>
+        <div className={`w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden shadow transition-all duration-300 hover:scale-105 ${theme === 'dark' ? 'shadow-gray-800' : 'shadow-gray-200'
+          }`}>
           <img src={image} alt={name} className="w-full h-full object-cover" />
         </div>
         <h3 className={`text-lg font-semibold mt-4 text-center ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{name}</h3>
@@ -473,7 +472,7 @@ const Courses = () => {
     const title = getLocalizedText(category.name);
     const image = category.thumbnailImgUrl || 'https://placehold.co/400x300';
     return (
-      
+
       <div
         className="relative cursor-pointer rounded-xl overflow-hidden group h-60 sm:h-72 md:h-80 flex items-end transition-all duration-300 shadow-lg hover:shadow-xl"
         onClick={() => navigate(`/categories/${category._id}`)}
@@ -598,10 +597,10 @@ const Courses = () => {
                     <button
                       onClick={() => handleTopicClick(topic._id)}
                       className={`whitespace-nowrap px-3 py-1 rounded-full transition-colors duration-300
-                        ${selectedTopic === topic._id 
-                          ? 'bg-[#00ffd0] text-black font-semibold' 
-                          : theme === 'dark' 
-                            ? 'text-white hover:bg-gray-800' 
+                        ${selectedTopic === topic._id
+                          ? 'bg-[#00ffd0] text-black font-semibold'
+                          : theme === 'dark'
+                            ? 'text-white hover:bg-gray-800'
                             : 'text-gray-800 hover:bg-gray-100'}
                       `}
                     >
@@ -644,8 +643,8 @@ const Courses = () => {
           <h2 className={`text-xl md:text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
             {t('sections.trending')}
           </h2>
-          <button 
-            onClick={() => navigate('/all-courses')} 
+          <button
+            onClick={() => navigate('/all-courses')}
             className={`${theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors duration-200 flex items-center gap-1`}
           >
             {t('buttons.viewAll')} <span className="ml-1">&rarr;</span>
@@ -662,8 +661,8 @@ const Courses = () => {
           <h2 className={`text-xl md:text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
             {t('sections.newlyReleased')}
           </h2>
-          <button 
-            onClick={() => navigate('/all-courses')} 
+          <button
+            onClick={() => navigate('/all-courses')}
             className={`${theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors duration-200 flex items-center gap-1`}
           >
             {t('buttons.viewAll')} <span className="ml-1">&rarr;</span>
@@ -778,7 +777,7 @@ const Courses = () => {
           </Slider>
         </div>
         <div className="text-center mt-8">
-          <button 
+          <button
             onClick={() => navigate('/instructors')}
             className={`rounded px-6 py-2 border transition-all duration-200 ${theme === 'dark' ? 'border-white text-white hover:bg-white hover:text-black' : 'border-black text-black hover:bg-black hover:text-white'}`}
           >

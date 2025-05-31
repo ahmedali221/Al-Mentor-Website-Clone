@@ -38,8 +38,8 @@ const InstructorForms = () => {
     const fetchData = async () => {
       try {
         const [categoriesRes, topicsRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/categories'),
-          axios.get('http://localhost:5000/api/topics')
+          axios.get('/api/categories'),
+          axios.get('/api/topics')
         ]);
         setCategories(categoriesRes.data);
         setTopics(topicsRes.data);
@@ -54,7 +54,7 @@ const InstructorForms = () => {
   // Handle Topic Change
   const handleTopicChange = async (topicId) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/topics/${topicId}/subtopics`);
+      const response = await axios.get(`/api/topics/${topicId}/subtopics`);
       setSubtopics(response.data);
     } catch (error) {
       console.error('Error fetching subtopics:', error);
@@ -89,7 +89,7 @@ const InstructorForms = () => {
     formData.append('thumbnail', file);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/upload', formData, {
+      const response = await axios.post('/api/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -117,7 +117,7 @@ const InstructorForms = () => {
         rating: { average: 0, count: 0 }
       };
 
-      const response = await axios.post('http://localhost:5000/api/courses', courseData, {
+      const response = await axios.post('/api/courses', courseData, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }

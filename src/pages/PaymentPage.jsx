@@ -85,7 +85,7 @@ function PaymentPage() {
 
 
 
-      const response = await axios.post("http://localhost:5000/api/payments/", paymentData, {
+      const response = await axios.post("/api/payments/", paymentData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -94,7 +94,7 @@ function PaymentPage() {
       if (response.data) {
         try {
           await axios.post(
-            "http://localhost:5000/api/user-subscriptions/user",
+            "/api/user-subscriptions/user",
             {
               userId: user._id,
               subscriptionId: planId
@@ -172,7 +172,7 @@ function PaymentPage() {
       try {
         setPlanLoading(true);
         const response = await axios.get(
-          `http://localhost:5000/api/subscriptions/${planId}`,
+          `/api/subscriptions/${planId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -246,8 +246,8 @@ function PaymentPage() {
     return (
       <div
         className={`min-h-screen flex items-center justify-center ${theme === "dark"
-            ? "bg-[#1A1A1A] text-white"
-            : "bg-gray-50 text-gray-900"
+          ? "bg-[#1A1A1A] text-white"
+          : "bg-gray-50 text-gray-900"
           }`}>
         <div className='text-center'>
           <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600 mx-auto'></div>
@@ -261,8 +261,8 @@ function PaymentPage() {
     return (
       <div
         className={`min-h-screen flex items-center justify-center ${theme === "dark"
-            ? "bg-[#1A1A1A] text-white"
-            : "bg-gray-50 text-gray-900"
+          ? "bg-[#1A1A1A] text-white"
+          : "bg-gray-50 text-gray-900"
           }`}>
         <div className='text-center'>
           <p className='text-red-500 text-xl mb-4'>{error}</p>
@@ -281,8 +281,8 @@ function PaymentPage() {
   return (
     <div
       className={`min-h-screen flex items-center justify-center mt-16 ${theme === "dark"
-          ? "bg-[#1A1A1A] text-white"
-          : "bg-gray-50 text-gray-900"
+        ? "bg-[#1A1A1A] text-white"
+        : "bg-gray-50 text-gray-900"
         }`}
       dir={isRTL ? "rtl" : "ltr"}>
       <div className='w-full max-w-[1200px] px-2 pt-28 pb-12'>
@@ -335,17 +335,17 @@ function PaymentPage() {
                     <div
                       onClick={() => handlePaymentMethodClick(method.id)}
                       className={`flex items-center justify-between p-4 cursor-pointer ${selectedPaymentMethod === method.id
-                          ? `${theme === "dark" ? "bg-[#2C2C2C]" : "bg-white"
-                          } border border-red-500`
-                          : theme === "dark"
-                            ? "bg-[#222222]"
-                            : "bg-gray-100"
+                        ? `${theme === "dark" ? "bg-[#2C2C2C]" : "bg-white"
+                        } border border-red-500`
+                        : theme === "dark"
+                          ? "bg-[#222222]"
+                          : "bg-gray-100"
                         }`}>
                       <div className='flex items-center gap-4'>
                         <div
                           className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedPaymentMethod === method.id
-                              ? "border-red-500"
-                              : "border-gray-400"
+                            ? "border-red-500"
+                            : "border-gray-400"
                             }`}>
                           {selectedPaymentMethod === method.id && (
                             <div className='w-2.5 h-2.5 rounded-full bg-red-500' />

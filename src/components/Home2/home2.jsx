@@ -40,7 +40,7 @@ const Home = () => {
       if (!user) return;
 
       try {
-        const response = await fetch(`http://localhost:5000/api/saved-courses/user/${user._id}`, {
+        const response = await fetch(`/api/saved-courses/user/${user._id}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -76,7 +76,7 @@ const Home = () => {
 
       if (isCurrentlySaved) {
         // Unsave course
-        const response = await fetch(`http://localhost:5000/api/saved-courses/${user._id}/${courseId}`, {
+        const response = await fetch(`/api/saved-courses/${user._id}/${courseId}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -98,7 +98,7 @@ const Home = () => {
           courseId,
           savedAt: new Date().toISOString()
         };
-        const response = await fetch('http://localhost:5000/api/saved-courses', {
+        const response = await fetch('/api/saved-courses', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

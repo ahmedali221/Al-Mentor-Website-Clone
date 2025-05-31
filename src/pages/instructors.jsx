@@ -24,7 +24,7 @@ export default function Instructors() {
     setLoading(true);
     setError(null);
 
-    fetch(`http://localhost:5000/api/instructors?page=${page}&limit=${limit}`)
+    fetch(`/api/instructors?page=${page}&limit=${limit}`)
       .then((res) => {
         if (!res.ok) {
           return res
@@ -66,7 +66,7 @@ export default function Instructors() {
       }
 
       try {
-        const response = await fetch(`http://localhost:5000/api/instructors?page=1&limit=100`);
+        const response = await fetch(`/api/instructors?page=1&limit=100`);
         const data = await response.json();
 
         if (data.success) {

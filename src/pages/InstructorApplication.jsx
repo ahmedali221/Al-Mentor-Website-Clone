@@ -44,7 +44,7 @@ const InstructorApplication = () => {
                 }
             });
 
-            const response = await fetch('http://localhost:5000/api/instructors', {
+            const response = await fetch('/api/instructors', {
                 method: 'POST',
                 body: formData,
             });
@@ -182,8 +182,8 @@ const InstructorApplication = () => {
                                 type="submit"
                                 disabled={isSubmitting}
                                 className={`w-full py-3 px-4 rounded-md font-medium ${isSubmitting
-                                        ? 'bg-gray-400 cursor-not-allowed'
-                                        : 'bg-red-600 hover:bg-red-700'
+                                    ? 'bg-gray-400 cursor-not-allowed'
+                                    : 'bg-red-600 hover:bg-red-700'
                                     } text-white transition-colors`}
                             >
                                 {isSubmitting

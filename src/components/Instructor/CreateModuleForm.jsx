@@ -44,12 +44,12 @@ const CreateModuleForm = () => {
     const fetchCourseDetails = async () => {
       try {
         console.log('Fetching course details for ID:', finalCourseId);
-        const response = await axios.get(`http://localhost:5000/api/courses/${finalCourseId}`, {
+        const response = await axios.get(`/api/courses/${finalCourseId}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
-        
+
         if (response.data.success) {
           console.log('Course details fetched successfully:', response.data.data);
           setCourseDetails(response.data.data);
@@ -75,7 +75,7 @@ const CreateModuleForm = () => {
     duration: 0,
     isPublished: false,
     completionCriteria: 'all-lessons',
-    level: { 
+    level: {
       en: 'beginner',
       ar: 'مبتدئ'
     }
@@ -121,7 +121,7 @@ const CreateModuleForm = () => {
 
       console.log('Submitting module data:', moduleForm);
 
-      const response = await axios.post('http://localhost:5000/api/modules', {
+      const response = await axios.post('/api/modules', {
         ...moduleForm,
         course: moduleForm.course.toString(),
         order: parseInt(moduleForm.order),
@@ -140,10 +140,10 @@ const CreateModuleForm = () => {
         const newModuleId = response.data._id;
         console.log('Created module with ID:', newModuleId);
         toast.success(t('messages.moduleCreated'));
-        
+
         // Navigate to lesson form with the correct module ID
         navigate(`/instructor-lesson-form/${newModuleId}`, {
-          state: { 
+          state: {
             courseId: moduleForm.course,
             moduleId: newModuleId,
             moduleDetails: response.data
@@ -154,9 +154,9 @@ const CreateModuleForm = () => {
         const newModuleId = response.data.data._id;
         console.log('Created module with ID:', newModuleId);
         toast.success(t('messages.moduleCreated'));
-        
+
         navigate(`/instructor-lesson-form/${newModuleId}`, {
-          state: { 
+          state: {
             courseId: moduleForm.course,
             moduleId: newModuleId,
             moduleDetails: response.data.data
@@ -169,8 +169,8 @@ const CreateModuleForm = () => {
     } catch (error) {
       console.error('Error creating module:', error.response?.data || error);
       toast.error(
-        error.response?.data?.message || 
-        error.response?.data?.error || 
+        error.response?.data?.message ||
+        error.response?.data?.error ||
         t('messages.createError')
       );
     } finally {
@@ -245,9 +245,9 @@ const CreateModuleForm = () => {
               onChange={(e) => handleInputChange('level', {
                 ...moduleForm.level,
                 [currentLang]: e.target.value,
-                [currentLang === 'en' ? 'ar' : 'en']: 
+                [currentLang === 'en' ? 'ar' : 'en']:
                   e.target.value === 'beginner' ? 'مبتدئ' :
-                  e.target.value === 'intermediate' ? 'متوسط' : 'متقدم'
+                    e.target.value === 'intermediate' ? 'متوسط' : 'متقدم'
               })}
               required
               className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -336,9 +336,8 @@ const CreateModuleForm = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`px-6 py-2 rounded-lg text-white ${
-                loading ? 'bg-gray-400' : 'bg-red-600 hover:bg-red-700'
-              }`}
+              className={`px-6 py-2 rounded-lg text-white ${loading ? 'bg-gray-400' : 'bg-red-600 hover:bg-red-700'
+                }`}
             >
               {loading ? t('common.loading') : t('instructorForms.createModule')}
             </button>

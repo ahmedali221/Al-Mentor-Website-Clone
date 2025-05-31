@@ -27,7 +27,7 @@ export default function InstructorDetails() {
     // Fetch the instructor details
     const fetchInstructor = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/instructors/${id}`);
+        const res = await fetch(`/api/instructors/${id}`);
         const data = await res.json();
         setInstructor(data.data || data || null);
       } catch (err) {
@@ -46,7 +46,7 @@ export default function InstructorDetails() {
     if (!id) return;
     const fetchCourses = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/courses/instructor/${id}`);
+        const res = await fetch(`/api/courses/instructor/${id}`);
         const data = await res.json();
         setCourses(data || []);
       } catch (err) {

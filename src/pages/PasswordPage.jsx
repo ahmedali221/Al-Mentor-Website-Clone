@@ -46,10 +46,10 @@ function PasswordPage() {
                         const authCheckResponse = await axios.get('/api/auth/check', {
                             headers: { Authorization: `Bearer ${response.data.token}` }
                         });
-                        
+
                         if (authCheckResponse.data.message === "Authenticated") {
                             // Then fetch complete user data including instructor status
-                            const userResponse = await axios.get(`http://localhost:5000/api/users/${authCheckResponse.data.user._id}`, {
+                            const userResponse = await axios.get(`/api/users/${authCheckResponse.data.user._id}`, {
                                 headers: { Authorization: `Bearer ${response.data.token}` }
                             });
                             console.log("Fetched complete user data:", userResponse.data);

@@ -33,7 +33,7 @@ const SavedCourses = () => {
     const fetchSavedCourses = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:5000/api/saved-courses/user/${user._id}`, {
+        const response = await fetch(`/api/saved-courses/user/${user._id}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -44,10 +44,10 @@ const SavedCourses = () => {
         }
 
         const data = await response.json();
-        
+
         // Extract course data from the response
         const courses = Array.isArray(data) ? data : data.data || [];
-        
+
         // Map the courses to include all necessary data
         const formattedCourses = courses.map(item => ({
           _id: item.courseId?._id || item._id,
@@ -78,7 +78,7 @@ const SavedCourses = () => {
 
   const toggleSaveCourse = async (courseId, e) => {
     e.stopPropagation();
-    
+
     if (!user) {
       navigate('/loginPage');
       return;
@@ -92,7 +92,7 @@ const SavedCourses = () => {
 
       if (isCurrentlySaved) {
         // Unsave course
-        const response = await fetch(`http://localhost:5000/api/saved-courses/${user._id}/${courseId}`, {
+        const response = await fetch(`/api/saved-courses/${user._id}/${courseId}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -107,7 +107,7 @@ const SavedCourses = () => {
         toast.success(t('messages.courseRemovedFromSaved'));
       } else {
         // Save course
-        const response = await fetch('http://localhost:5000/api/saved-courses', {
+        const response = await fetch('/api/saved-courses', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

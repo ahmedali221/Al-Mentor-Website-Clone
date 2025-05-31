@@ -31,7 +31,7 @@ const Home = () => {
     const fetchCourses = async () => {
       setLoadingCourses(true);
       try {
-        const res = await fetch('http://localhost:5000/api/courses');
+        const res = await fetch('/api/courses');
         if (!res.ok) throw new Error('Failed to fetch courses');
         const data = await res.json();
         setAllCourses(data.data || data);
@@ -48,7 +48,7 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/category')
+    fetch('/api/category')
       .then(res => res.json())
       .then(data => setCategories(data.data || []))
       .catch(err => console.error('Error fetching categories:', err));
@@ -58,7 +58,7 @@ const Home = () => {
     const fetchInstructors = async () => {
       setLoadingInstructors(true);
       try {
-        const res = await fetch('http://localhost:5000/api/instructors');
+        const res = await fetch('/api/instructors');
         if (!res.ok) throw new Error('Failed to fetch instructors');
         const data = await res.json();
         setInstructors(data.data || []);
@@ -250,8 +250,8 @@ const Home = () => {
           <button
             onClick={handleViewAllCourses}
             className={`rounded px-6 py-2 border-2 transition text-3xl cursor-pointer ${theme === 'dark'
-                ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
-                : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
+              ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
+              : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
               }`}
           >
             {t('buttons.courses')}
@@ -300,8 +300,8 @@ const Home = () => {
           <button
             onClick={handleViewAllInstructors}
             className={`rounded px-6 py-2 border-2 transition text-3xl cursor-pointer ${theme === 'dark'
-                ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
-                : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
+              ? 'bg-transparent text-white border-white hover:bg-white hover:text-black'
+              : 'bg-transparent text-black border-black hover:bg-black hover:text-white'
               }`}
           >
             {t('buttons.instructors')}

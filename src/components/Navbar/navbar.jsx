@@ -168,7 +168,7 @@ const Navbar = () => {
       if (!user) return;
 
       try {
-        const response = await fetch(`http://localhost:5000/api/instructors?page=1&limit=100`);
+        const response = await fetch(`/api/instructors?page=1&limit=100`);
         const data = await response.json();
 
         if (data.success) {

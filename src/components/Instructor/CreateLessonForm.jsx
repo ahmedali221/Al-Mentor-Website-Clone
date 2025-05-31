@@ -37,12 +37,12 @@ const CreateLessonForm = () => {
     const fetchModuleDetails = async () => {
       try {
         console.log('Fetching module details for ID:', moduleId);
-        const response = await axios.get(`http://localhost:5000/api/modules/${moduleId}`, {
+        const response = await axios.get(`/api/modules/${moduleId}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
-        
+
         if (response.data.success && response.data.data) {
           console.log('Module details fetched successfully:', response.data.data);
           const moduleData = response.data.data;
@@ -149,7 +149,7 @@ const CreateLessonForm = () => {
 
     try {
       console.log('Submitting lesson data:', lessonForm);
-      
+
       if (!lessonForm.module) {
         toast.error(t('messages.moduleIdRequired'));
         setLoading(false);
@@ -168,7 +168,7 @@ const CreateLessonForm = () => {
         return;
       }
 
-      const response = await axios.post('http://localhost:5000/api/lessons', {
+      const response = await axios.post('/api/lessons', {
         ...lessonForm,
         module: lessonForm.module.toString(),
         course: lessonForm.course.toString(),
@@ -187,7 +187,7 @@ const CreateLessonForm = () => {
         const newLessonId = response.data._id;
         console.log('Created lesson with ID:', newLessonId);
         toast.success(t('messages.lessonCreated'));
-        
+
         toast.info(
           `${t('instructor.lessonTitleEn')}: ${response.data.title.en}\n` +
           `${t('instructor.lessonTitleAr')}: ${response.data.title.ar}`
@@ -195,7 +195,7 @@ const CreateLessonForm = () => {
 
         setTimeout(() => {
           navigate(`/instructor-module/${lessonForm.module}`, {
-            state: { 
+            state: {
               courseId: lessonForm.course,
               moduleId: lessonForm.module,
               moduleDetails: moduleDetails,
@@ -436,9 +436,8 @@ const CreateLessonForm = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`px-6 py-2 rounded-lg text-white ${
-                loading ? 'bg-gray-400' : 'bg-red-600 hover:bg-red-700'
-              }`}
+              className={`px-6 py-2 rounded-lg text-white ${loading ? 'bg-gray-400' : 'bg-red-600 hover:bg-red-700'
+                }`}
             >
               {loading ? t('common.loading') : t('instructorForms.createLesson')}
             </button>
