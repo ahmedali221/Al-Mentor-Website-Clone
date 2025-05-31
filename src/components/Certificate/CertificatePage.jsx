@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -52,18 +53,18 @@ const CertificatePage = () => {
         }
 
         // Fetch user data
-        const userResponse = await axios.get(`/api/users/${userId}`, {
+        const userResponse = await axios.get(`https://al-mentor-database-production.up.railway.app/${userId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setUserData(userResponse.data);
 
         // Fetch course data
-        const courseResponse = await axios.get(`/api/courses/${courseId}`);
+        const courseResponse = await axios.get(`https://al-mentor-database-production.up.railway.app/${courseId}`);
         const course = courseResponse.data;
         setCertificateData(course);
 
         // Fetch all instructors
-        const instructorsResponse = await axios.get('/api/instructors');
+        const instructorsResponse = await axios.get('https://al-mentor-database-production.up.railway.app/instructors');
         const instructors = instructorsResponse.data.data || instructorsResponse.data;
         setAllInstructors(instructors);
 

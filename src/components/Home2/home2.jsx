@@ -40,7 +40,7 @@ const Home = () => {
       if (!user) return;
 
       try {
-        const response = await fetch(`http://localhost:5000/api/saved-courses/user/${user._id}`, {
+        const response = await fetch(`https://al-mentor-database-production.up.railway.app/saved-courses/user/${user._id}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -76,7 +76,7 @@ const Home = () => {
 
       if (isCurrentlySaved) {
         // Unsave course
-        const response = await fetch(`http://localhost:5000/api/saved-courses/${user._id}/${courseId}`, {
+        const response = await fetch(`https://al-mentor-database-production.up.railway.app/saved-courses/${user._id}/${courseId}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -98,7 +98,7 @@ const Home = () => {
           courseId,
           savedAt: new Date().toISOString()
         };
-        const response = await fetch('http://localhost:5000/api/saved-courses', {
+        const response = await fetch('https://al-mentor-database-production.up.railway.app/saved-courses', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -134,7 +134,7 @@ const Home = () => {
   useEffect(() => {
     setLoadingInstructors(true);
     axios
-      .get("/api/instructors")
+      .get("https://al-mentor-database-production.up.railway.app/instructors")
       .then((res) => {
         setInstructors(res.data.data);
       })
@@ -150,7 +150,7 @@ const Home = () => {
   // Fetch courses
   useEffect(() => {
     axios
-      .get("/api/courses")
+      .get("https://al-mentor-database-production.up.railway.app/courses")
       .then((res) => {
         const courseData = res.data.data || res.data;
         setAllCourses(courseData);
@@ -178,7 +178,7 @@ const Home = () => {
   // Fetch programs
   useEffect(() => {
     axios
-      .get("/api/programs")
+      .get("https://al-mentor-database-production.up.railway.app/programs")
       .then((res) => {
         const programData = res.data.data || res.data;
         setPrograms(programData);
@@ -189,7 +189,7 @@ const Home = () => {
   // Fetch categories
   useEffect(() => {
     axios
-      .get("/api/category")
+      .get("https://al-mentor-database-production.up.railway.app/category")
       .then((res) => setCategories(res.data.data))
       .catch((err) => console.error("Error fetching categories:", err));
   }, []);

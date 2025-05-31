@@ -22,7 +22,7 @@ const MyCourses = () => {
   // Fetch course details for completed courses
   const fetchCourseDetails = async (courseId) => {
     try {
-      const response = await axios.get(`/api/courses/${courseId}`);
+      const response = await axios.get(`https://al-mentor-database-production.up.railway.app/courses/${courseId}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching course ${courseId}:`, error);

@@ -27,7 +27,7 @@ export default function InstructorDetails() {
     // Fetch the instructor details
     const fetchInstructor = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/instructors/${id}`);
+        const res = await fetch(`https://al-mentor-database-production.up.railway.app/instructors/${id}`);
         const data = await res.json();
         setInstructor(data.data || data || null);
       } catch (err) {
@@ -46,7 +46,7 @@ export default function InstructorDetails() {
     if (!id) return;
     const fetchCourses = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/courses/instructor/${id}`);
+        const res = await fetch(`https://al-mentor-database-production.up.railway.app/courses/instructor/${id}`);
         const data = await res.json();
         setCourses(data || []);
       } catch (err) {
@@ -82,7 +82,7 @@ export default function InstructorDetails() {
 
   const avatar =
     profile.profilePicture ||
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(
+    `https://al-mentor-database-production.up.railway.app/?name=${encodeURIComponent(
       name
     )}&size=256&background=374151&color=fff`;
 

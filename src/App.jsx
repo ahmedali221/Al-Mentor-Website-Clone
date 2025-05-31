@@ -7,7 +7,7 @@ import LoginPage from './pages/LoginPage.jsx';
 import PasswordPage from './pages/PasswordPage.jsx';
 import SignupPage from './pages/SignupPage.jsx';
 import SignEmail from './pages/SignEmail.jsx';
-import Home from './components/Home/Home.jsx'; // Update Home casing
+import Home from './components/Home'; // Update Home casing
 import Instructors from './pages/Instructors'; // Remove .jsx extension
 import { ThemeProvider } from './context/ThemeContext.jsx';
 import { MyCoursesProvider } from './context/MyCoursesContext.jsx';
@@ -15,7 +15,7 @@ import './i18n/config';
 import ProgramsPage from './pages/ProgramsPage.jsx';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import Courses from './components/Courses/Courses.jsx';
+import Courses from './components/Courses/courses.jsx';
 import CategoryPage from './pages/CategoryPage.jsx';
 import CourseDetailsPage from './components/CourseDetails/CourseDetails.jsx';
 import AllCourses from './components/Courses/AllCourses.jsx';
@@ -24,16 +24,16 @@ import { CourseProvider } from './components/LessonViewer/CourseContext.jsx';
 import MyCourses from './components/MyCourses/MyCourses.jsx';
 import CertificatePage from './components/Certificate/CertificatePage.jsx';
 import SavedCourses from './components/Courses/SavedCourses.jsx';
-import Profile from './components/Profile/Profile.jsx';
+import Profile from './components/Profile/profile.jsx';
 import BecomeInstructor from './pages/BecomeInstructor.jsx';
-import Home2 from './components/Home2/Home2.jsx'; // Update Home2 casing
+import Home2 from './components/Home2/home2.jsx'; // Update Home2 casing
 import ProgramDetailPage from './pages/ProgramDetailPage.jsx';
 import InstructorDetails from './pages/InstructorDetails.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 import AIChatPage from './pages/AIChatPage.jsx';
 import Subscribe from './pages/Subscribe.jsx';
-import InstructorDashboard from './pages/InstructorDashbaord.jsx'; // Fix typo in filename
+import InstructorDashboard from './pages/instructorDashbaord.jsx'; // Fix typo in filename
 import PaymentPage from './pages/PaymentPage.jsx';
 import InstructorSessionChat from './components/InstructorSession/InstructorSessionChat.jsx';
 import SessionHistory from './components/InstructorSession/SessionHistory.jsx';

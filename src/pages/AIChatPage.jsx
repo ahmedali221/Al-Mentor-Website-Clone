@@ -62,7 +62,7 @@ const AIChatHomepage = () => {
   const fetchUserChats = async () => {
     if (!userId) return;
     try {
-      const response = await fetch(`/api/chats/user/${userId}`);
+      const response = await fetch(`https://al-mentor-database-production.up.railway.app/chats/user/${userId}`);
       const data = await response.json();
       if (data.success) {
         setChatHistory(data.data);
@@ -81,7 +81,7 @@ const AIChatHomepage = () => {
 
   const loadChat = async (chatId) => {
     try {
-      const response = await fetch(`/api/chats/${chatId}`);
+      const response = await fetch(`https://al-mentor-database-production.up.railway.app/chats/${chatId}`);
       const data = await response.json();
       if (data.success) {
         setCurrentChatId(chatId);
@@ -96,7 +96,7 @@ const AIChatHomepage = () => {
     e.stopPropagation();
     if (window.confirm(t('ai.chat.deleteChatConfirm'))) {
       try {
-        const response = await fetch(`/api/chats/${chatId}`, {
+        const response = await fetch(`https://al-mentor-database-production.up.railway.app/chats/${chatId}`, {
           method: 'DELETE'
         });
         const data = await response.json();
@@ -114,7 +114,7 @@ const AIChatHomepage = () => {
 
   const updateChatTitle = async (chatId, newTitle) => {
     try {
-      const response = await fetch(`/api/chats/${chatId}/title`, {
+      const response = await fetch(`https://al-mentor-database-production.up.railway.app/chats/${chatId}/title`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -136,7 +136,7 @@ const AIChatHomepage = () => {
 
   const saveChatMessage = async (message, role, chatId = currentChatId) => {
     try {
-      const response = await fetch('/api/chats', {
+      const response = await fetch('https://al-mentor-database-production.up.railway.app/chats', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -210,7 +210,7 @@ const AIChatHomepage = () => {
     const chatIdToUse = currentChatId || chatData?._id;
 
     try {
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      const response = await fetch("https://al-mentor-database-production.up.railway.app/v1/chat/completions", {
         method: "POST",
         headers: {
           "Authorization": "Bearer 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",

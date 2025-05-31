@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -25,11 +26,11 @@ const CategoryPage = () => {
 
   useEffect(() => {
     if (!category) {
-      axios.get(`/api/categories/${id}`)
+      axios.get(`https://al-mentor-database-production.up.railway.app/categories/${id}`)
         .then(res => setCategory(res.data.data))
         .catch(() => setCategory(null));
     }
-    axios.get('/api/courses')
+    axios.get('https://al-mentor-database-production.up.railway.app/courses')
       .then(res => {
         const categoryCourses = res.data.filter(c => c.category === id);
         setCourses(categoryCourses);
@@ -68,7 +69,7 @@ const CategoryPage = () => {
     const fetchSavedCourses = async () => {
       if (!user) return;
       try {
-        const response = await fetch(`http://localhost:5000/api/saved-courses/user/${user._id}`, {
+        const response = await fetch(`https://al-mentor-database-production.up.railway.app/saved-courses/user/${user._id}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -95,7 +96,7 @@ const CategoryPage = () => {
       const isCurrentlySaved = savedCourses.includes(courseId);
       if (isCurrentlySaved) {
         // Unsave course
-        const response = await fetch(`http://localhost:5000/api/saved-courses/${user._id}/${courseId}`, {
+        const response = await fetch(`https://al-mentor-database-production.up.railway.app/saved-courses/${user._id}/${courseId}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -115,7 +116,7 @@ const CategoryPage = () => {
           courseId,
           savedAt: new Date().toISOString()
         };
-        const response = await fetch('http://localhost:5000/api/saved-courses', {
+        const response = await fetch('https://al-mentor-database-production.up.railway.app/saved-courses', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

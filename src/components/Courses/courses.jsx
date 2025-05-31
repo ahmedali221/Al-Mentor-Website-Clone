@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import Slider from 'react-slick';
 import './courses.css';
@@ -22,17 +23,17 @@ const Courses = () => {
   const { user } = useAuth();
 
   const [instructors, setInstructors] = useState([]);
-  const [allCourses, setAllCourses] = useState([]);
+  const [ setAllCourses] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Sectioned courses
-  const [picks, setPicks] = useState([]);
+  const [ setPicks] = useState([]);
   const [trending, setTrending] = useState([]);
   const [newlyReleased, setNewlyReleased] = useState([]);
-  const [freeCourses, setFreeCourses] = useState([]);
-  const [popular, setPopular] = useState([]);
+  const [ setFreeCourses] = useState([]);
+  const [ setPopular] = useState([]);
 
   const [subscriptionPlans, setSubscriptionPlans] = useState([]);
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -59,7 +60,7 @@ const Courses = () => {
       if (!user) return;
       
       try {
-        const response = await fetch(`http://localhost:5000/api/saved-courses/user/${user._id}`, {
+        const response = await fetch(`https://al-mentor-database-production.up.railway.app/saved-courses/user/${user._id}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -104,7 +105,7 @@ const Courses = () => {
 
       if (isCurrentlySaved) {
         // Unsave course
-        const response = await fetch(`http://localhost:5000/api/saved-courses/${user._id}/${courseId}`, {
+        const response = await fetch(`https://al-mentor-database-production.up.railway.app/saved-courses/${user._id}/${courseId}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -121,7 +122,7 @@ const Courses = () => {
         toast.success(t('Course removed from saved courses'));
       } else {
         // Save course
-        const response = await fetch('http://localhost:5000/api/saved-courses', {
+        const response = await fetch('https://al-mentor-database-production.up.railway.app/saved-courses', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -154,7 +155,7 @@ const Courses = () => {
   };
 
   useEffect(() => {
-    axios.get('/api/instructors')
+    axios.get('https://al-mentor-database-production.up.railway.app/instructors')
       .then((res) => setInstructors(res.data.data))
       .catch((err) => console.error('Error fetching instructors:', err));
   }, []);
@@ -165,7 +166,7 @@ const Courses = () => {
     const search = params.get('search');
     setSearchQuery(search || '');
 
-    axios.get('/api/courses')
+    axios.get('https://al-mentor-database-production.up.railway.app/courses')
       .then((res) => {
         const coursesData = res.data;
         setAllCourses(coursesData);
@@ -180,7 +181,7 @@ const Courses = () => {
   }, [location.search]);
 
   useEffect(() => {
-    axios.get('/api/category')
+    axios.get('https://al-mentor-database-production.up.railway.app/category')
       .then((res) => setCategories(res.data.data))
       .catch((err) => console.error('Error fetching categories:', err));
   }, []);
@@ -190,7 +191,7 @@ const Courses = () => {
     const fetchSubscriptionPlans = async () => {
       try {
         setSubscriptionLoading(true);
-        const response = await axios.get('/api/subscriptions');
+        const response = await axios.get('https://al-mentor-database-production.up.railway.app/subscriptions');
         setSubscriptionPlans(response.data);
         // Set the first plan as selected by default
         if (response.data.length > 0) {
@@ -212,7 +213,7 @@ const Courses = () => {
     const fetchTopics = async () => {
       try {
         setTopicLoading(true);
-        const response = await axios.get('/api/topics');
+        const response = await axios.get('https://al-mentor-database-production.up.railway.app/topics');
         setTopics(response.data);
       } catch (err) {
         console.error('Error fetching topics:', err);
@@ -229,7 +230,7 @@ const Courses = () => {
   useEffect(() => {
     const fetchInitialCourses = async () => {
       try {
-        const response = await axios.get('/api/courses');
+        const response = await axios.get('https://al-mentor-database-production.up.railway.app/courses');
         setFilteredPicks(response.data);
       } catch (err) {
         console.error('Error fetching initial courses:', err);
@@ -246,7 +247,7 @@ const Courses = () => {
       if (!selectedTopic) {
         // If no topic selected, fetch all courses
         try {
-          const response = await axios.get('/api/courses');
+          const response = await axios.get('https://al-mentor-database-production.up.railway.app/courses');
           setFilteredPicks(response.data);
         } catch (err) {
           console.error('Error fetching courses:', err);
@@ -258,10 +259,10 @@ const Courses = () => {
       try {
         setTopicCoursesLoading(true);
         // Get courses for the selected topic
-        const topicResponse = await axios.get(`/api/topics/${selectedTopic}`);
+        const topicResponse = await axios.get(`https://al-mentor-database-production.up.railway.app/topics/${selectedTopic}`);
 
         // Get all courses and filter by topic
-        const coursesResponse = await axios.get('/api/courses');
+        const coursesResponse = await axios.get('https://al-mentor-database-production.up.railway.app/courses');
 
         // Filter courses based on topic
         const coursesWithTopic = coursesResponse.data.filter(course => {

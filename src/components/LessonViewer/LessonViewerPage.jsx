@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useMemo, createContext, useContext } from 'react';
+/* eslint-disable no-unused-vars */
+import React, { useState, useEffect, useMemo, createContext} from 'react';
 import { ChevronRight, ChevronDown, ChevronLeft, Star, Clock, FileText, 
          Bell, X, PlayCircle, Volume2, Maximize, Settings, Book, 
          BookOpen, Menu, Bookmark, Video, Share, Download, ExternalLink,
@@ -69,7 +70,7 @@ export default function EnhancedLessonViewer() {
     const fetchCourseData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`/api/courses/${courseId}`);
+        const response = await axios.get(`https://al-mentor-database-production.up.railway.app/courses/${courseId}`);
         setCourseData(response.data);
         
         if (response.data.lessons && response.data.lessons.length > 0) {
@@ -95,7 +96,7 @@ export default function EnhancedLessonViewer() {
     const fetchLessons = async () => {
       try {
         setLessonsLoading(true);
-        const response = await axios.get(`/api/lessons/course/${courseId}`);
+        const response = await axios.get(`https://al-mentor-database-production.up.railway.app/lessons/course/${courseId}`);
         setLessons(response.data);
       } catch (err) {
         setError('Failed to load lessons');
@@ -141,7 +142,7 @@ export default function EnhancedLessonViewer() {
   
   const fetchSavedCourses = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/saved-courses/user/${user._id}`);
+      const response = await fetch(`https://al-mentor-database-production.up.railway.app/saved-courses/user/${user._id}`);
       if (!response.ok) throw new Error('Failed to fetch saved courses');
       const data = await response.json();
       setSavedCourses(data.map(item => item.courseId._id));
@@ -225,7 +226,7 @@ export default function EnhancedLessonViewer() {
   // Mark announcement as read
   const markAnnouncementAsRead = async (announcementId) => {
     try {
-      await axios.patch(`/api/courses/${courseId}/announcements/${announcementId}/read`);
+      await axios.patch(`https://al-mentor-database-production.up.railway.app/courses/${courseId}/announcements/${announcementId}/read`);
       
       setCourseData(prev => ({
         ...prev,
@@ -327,7 +328,7 @@ export default function EnhancedLessonViewer() {
     try {
       setSavingCourse(true);
       
-      const response = await fetch(`http://localhost:5000/api/saved-courses/${user._id}/${courseId}`, {
+      const response = await fetch(`https://al-mentor-database-production.up.railway.app/saved-courses/${user._id}/${courseId}`, {
         method: isSaved ? 'DELETE' : 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -353,7 +354,7 @@ export default function EnhancedLessonViewer() {
       
       try {
         // Get all saved courses for the user
-        const response = await fetch(`http://localhost:5000/api/saved-courses/user/${user._id}`, {
+        const response = await fetch(`https://al-mentor-database-production.up.railway.app/saved-courses/user/${user._id}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -389,7 +390,7 @@ export default function EnhancedLessonViewer() {
         savedAt: new Date().toISOString()
       });
       
-      const response = await fetch('http://localhost:5000/api/saved-courses', {
+      const response = await fetch('https://al-mentor-database-production.up.railway.app/saved-courses', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -433,7 +434,7 @@ export default function EnhancedLessonViewer() {
 
       try {
     setSubscriptionLoading(true);
-const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/${user._id}`);
+const response = await fetch(`https://al-mentor-database-production.up.railway.app/user-subscriptions/user/${user._id}`);
     if (!response.ok) throw new Error('Failed to fetch subscription');
     const data = await response.json();
     console.log('User subscriptions:', data);
@@ -946,7 +947,7 @@ const response = await fetch(`http://localhost:5000/api/user-subscriptions/user/
                         </video>
                       )
                     ) : (
-                      <img src="/api/placeholder/800/450" alt={t('lessonViewer.videoPlaceholder')} className="w-full h-full object-cover" />
+                      <img src="https://al-mentor-database-production.up.railway.app/placeholder/800/450" alt={t('lessonViewer.videoPlaceholder')} className="w-full h-full object-cover" />
                     )
                   ) : (
                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-75">

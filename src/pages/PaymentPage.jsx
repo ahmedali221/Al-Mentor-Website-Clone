@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -85,7 +86,7 @@ function PaymentPage() {
 
 
 
-      const response = await axios.post("http://localhost:5000/api/payments/", paymentData, {
+      const response = await axios.post("https://al-mentor-database-production.up.railway.app/payments/", paymentData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -94,7 +95,7 @@ function PaymentPage() {
       if (response.data) {
         try {
           await axios.post(
-            "http://localhost:5000/api/user-subscriptions/user",
+            "https://al-mentor-database-production.up.railway.app/user-subscriptions/user",
             {
               userId: user._id,
               subscriptionId: planId
@@ -172,7 +173,7 @@ function PaymentPage() {
       try {
         setPlanLoading(true);
         const response = await axios.get(
-          `http://localhost:5000/api/subscriptions/${planId}`,
+          `https://al-mentor-database-production.up.railway.app/subscriptions/${planId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -44,7 +45,7 @@ const InstructorApplication = () => {
                 }
             });
 
-            const response = await fetch('http://localhost:5000/api/instructors', {
+            const response = await fetch('https://al-mentor-database-production.up.railway.app/instructors', {
                 method: 'POST',
                 body: formData,
             });

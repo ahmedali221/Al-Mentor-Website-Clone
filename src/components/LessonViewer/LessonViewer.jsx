@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, createContext, useContext } from 'react';
+import React, { useState, useEffect, useMemo, createContext } from 'react';
 import { ChevronRight, ChevronDown, ChevronLeft, Star, Clock, FileText, Bell, X, PlayCircle, Volume2, Maximize, Settings } from 'lucide-react';
 
 // =====================
@@ -126,6 +126,7 @@ const mockCourseData = {
 export default function LessonViewer() {
   const [courseData, setCourseData] = useState(mockCourseData);
   const [activeTab, setActiveTab] = useState('Course Viewer');
+  // eslint-disable-next-line no-unused-vars
   const [sidebarView, setSidebarView] = useState('Course Outline');
   const [currentLesson, setCurrentLesson] = useState({
     moduleId: 'module-2',
@@ -136,6 +137,7 @@ export default function LessonViewer() {
   const [activeNote, setActiveNote] = useState(null);
   const [newNote, setNewNote] = useState('');
   const [isPlaying, setIsPlaying] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [currentTime] = useState('00:10/05:31');
   const [favoriteLessons, setFavoriteLessons] = useState(() => {
     // Load from localStorage on mount
@@ -371,58 +373,5 @@ export default function LessonViewer() {
   );
 }
 
-function CourseOutline() {
-  const { courseData, favoriteLessons, toggleFavoriteLesson, setCurrentLesson, currentLesson } = useContext(CourseContext);
-  return (
-    <>
-      {courseData.modules.map(module => (
-        <div key={module.id}>
-          <div className="font-bold mt-2 mb-1">{module.title}</div>
-          {module.lessons.map(lesson => (
-            <div
-              key={lesson.id} 
-              className={`flex items-center px-2 py-1 cursor-pointer ${currentLesson?.lessonId === lesson.id ? 'bg-gray-800 font-bold' : ''}`}
-              onClick={() => setCurrentLesson({ moduleId: module.id, lessonId: lesson.id, title: lesson.title })}
-            >
-              <span className="flex-1 text-sm">{lesson.title}</span>
-              <button
-                className="ml-2"
-                onClick={e => { e.stopPropagation(); toggleFavoriteLesson(lesson.id); }}
-                aria-label={favoriteLessons.includes(lesson.id) ? 'Unstar lesson' : 'Star lesson'}
-              >
-                <Star size={16} className={favoriteLessons.includes(lesson.id) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-400'} />
-              </button>
-            </div>
-          ))}
-        </div>
-      ))}
-    </>
-  );
-}
 
-function StarredLessons() {
-  const { courseData, favoriteLessons, setCurrentLesson, currentLesson } = useContext(CourseContext);
-  // Flatten all lessons and filter by favoriteLessons
-  const allLessons = courseData.modules.flatMap(module =>
-    module.lessons.map(lesson => ({ ...lesson, moduleId: module.id }))
-  );
-  const starred = allLessons.filter(lesson => favoriteLessons.includes(lesson.id));
-  return (
-    <div>
-      {starred.length === 0 ? (
-        <div className="p-4 text-center text-gray-400">No starred lessons yet</div>
-      ) : (
-        starred.map(lesson => (
-          <div
-            key={lesson.id} 
-            className={`flex items-center px-2 py-1 cursor-pointer ${currentLesson?.lessonId === lesson.id ? 'bg-gray-800 font-bold' : ''}`}
-            onClick={() => setCurrentLesson({ moduleId: lesson.moduleId, lessonId: lesson.id, title: lesson.title })}
-          >
-            <span className="flex-1 text-sm">{lesson.title}</span>
-            <Star size={16} className="text-yellow-400 fill-yellow-400" />
-          </div>
-        ))
-      )}
-    </div>
-  );
-}
+
