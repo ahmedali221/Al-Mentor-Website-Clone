@@ -28,7 +28,6 @@ const Courses = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Sectioned courses
   const [picks, setPicks] = useState([]);
   const [trending, setTrending] = useState([]);
   const [newlyReleased, setNewlyReleased] = useState([]);
@@ -88,23 +87,17 @@ const Courses = () => {
 
     if (savingCourse) return;
 
-    // Debug logs
-    console.log('DEBUG: user =', user);
-    console.log('DEBUG: courseId =', courseId);
-    console.log('DEBUG: token =', localStorage.getItem('token'));
     const payload = {
       userId: user?._id,
       courseId,
       savedAt: new Date().toISOString()
     };
-    console.log('DEBUG: payload =', payload);
 
     try {
       setSavingCourse(true);
       const isCurrentlySaved = savedCourses.includes(courseId);
 
       if (isCurrentlySaved) {
-        // Unsave course
         const response = await fetch(`https://al-mentor-database-production.up.railway.app/api/saved-courses/${user._id}/${courseId}`, {
           method: 'DELETE',
           headers: {
@@ -114,14 +107,12 @@ const Courses = () => {
 
         if (!response.ok) {
           const errorData = await response.json();
-          console.error('DEBUG: Unsave error response:', errorData);
           throw new Error('Failed to unsave course');
         }
 
         setSavedCourses(prev => prev.filter(id => id !== courseId));
         toast.success(t('Course removed from saved courses'));
       } else {
-        // Save course
         const response = await fetch('https://al-mentor-database-production.up.railway.app/api/saved-courses', {
           method: 'POST',
           headers: {
@@ -133,7 +124,6 @@ const Courses = () => {
 
         const data = await response.json();
         if (!response.ok) {
-          console.error('DEBUG: Save error response:', data);
           if (
             response.status === 409 ||
             (response.status === 400 && data.message && data.message.toLowerCase().includes('already saved'))
@@ -161,16 +151,14 @@ const Courses = () => {
   }, []);
 
   useEffect(() => {
-    // Get search query from URL
     const params = new URLSearchParams(location.search);
     const search = params.get('search');
     setSearchQuery(search || '');
 
-    axios.get('/api/courses')
+    axios.get('https://al-mentor-database-production.up.railway.app/api/courses')
       .then((res) => {
-        const coursesData = res.data;
+        const coursesData = Array.isArray(res.data) ? res.data : [];
         setAllCourses(coursesData);
-        // Mock filtering for sections (replace with real tags/fields if available)
         setPicks(coursesData.slice(0, 5));
         setTrending(coursesData.slice(5, 10));
         setNewlyReleased(coursesData.slice(10, 15));
@@ -187,18 +175,16 @@ const Courses = () => {
   }, []);
 
   useEffect(() => {
-    // Fetch subscription plans
     const fetchSubscriptionPlans = async () => {
       try {
         setSubscriptionLoading(true);
         const response = await axios.get('https://al-mentor-database-production.up.railway.app/api/subscriptions');
-        setSubscriptionPlans(response.data);
-        // Set the first plan as selected by default
-        if (response.data.length > 0) {
-          setSelectedPlan(response.data[0]._id);
+        const plans = Array.isArray(response.data) ? response.data : [];
+        setSubscriptionPlans(plans);
+        if (plans.length > 0) {
+          setSelectedPlan(plans[0]._id);
         }
       } catch (err) {
-        console.error('Error fetching subscription plans:', err);
         setSubscriptionError('Failed to load subscription plans');
       } finally {
         setSubscriptionLoading(false);
@@ -208,15 +194,13 @@ const Courses = () => {
     fetchSubscriptionPlans();
   }, []);
 
-  // Fetch topics
   useEffect(() => {
     const fetchTopics = async () => {
       try {
         setTopicLoading(true);
         const response = await axios.get('https://al-mentor-database-production.up.railway.app/api/topics');
-        setTopics(response.data);
+        setTopics(Array.isArray(response.data) ? response.data : []);
       } catch (err) {
-        console.error('Error fetching topics:', err);
         setTopicError('Failed to load topics');
       } finally {
         setTopicLoading(false);
@@ -226,14 +210,12 @@ const Courses = () => {
     fetchTopics();
   }, []);
 
-  // Fetch initial courses
   useEffect(() => {
     const fetchInitialCourses = async () => {
       try {
         const response = await axios.get('https://al-mentor-database-production.up.railway.app/api/courses');
-        setFilteredPicks(response.data);
+        setFilteredPicks(Array.isArray(response.data) ? response.data : []);
       } catch (err) {
-        console.error('Error fetching initial courses:', err);
         setTopicError('Failed to load courses');
       }
     };
@@ -241,16 +223,13 @@ const Courses = () => {
     fetchInitialCourses();
   }, []);
 
-  // Handle topic selection and filtering
   useEffect(() => {
     const filterCoursesByTopic = async () => {
       if (!selectedTopic) {
-        // If no topic selected, fetch all courses
         try {
           const response = await axios.get('https://al-mentor-database-production.up.railway.app/api/courses');
-          setFilteredPicks(response.data);
+          setFilteredPicks(Array.isArray(response.data) ? response.data : []);
         } catch (err) {
-          console.error('Error fetching courses:', err);
           setTopicError('Failed to load courses');
         }
         return;
@@ -258,15 +237,10 @@ const Courses = () => {
 
       try {
         setTopicCoursesLoading(true);
-        // Get courses for the selected topic
         const topicResponse = await axios.get(`https://al-mentor-database-production.up.railway.app/api/topics/${selectedTopic}`);
-
-        // Get all courses and filter by topic
         const coursesResponse = await axios.get('https://al-mentor-database-production.up.railway.app/api/courses');
 
-        // Filter courses based on topic
-        const coursesWithTopic = coursesResponse.data.filter(course => {
-          // Check if course has category field that matches topic's category
+        const coursesWithTopic = (Array.isArray(coursesResponse.data) ? coursesResponse.data : []).filter(course => {
           const courseCategory = course.category?._id || course.category;
           const topicCategory = topicResponse.data.category;
           return courseCategory === topicCategory;
@@ -274,7 +248,6 @@ const Courses = () => {
 
         setFilteredPicks(coursesWithTopic);
       } catch (err) {
-        console.error('Error filtering courses by topic:', err);
         setTopicError('Failed to load courses for this topic');
         setFilteredPicks([]);
       } finally {
@@ -289,16 +262,13 @@ const Courses = () => {
     setSelectedTopic(prevTopic => prevTopic === topicId ? null : topicId);
   };
 
-  // Original getFiltered function for other sections
   const getFiltered = (list) => {
     let filtered = list;
 
-    // Apply category filter
     if (selectedCategory) {
       filtered = filtered.filter(course => course.category === selectedCategory);
     }
 
-    // Apply search filter
     if (searchQuery) {
       const searchLower = searchQuery.toLowerCase();
       filtered = filtered.filter(course => {
@@ -318,7 +288,6 @@ const Courses = () => {
     setSelectedCategory(categoryId);
   };
 
-  // Custom carousel arrows
   const CustomPrevArrow = ({ onClick }) => (
     <div className="custom-arrow left" onClick={onClick}>
       <RiArrowDropLeftLine size={40} color="white" />
@@ -331,7 +300,6 @@ const Courses = () => {
     </div>
   );
 
-  // Carousel settings
   const sliderSettings = {
     dots: false,
     infinite: true,
@@ -348,7 +316,6 @@ const Courses = () => {
     ],
   };
 
-  // Category slider settings
   const categorySliderSettings = {
     ...sliderSettings,
     slidesToShow: 6,
@@ -379,22 +346,18 @@ const Courses = () => {
     ],
   };
 
-  // Helper function to get localized text
   const getLocalizedText = (obj) => {
     if (!obj) return '';
     if (typeof obj === 'string') return obj;
     if (obj && typeof obj === 'object') {
-      // Handle translation objects with en/ar keys
       if (obj.en || obj.ar) {
         return obj[currentLang] || obj.en || obj.ar || '';
       }
-      // Handle other object types
       return obj[currentLang] || obj.en || '';
     }
     return '';
   };
 
-  // Course card
   const CourseCard = ({ course }) => {
     if (!course) return null;
 
@@ -445,10 +408,8 @@ const Courses = () => {
     );
   };
 
-  // Instructor card
   const InstructorCard = ({ instructor }) => {
     if (!instructor) return null;
-    // Try to get the profile object, fallback to user, fallback to instructor itself
     const profile = instructor.profile || instructor.user || instructor;
     const name = `${profile.firstName?.[currentLang] || profile.firstName?.en || profile.firstName || ''} ${profile.lastName?.[currentLang] || profile.lastName?.en || profile.lastName || ''}`.trim() || 'Unknown Instructor';
     const title = instructor.professionalTitle?.[currentLang] || instructor.professionalTitle?.en || instructor.professionalTitle || '';
@@ -469,12 +430,10 @@ const Courses = () => {
     );
   };
 
-  // Category Hero Card (for the top section)
   const CategoryHeroCard = ({ category }) => {
     const title = getLocalizedText(category.name);
     const image = category.thumbnailImgUrl || 'https://placehold.co/400x300';
     return (
-      
       <div
         className="relative cursor-pointer rounded-xl overflow-hidden group h-60 sm:h-72 md:h-80 flex items-end transition-all duration-300 shadow-lg hover:shadow-xl"
         onClick={() => navigate(`/categories/${category._id}`)}
@@ -494,7 +453,6 @@ const Courses = () => {
     );
   };
 
-  // Custom card for Newly Released section
   const NewlyReleasedCard = ({ course }) => {
     if (!course) return null;
 
@@ -553,14 +511,12 @@ const Courses = () => {
     }
   };
 
-  // Add plan selection handler
   const handlePlanSelection = (planId) => {
     setSelectedPlan(planId);
   };
 
   return (
     <div className={`${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-black'} min-h-screen transition-colors duration-200`} dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Category Hero Carousel */}
       <section className="mt-8 py-8 md:py-12 px-2 sm:px-4 md:px-8">
         <h2 className={`text-2xl md:text-3xl font-bold mb-12 md:mb-16 ${isRTL ? 'text-right' : 'text-left'} ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
           {t('sections.categories')}
@@ -576,7 +532,6 @@ const Courses = () => {
         </div>
       </section>
 
-      {/* Course List Section */}
       <section id="course-list-section" className="py-8 md:py-12 px-2 sm:px-4 md:px-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-12">
           <h2 className={`text-xl md:text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
@@ -639,7 +594,6 @@ const Courses = () => {
         )}
       </section>
 
-      {/* Trending Courses */}
       <section className="py-8 md:py-12 px-2 sm:px-4 md:px-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-12">
           <h2 className={`text-xl md:text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
@@ -657,7 +611,6 @@ const Courses = () => {
         </Slider>
       </section>
 
-      {/* Newly Released */}
       <section className="py-8 md:py-12 px-2 sm:px-4 md:px-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-12">
           <h2 className={`text-xl md:text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
@@ -681,7 +634,6 @@ const Courses = () => {
         </div>
       </section>
 
-      {/* Subscription Section */}
       <section className={`${theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-gray-100'} rounded-xl p-6 md:p-10 my-8 max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 transition-colors duration-200`}>
         <div className="flex-1 min-w-[260px] mb-12 md:mb-16">
           <h2 className={`text-lg md:text-xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
@@ -766,7 +718,6 @@ const Courses = () => {
         </div>
       </section>
 
-      {/* Instructors Section */}
       <section className="py-8 md:py-12 px-2 sm:px-4 md:px-8">
         <h2 className={`text-2xl font-bold mb-12 md:mb-16 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
           {t('sections.instructors')}
