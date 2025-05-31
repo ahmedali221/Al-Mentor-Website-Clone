@@ -20,7 +20,6 @@ import CategoryPage from './pages/CategoryPage.jsx';
 import CourseDetailsPage from './components/CourseDetails/CourseDetails.jsx';
 import AllCourses from './components/Courses/AllCourses.jsx';
 import LessonViewerPage from './components/LessonViewer/LessonViewerPage.jsx';
-import { CourseProvider } from './components/LessonViewer/CourseContext.jsx';
 import MyCourses from './components/MyCourses/MyCourses.jsx';
 import CertificatePage from './components/Certificate/CertificatePage.jsx';
 import SavedCourses from './components/Courses/SavedCourses.jsx';
@@ -38,7 +37,10 @@ import PaymentPage from './pages/PaymentPage.jsx';
 import InstructorSessionChat from './components/InstructorSession/InstructorSessionChat.jsx';
 import SessionHistory from './components/InstructorSession/SessionHistory.jsx';
 import InstructorApplication from './pages/InstructorApplication.jsx';
-
+import { CourseProvider } from './components/LessonViewer/CourseContext';
+import CreateCourseForm from './components/Instructor/CreateCourseForm';
+import CreateModuleForm from './components/Instructor/CreateModuleForm';
+import CreateLessonForm from './components/Instructor/CreateLessonForm';
 // Create a separate component for routes
 const AppRoutes = () => {
   const { user } = useAuth();
@@ -50,6 +52,9 @@ const AppRoutes = () => {
         <Route path="/signup-Email" element={<SignEmail />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/password" element={<PasswordPage />} />
+        <Route path="/instructor-form" element={<CreateCourseForm />} />
+        <Route path="/instructor-module-form/:courseId" element={<CreateModuleForm />} />
+        <Route path="/instructor-lesson-form/:moduleId" element={<CreateLessonForm />} />
       </Route>
 
       {/* Main Routes */}
@@ -204,6 +209,8 @@ const AppRoutes = () => {
             <InstructorApplication />
           </ProtectedRoute>
         } />
+
+      
       </Route>
     </Routes>
   );
