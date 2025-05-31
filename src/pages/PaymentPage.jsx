@@ -85,7 +85,7 @@ function PaymentPage() {
 
 
 
-      const response = await axios.post("/api/payments/", paymentData, {
+      const response = await axios.post("https://al-mentor-database-production.up.railway.app/api/payments/", paymentData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -94,7 +94,7 @@ function PaymentPage() {
       if (response.data) {
         try {
           await axios.post(
-            "/api/user-subscriptions/user",
+            "https://al-mentor-database-production.up.railway.app/api/user-subscriptions/user",
             {
               userId: user._id,
               subscriptionId: planId
@@ -172,7 +172,7 @@ function PaymentPage() {
       try {
         setPlanLoading(true);
         const response = await axios.get(
-          `/api/subscriptions/${planId}`,
+          `https://al-mentor-database-production.up.railway.app/api/subscriptions/${planId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,

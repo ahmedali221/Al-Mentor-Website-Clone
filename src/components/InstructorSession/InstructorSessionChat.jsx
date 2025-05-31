@@ -110,7 +110,7 @@ const InstructorSessionChat = () => {
     useEffect(() => {
         const fetchSession = async () => {
             try {
-                const response = await fetch(`http://localhost:5000/api/instructor-sessions/${sessionId}`);
+                const response = await fetch(`https://al-mentor-database-production.up.railway.app/api/instructor-sessions/${sessionId}`);
                 const data = await response.json();
                 if (data.success) {
                     setSession(data.data);

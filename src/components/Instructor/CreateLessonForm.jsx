@@ -37,7 +37,7 @@ const CreateLessonForm = () => {
     const fetchModuleDetails = async () => {
       try {
         console.log('Fetching module details for ID:', moduleId);
-        const response = await axios.get(`/api/modules/${moduleId}`, {
+        const response = await axios.get(`https://al-mentor-database-production.up.railway.app/api/modules/${moduleId}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -168,7 +168,7 @@ const CreateLessonForm = () => {
         return;
       }
 
-      const response = await axios.post('/api/lessons', {
+      const response = await axios.post('https://al-mentor-database-production.up.railway.app/api/lessons', {
         ...lessonForm,
         module: lessonForm.module.toString(),
         course: lessonForm.course.toString(),

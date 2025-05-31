@@ -26,7 +26,7 @@ function SignEmail() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('/api/auth/checkEmail', { email });
+            const response = await axios.post('https://al-mentor-database-production.up.railway.app/api/auth/checkEmail', { email });
             if (!response.data.exists) {
                 navigate('/signup', { state: { email } });
             } else {

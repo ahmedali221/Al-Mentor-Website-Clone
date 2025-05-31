@@ -24,7 +24,7 @@ export default function Instructors() {
     setLoading(true);
     setError(null);
 
-    fetch(`/api/instructors?page=${page}&limit=${limit}`)
+    fetch(`https://al-mentor-database-production.up.railway.app/api/instructors?page=${page}&limit=${limit}`)
       .then((res) => {
         if (!res.ok) {
           return res
@@ -66,7 +66,7 @@ export default function Instructors() {
       }
 
       try {
-        const response = await fetch(`/api/instructors?page=1&limit=100`);
+        const response = await fetch(`https://al-mentor-database-production.up.railway.app/api/instructors?page=1&limit=100`);
         const data = await response.json();
 
         if (data.success) {
@@ -314,7 +314,7 @@ export default function Instructors() {
                 {t("home.instructors.subtitle")}
               </p>
               <button
-                onClick={() => navigate("/become-instructo")}
+                onClick={() => navigate("/become-instructor")}
                 className={`mt-2 bg-[#E4002B] hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 inline-block px-8 py-2.5 rounded text-base font-semibold transition-colors duration-200 ease-in-out`}
               >
                 {t("home.instructors.button")}

@@ -42,10 +42,10 @@ const Navbar = () => {
     const fetchAllData = async () => {
       try {
         const [coursesRes, instructorsRes, programsRes, categoriesRes] = await Promise.all([
-          axios.get('/api/courses'),
-          axios.get('/api/instructors'),
-          axios.get('/api/programs'),
-          axios.get('/api/category')
+          axios.get('https://al-mentor-database-production.up.railway.app/api/courses'),
+          axios.get('https://al-mentor-database-production.up.railway.app/api/instructors'),
+          axios.get('https://al-mentor-database-production.up.railway.app/api/programs'),
+          axios.get('https://al-mentor-database-production.up.railway.app/api/category')
         ]);
 
         setAllData({
@@ -168,7 +168,7 @@ const Navbar = () => {
       if (!user) return;
 
       try {
-        const response = await fetch(`/api/instructors?page=1&limit=100`);
+        const response = await fetch(`https://al-mentor-database-production.up.railway.app/api/instructors?page=1&limit=100`);
         const data = await response.json();
 
         if (data.success) {

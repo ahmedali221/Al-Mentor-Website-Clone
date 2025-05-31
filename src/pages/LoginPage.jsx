@@ -22,7 +22,7 @@ function LoginPage() {
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (token) {
-            axios.get('/api/auth/check', {
+            axios.get('https://al-mentor-database-production.up.railway.app/api/auth/check', {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -57,7 +57,7 @@ function LoginPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('/api/auth/checkEmail', { email });
+            const response = await axios.post('https://al-mentor-database-production.up.railway.app/api/auth/checkEmail', { email });
             if (response.data.exists) {
                 alert(t('auth.emailVerified', 'Email verified! Please enter your password.'));
                 navigate('/password', { state: { email: email } });

@@ -40,8 +40,8 @@ const CreateCourseForm = () => {
       try {
         console.log('Fetching categories and topics...');
         const [categoriesRes, topicsRes] = await Promise.all([
-          axios.get('/api/category'),
-          axios.get('/api/topics')
+          axios.get('https://al-mentor-database-production.up.railway.app/api/category'),
+          axios.get('https://al-mentor-database-production.up.railway.app/api/topics')
         ]);
 
         if (categoriesRes.data.success) {
@@ -108,7 +108,7 @@ const CreateCourseForm = () => {
 
       console.log('Submitting course data:', courseData);
 
-      const response = await axios.post('/api/courses', courseData, {
+      const response = await axios.post('https://al-mentor-database-production.up.railway.app/api/courses', courseData, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'

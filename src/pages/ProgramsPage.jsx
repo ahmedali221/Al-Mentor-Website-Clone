@@ -19,7 +19,7 @@ function ProgramsPage() {
         const fetchPrograms = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get('/api/programs');
+                const response = await axios.get('https://al-mentor-database-production.up.railway.app/api/programs');
                 setPrograms(response.data);
                 setLoading(false);
             } catch (err) {

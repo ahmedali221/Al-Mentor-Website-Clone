@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -38,7 +39,7 @@ function BecomeInstructor() {
     // Check if user is already an instructor
     const checkInstructorStatus = async () => {
       try {
-        const response = await fetch(`/api/instructors?page=1&limit=100`);
+        const response = await fetch(`https://al-mentor-database-production.up.railway.app/api/instructors?page=1&limit=100`);
         const data = await response.json();
 
         if (data.success) {
@@ -84,7 +85,7 @@ function BecomeInstructor() {
       formData.append("resume", data.resume[0]);
       formData.append("profilePicture", data.profilePicture[0]);
 
-      const response = await fetch("/api/instructors", {
+      const response = await fetch("https://al-mentor-database-production.up.railway.app/api/instructors", {
         method: "POST",
         body: formData,
       });
@@ -618,7 +619,7 @@ function MentorApplicationModal({ isOpen, onClose }) {
 
       console.log("📤 البيانات المرسلة:", instructorData);
 
-      const response = await fetch("/api/instructors", {
+      const response = await fetch("https://al-mentor-database-production.up.railway.app/api/instructors", {
         method: "POST",
         headers: {
           'Content-Type': 'application/json'

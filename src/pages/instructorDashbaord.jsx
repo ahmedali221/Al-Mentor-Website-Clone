@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
@@ -38,7 +39,7 @@ function InstructorDashboard() {
                 setLoadingCourses(true);
 
                 // First, get all instructors and find the one matching our user ID
-                const instructorsResponse = await fetch('/api/instructors?page=1&limit=100');
+                const instructorsResponse = await fetch('https://al-mentor-database-production.up.railway.app/api/instructors?page=1&limit=100');
                 const instructorsData = await instructorsResponse.json();
 
                 console.log('User ID:', user._id);
@@ -57,7 +58,7 @@ function InstructorDashboard() {
 
                         // Fetch detailed instructor data using instructor ID
                         const instructorResponse = await fetch(
-                            `/api/instructors/${instructorId}`
+                            `https://al-mentor-database-production.up.railway.app/api/instructors/${instructorId}`
                         );
                         const instructorDetails = await instructorResponse.json();
                         setInstructorData(instructorDetails.data || instructorDetails);
@@ -65,7 +66,7 @@ function InstructorDashboard() {
                         // Fetch instructor's courses using the instructor ID (not user ID)
                         console.log('Fetching courses for instructor ID:', instructorId);
                         const coursesResponse = await fetch(
-                            `/api/instructors/${instructorId}/courses`
+                            `https://al-mentor-database-production.up.railway.app/api/instructors/${instructorId}/courses`
                         );
                         const coursesData = await coursesResponse.json();
 

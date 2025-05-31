@@ -33,7 +33,7 @@ const SavedCourses = () => {
     const fetchSavedCourses = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/saved-courses/user/${user._id}`, {
+        const response = await fetch(`https://al-mentor-database-production.up.railway.app/api/saved-courses/user/${user._id}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -92,7 +92,7 @@ const SavedCourses = () => {
 
       if (isCurrentlySaved) {
         // Unsave course
-        const response = await fetch(`/api/saved-courses/${user._id}/${courseId}`, {
+        const response = await fetch(`https://al-mentor-database-production.up.railway.app/api/saved-courses/${user._id}/${courseId}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -107,7 +107,7 @@ const SavedCourses = () => {
         toast.success(t('messages.courseRemovedFromSaved'));
       } else {
         // Save course
-        const response = await fetch('/api/saved-courses', {
+        const response = await fetch('https://al-mentor-database-production.up.railway.app/api/saved-courses', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

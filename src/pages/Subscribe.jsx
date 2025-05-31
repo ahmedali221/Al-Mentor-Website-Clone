@@ -62,7 +62,7 @@ function Subscribe() {
         setLoading(true);
         setError(null);
         const response = await axios.get(
-          "/api/subscriptions",
+          "https://al-mentor-database-production.up.railway.app/api/subscriptions",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,

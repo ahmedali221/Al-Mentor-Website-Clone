@@ -22,8 +22,8 @@ const SessionHistory = ({ isInstructor = false }) => {
 
             try {
                 const endpoint = isInstructor
-                    ? `http://localhost:5000/api/instructor-sessions/instructor/${user._id}`
-                    : `http://localhost:5000/api/instructor-sessions/user/${user._id}`;
+                    ? `hhttps://al-mentor-database-production.up.railway.app/api/instructor-sessions/instructor/${user._id}`
+                    : `https://al-mentor-database-production.up.railway.app/api/instructor-sessions/user/${user._id}`;
 
                 const response = await fetch(endpoint);
                 const data = await response.json();
@@ -45,7 +45,7 @@ const SessionHistory = ({ isInstructor = false }) => {
 
     const handleStatusChange = async (sessionId, newStatus, additionalData = {}) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/instructor-sessions/${sessionId}/${newStatus}`, {
+            const response = await fetch(`https://al-mentor-database-production.up.railway.app/api/instructor-sessions/${sessionId}/${newStatus}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

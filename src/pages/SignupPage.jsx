@@ -32,7 +32,7 @@ function SignupPage() {
             const [firstNameEn, lastNameEn] = formData.fullNameEn.split(' ');
             const [firstNameAr, lastNameAr] = formData.fullNameAr.split(' ');
 
-            const response = await axios.post('/api/auth/register', {
+            const response = await axios.post('https://al-mentor-database-production.up.railway.app/api/auth/register', {
                 username: formData.username,
                 email: formData.email,
                 password: formData.password,

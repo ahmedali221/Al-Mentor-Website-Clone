@@ -29,13 +29,13 @@ function ProgramDetailPage() {
       try {
         setLoading(true);
 
-        console.log("Fetching program:", `/api/programs/${programId}`);
-        const programRes = await axios.get(`/api/programs/${programId}`);
+        console.log("Fetching program:", `https://al-mentor-database-production.up.railway.app/api/programs/${programId}`);
+        const programRes = await axios.get(`https://al-mentor-database-production.up.railway.app/api/programs/${programId}`);
         const programData = programRes.data;
         console.log("Fetched program data:", programData);
 
         const courseRequests = programData.courses.map(courseId => {
-          const url = `/api/courses/${courseId}`;
+          const url = `https://al-mentor-database-production.up.railway.app/api/courses/${courseId}`;
           console.log("Fetching course:", url);
           return axios.get(url);
         });
