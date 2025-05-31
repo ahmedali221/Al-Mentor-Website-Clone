@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
@@ -26,15 +28,18 @@ const CourseDetails = () => {
   const { t, i18n } = useTranslation();
   const currentLang = i18n.language;
   const navigate = useNavigate();
+  // eslint-disable-next-line no-unused-vars
   const { myCourses, addCourse, removeCourse, isCourseAdded } = useMyCourses();
 
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
+  // eslint-disable-next-line no-unused-vars
   const [savedCourses, setSavedCourses] = useState(() => {
     const saved = localStorage.getItem('savedCourses');
     return saved ? JSON.parse(saved) : [];
   });
   const [expandedSections, setExpandedSections] = useState({});
+  // eslint-disable-next-line no-unused-vars
   const [instructorDetails, setInstructorDetails] = useState([]);
   const [lessons, setLessons] = useState([]);
   const [lessonsLoading, setLessonsLoading] = useState(true);
@@ -112,7 +117,7 @@ const CourseDetails = () => {
 
   useEffect(() => {
     setLoading(true);
-    axios.get(`/api/courses/${id}`)
+    axios.get(`https://al-mentor-database-production.up.railway.app/courses/${id}`)
       .then(res => {
         setCourse(res.data);
         setLoading(false);
@@ -126,7 +131,7 @@ const CourseDetails = () => {
 
   // Fetch all instructors (like in home.jsx)
   useEffect(() => {
-    axios.get('/api/instructors')
+    axios.get('https://al-mentor-database-production.up.railway.app/instructors')
       .then((res) => setAllInstructors(res.data.data))
       .catch((err) => console.error('Error fetching instructors:', err));
   }, []);
@@ -176,7 +181,7 @@ const CourseDetails = () => {
     const fetchLessons = async () => {
       setLessonsLoading(true);
       try {
-        const response = await axios.get(`/api/lessons/course/${id}`);
+        const response = await axios.get(`https://al-mentor-database-production.up.railway.app/lessons/course/${id}`);
         setLessons(response.data);
       } catch (error) {
         console.error('Error fetching lessons:', error);
@@ -241,7 +246,7 @@ const CourseDetails = () => {
     
     const fetchRatings = async () => {
       try {
-        const response = await axios.get(`/api/courses/${id}/ratings`);
+        const response = await axios.get(`https://al-mentor-database-production.up.railway.app/courses/${id}/ratings`);
         setCourseRating(response.data);
       } catch (error) {
         if (error.response && error.response.status === 404) {
@@ -277,7 +282,7 @@ const CourseDetails = () => {
       }
 
       // Fetch user data
-      const userResponse = await axios.get(`/api/users/${userId}`, {
+      const userResponse = await axios.get(`https://al-mentor-database-production.up.railway.app/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const userData = userResponse.data;

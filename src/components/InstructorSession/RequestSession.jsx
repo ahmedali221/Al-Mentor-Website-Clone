@@ -36,7 +36,7 @@ const RequestSession = ({ instructorId, onClose }) => {
 
         setIsSubmitting(true);
         try {
-            const response = await fetch('http://localhost:5000/api/instructor-sessions', {
+            const response = await fetch('https://al-mentor-database-production.up.railway.app/instructor-sessions', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

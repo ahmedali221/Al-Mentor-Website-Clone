@@ -27,7 +27,7 @@ function PasswordPage() {
         e.preventDefault();
         try {
             console.log("Attempting login with email:", location.state.email);
-            const response = await axios.post('/api/auth/login', {
+            const response = await axios.post('https://al-mentor-database-production.up.railway.app/auth/login', {
                 email: location.state.email,
                 password
             });
@@ -42,7 +42,7 @@ function PasswordPage() {
                 if (!response.data.user) {
                     console.log("No user data in response, fetching user data...");
                     try {
-                        const userResponse = await axios.get('/api/auth/me', {
+                        const userResponse = await axios.get('https://al-mentor-database-production.up.railway.app/auth/me', {
                             headers: { Authorization: `Bearer ${response.data.token}` }
                         });
                         console.log("Fetched user data:", userResponse.data);

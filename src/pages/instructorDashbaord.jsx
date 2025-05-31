@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
@@ -26,7 +27,7 @@ function InstructorDashboard() {
         // Check if user is already an instructor
         const checkInstructorStatus = async () => {
             try {
-                const response = await fetch(`http://localhost:5000/api/instructors?page=1&limit=100`);
+                const response = await fetch(`https://al-mentor-database-production.up.railway.app/instructors?page=1&limit=100`);
                 const data = await response.json();
 
                 if (data.success) {

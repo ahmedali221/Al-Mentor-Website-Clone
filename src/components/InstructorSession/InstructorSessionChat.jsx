@@ -33,7 +33,7 @@ const InstructorSessionChat = () => {
         const connectWebSocket = () => {
             try {
                 console.log('Attempting WebSocket connection...');
-                const ws = new WebSocket(`ws://localhost:5000?userId=${user._id}&sessionId=${sessionId}`);
+                const ws = new WebSocket(`ws:https://al-mentor-database-production.up.railway.app/?userId=${user._id}&sessionId=${sessionId}`);
                 wsRef.current = ws;
 
                 ws.onopen = () => {
@@ -110,7 +110,7 @@ const InstructorSessionChat = () => {
     useEffect(() => {
         const fetchSession = async () => {
             try {
-                const response = await fetch(`http://localhost:5000/api/instructor-sessions/${sessionId}`);
+                const response = await fetch(`https://al-mentor-database-production.up.railway.app/instructor-sessions/${sessionId}`);
                 const data = await response.json();
                 if (data.success) {
                     setSession(data.data);

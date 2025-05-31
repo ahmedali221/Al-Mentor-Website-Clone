@@ -15,7 +15,7 @@ export function AuthProvider({ children }) {
       const token = localStorage.getItem("token");
       if (token) {
         try {
-          const response = await axios.get("http://localhost:5000/api/auth/check", {
+          const response = await axios.get("https://al-mentor-database-production.up.railway.app/auth/check", {
             headers: {
               Authorization: `Bearer ${token}`
             }

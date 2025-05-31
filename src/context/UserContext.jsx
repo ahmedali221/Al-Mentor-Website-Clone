@@ -12,7 +12,7 @@ export function UserProvider({ children }) {
     const token = localStorage.getItem('token');
     if (token) {
       // Check if token is valid
-      axios.get('/api/auth/check', {
+      axios.get('https://al-mentor-database-production.up.railway.app/auth/check', {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -41,11 +41,11 @@ export function UserProvider({ children }) {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.post('/api/auth/login', credentials);
+      const response = await axios.post('https://al-mentor-database-production.up.railway.app/auth/login', credentials);
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
         setUser(response.data.user);
-        const userResponse = await axios.get('/api/auth/check', {
+        const userResponse = await axios.get('https://al-mentor-database-production.up.railway.app/auth/check', {
           headers: {
             Authorization: `Bearer ${response.data.token}`
           }

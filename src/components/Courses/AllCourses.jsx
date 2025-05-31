@@ -15,6 +15,7 @@ const AllCourses = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // eslint-disable-next-line no-unused-vars
   const [instructors, setInstructors] = useState([]);
   const [allCourses, setAllCourses] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -40,7 +41,7 @@ const AllCourses = () => {
   };
 
   useEffect(() => {
-    axios.get('/api/instructors')
+    axios.get('https://al-mentor-database-production.up.railway.app/instructors')
       .then((res) => setInstructors(res.data.data))
       .catch((err) => console.error('Error fetching instructors:', err));
   }, []);
@@ -51,7 +52,7 @@ const AllCourses = () => {
     const search = params.get('search');
     setSearchQuery(search || '');
 
-    axios.get('/api/courses')
+    axios.get('https://al-mentor-database-production.up.railway.app/courses')
       .then((res) => {
         setAllCourses(res.data);
       })
@@ -59,7 +60,7 @@ const AllCourses = () => {
   }, [location.search]);
 
   useEffect(() => {
-    axios.get('/api/category')
+    axios.get('https://al-mentor-database-production.up.railway.app/category')
       .then((res) => setCategories(res.data.data))
       .catch((err) => console.error('Error fetching categories:', err));
   }, []);
