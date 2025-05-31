@@ -24,7 +24,9 @@
     "backToPrograms": "العودة إلى البرامج",
     "mySessions": "جلساتي",
     "instructorSessions": "جلسات المدرب",
-    "aiChat": "جرب المنتور"
+    "aiChat": "جرب المنتور",
+    "showAll": "اعرض الكل",
+    "categories": "الفئات"
   },
   "footer": {
     "explore": "استكشف",

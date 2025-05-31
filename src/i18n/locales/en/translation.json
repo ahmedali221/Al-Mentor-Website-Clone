@@ -59,6 +59,9 @@
     "backToModule": "Back to Module"
   },
   "navigation": {
+    "instructorForm": "Instructor Form",
+    "categories": "Categories",
+    "viewAllCourses": "View All Courses",
     "home": "Home",
     "courses": "Courses",
     "instructors": "Instructors",
@@ -73,7 +76,8 @@
     "backToPrograms": "Back to Programs",
     "mySessions": "My Sessions",
     "instructorSessions": "Instructor Sessions",
-    "aiChat": "Try AI Mentor"
+    "aiChat": "Try AI Mentor",
+    "showAll": "Show All"
   },
   "footer": {
     "explore": "Explore",

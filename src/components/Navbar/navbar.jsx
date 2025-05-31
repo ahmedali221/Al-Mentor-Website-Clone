@@ -35,7 +35,6 @@ const Navbar = () => {
   const panelWidth = 440;
   const coursesPanelWidth = 700;
   const panelHeight = 750;
-  const [isInstructor, setIsInstructor] = useState(false);
 
   // Fetch all data on component mount
   useEffect(() => {
@@ -163,26 +162,6 @@ const Navbar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    const checkInstructorStatus = async () => {
-      if (!user) return;
-
-      try {
-        const response = await fetch(`http://localhost:5000/api/instructors?page=1&limit=100`);
-        const data = await response.json();
-
-        if (data.success) {
-          const instructorStatus = data.data.some(instructor => instructor.user === user._id);
-          setIsInstructor(instructorStatus);
-        }
-      } catch (error) {
-        console.error("Error checking instructor status:", error);
-      }
-    };
-
-    checkInstructorStatus();
-  }, [user]);
-
   return (
     <nav
       className={`fixed top-0 left-0 right-0 px-4 py-4 z-50 shadow transition-all duration-300 text-lg font-medium ${theme === 'dark' ? 'bg-[#1a1a1a] text-white' : 'bg-white text-black'}`}
@@ -304,6 +283,13 @@ const Navbar = () => {
           <li className="relative">
             <Link to="/programs" className="hover:text-red-500 flex items-center">
               {t('navigation.programs')}
+              <span className="ml-1 px-2 py-0.5 text-xs font-bold bg-red-500 text-white rounded-full">{t('badges.new')}</span>
+            </Link>
+          </li>
+          {/*instructor form */}
+             <li className="relative">
+            <Link to="/instructor-form" className="hover:text-red-500 flex items-center">
+              {t('navigation.instructorForm')}
               <span className="ml-1 px-2 py-0.5 text-xs font-bold bg-red-500 text-white rounded-full">{t('badges.new')}</span>
             </Link>
           </li>
@@ -521,45 +507,16 @@ const Navbar = () => {
                       {t('profile.accountSettings')}
                     </Link>
 
-                    {!user?.isAdmin && (
-                      isInstructor ? (
-                        <Link
-                          to="/instructor-dashboard"
-                          className={`flex items-center px-4 py-2 text-sm ${theme === 'dark'
-                              ? 'text-gray-300 hover:bg-gray-700'
-                              : 'text-gray-700 hover:bg-gray-100'
-                            }`}
-                        >
-                          <svg
-                            className={`mr-3 h-5 w-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-400'
-                              }`}
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18h8a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17h-6v-3.777a8.935 8.935 0 00-2 .712V17a1 1 0 001 1z" />
-                          </svg>
-                          {t('navbar.instructorDashboard')}
-                        </Link>
-                      ) : (
-                        <Link
-                          to="/instructor-application"
-                          className={`flex items-center px-4 py-2 text-sm ${theme === 'dark'
-                              ? 'text-gray-300 hover:bg-gray-700'
-                              : 'text-gray-700 hover:bg-gray-100'
-                            }`}
-                        >
-                          <svg
-                            className={`mr-3 h-5 w-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-400'
-                              }`}
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                          </svg>
-                          {t('navbar.becomeInstructor')}
-                        </Link>
-                      )
-                    )}
+                    <Link
+                      to="/become-instructor"
+                      className={`flex items-center px-4 py-2 transition-colors ${theme === 'dark' ? 'hover:bg-[#232323] text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                        } ${isRTL ? 'flex-row-reverse' : ''}`}
+                    >
+                      <svg className={`w-5 h-5 ${isRTL ? 'ml-3' : 'mr-3'} ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      {t('profile.becomeInstructor')}
+                    </Link>
 
                     <button
                       onClick={handleLogout}
