@@ -307,6 +307,13 @@ const Navbar = () => {
               <span className="ml-1 px-2 py-0.5 text-xs font-bold bg-red-500 text-white rounded-full">{t('badges.new')}</span>
             </Link>
           </li>
+          {/*instructor form */}
+             <li className="relative">
+            <Link to="/instructor-form" className="hover:text-red-500 flex items-center">
+              {t('navigation.instructorForm')}
+              <span className="ml-1 px-2 py-0.5 text-xs font-bold bg-red-500 text-white rounded-full">{t('badges.new')}</span>
+            </Link>
+          </li>
           {/* Sessions with badge */}
           <li className="relative">
             <Link to="/my-sessions" className="hover:text-red-500 flex items-center">

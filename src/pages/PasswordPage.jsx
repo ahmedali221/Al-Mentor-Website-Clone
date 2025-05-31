@@ -42,13 +42,23 @@ function PasswordPage() {
                 if (!response.data.user) {
                     console.log("No user data in response, fetching user data...");
                     try {
-                        const userResponse = await axios.get('/api/auth/me', {
+                        // First get user ID from auth check
+                        const authCheckResponse = await axios.get('/api/auth/check', {
                             headers: { Authorization: `Bearer ${response.data.token}` }
                         });
-                        console.log("Fetched user data:", userResponse.data);
-                        const userData = userResponse.data;
-                        localStorage.setItem('user', JSON.stringify(userData));
-                        setUser(userData);
+                        
+                        if (authCheckResponse.data.message === "Authenticated") {
+                            // Then fetch complete user data including instructor status
+                            const userResponse = await axios.get(`http://localhost:5000/api/users/${authCheckResponse.data.user._id}`, {
+                                headers: { Authorization: `Bearer ${response.data.token}` }
+                            });
+                            console.log("Fetched complete user data:", userResponse.data);
+                            const userData = userResponse.data;
+                            localStorage.setItem('user', JSON.stringify(userData));
+                            setUser(userData);
+                        } else {
+                            throw new Error('Authentication check failed');
+                        }
                     } catch (userErr) {
                         console.error("Error fetching user data:", userErr);
                         setError(t('auth.fetchUserFailed', 'Login successful but failed to fetch user data'));
