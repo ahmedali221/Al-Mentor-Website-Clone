@@ -8,7 +8,7 @@ body {
   padding: 0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   box-sizing: border-box;
-  background: unset;
+  background: white;
 }
 
 :root[class~='dark'] body {
@@ -20,14 +20,23 @@ body {
 }
 
 /* Main content wrapper for horizontal breathing room */
-.main-content, .courses-main, .page-content, .container, .content-wrapper {
+.main-content,
+.courses-main,
+.page-content,
+.container,
+.content-wrapper {
   padding: 0;
   margin: 0;
   background: unset;
 }
 
 @media (max-width: 768px) {
-  .main-content, .courses-main, .page-content, .container, .content-wrapper {
+
+  .main-content,
+  .courses-main,
+  .page-content,
+  .container,
+  .content-wrapper {
     padding-left: 12px;
     padding-right: 12px;
     padding-top: 12px;
@@ -39,18 +48,24 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
 /* Hide scrollbar for IE, Edge and Firefox */
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
+
 /* Course card styling */
 .course-card {
   transition: transform 0.2s ease-in-out;
 }
+
 .course-card:hover {
   transform: translateY(-4px);
 }
+
 /* Custom slider arrows */
 .custom-arrow {
   position: absolute;
@@ -69,34 +84,43 @@ body {
   align-items: center;
   justify-content: center;
 }
+
 .custom-arrow.left {
   left: -20px;
 }
+
 .custom-arrow.right {
   right: -20px;
 }
+
 .custom-arrow:hover {
   background-color: rgba(0, 0, 0, 0.8);
 }
+
 :root[class~='dark'] .custom-arrow {
   background-color: #2a2a2a;
 }
+
 /* Override default slick-slider styles */
 .slick-track {
   margin-left: 0;
 }
+
 .slick-list {
   margin: 0 -8px;
 }
-.slick-slide > div {
+
+.slick-slide>div {
   padding: 0 8px;
 }
+
 /* Category grid section */
 .category-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 8px;
 }
+
 /* Custom badge styling */
 .badge {
   display: inline-block;
@@ -107,24 +131,30 @@ body {
   background-color: #007bff;
   color: white;
 }
+
 .badge-new {
   background-color: #0088cc;
 }
+
 .badge-hot {
   background-color: #ff3a30;
 }
+
 .badge-free {
   background-color: #34c759;
 }
+
 /* Responsive tweaks */
 @media (max-width: 768px) {
   .custom-arrow {
     display: none;
   }
+
   .section-title {
     font-size: 1.2rem;
   }
 }
+
 /* Custom buttons */
 .btn-outline {
   border: 1px solid #fff;
@@ -135,9 +165,11 @@ body {
   font-size: 0.875rem;
   transition: all 0.2s ease;
 }
+
 .btn-outline:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
+
 .btn-primary {
   background-color: #0088cc;
   border: none;
@@ -147,29 +179,35 @@ body {
   font-size: 0.875rem;
   transition: all 0.2s ease;
 }
+
 .btn-primary:hover {
   background-color: #006da3;
 }
+
 /* Category card effects */
 .category-card {
   position: relative;
   overflow: hidden;
   border-radius: 8px;
 }
+
 .category-card img {
   transition: transform 0.5s ease;
 }
+
 .category-card:hover img {
   transform: scale(1.05);
 }
+
 .category-card-overlay {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   padding: 16px;
-  background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0));
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0));
 }
+
 /* Section headings */
 .section-heading {
   font-size: 1.25rem;
@@ -179,29 +217,35 @@ body {
   justify-content: space-between;
   align-items: center;
 }
+
 .section-heading a {
   font-size: 0.875rem;
   color: #777;
   text-decoration: none;
 }
+
 .section-heading a:hover {
   color: #fff;
 }
+
 /* Subscription card styling */
 .subscription-card {
   background-color: #1a1a1a;
   border-radius: 8px;
   padding: 24px;
 }
+
 .subscription-option {
   background-color: #2a2a2a;
   border-radius: 6px;
   padding: 12px;
   text-align: center;
 }
+
 .subscription-option.highlighted {
   background-color: #0088cc;
 }
+
 /* Quick links styling */
 .quick-links {
   display: flex;
@@ -210,6 +254,7 @@ body {
   gap: 16px;
   padding-bottom: 8px;
 }
+
 .quick-links a {
   white-space: nowrap;
   color: #aaa;
@@ -217,9 +262,11 @@ body {
   font-size: 0.75rem;
   transition: color 0.2s ease;
 }
+
 .quick-links a:hover {
   color: #fff;
 }
+
 /* Instructor card styling */
 .instructor-card {
   display: flex;
@@ -227,6 +274,7 @@ body {
   align-items: center;
   padding: 8px;
 }
+
 .instructor-image {
   width: 70px;
   height: 70px;
@@ -234,12 +282,14 @@ body {
   overflow: hidden;
   margin-bottom: 8px;
 }
+
 .instructor-name {
   font-size: 0.875rem;
   font-weight: 500;
   margin-bottom: 2px;
   text-align: center;
 }
+
 .instructor-title {
   font-size: 0.75rem;
   color: #aaa;

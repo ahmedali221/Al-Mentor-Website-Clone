@@ -557,7 +557,7 @@ const Courses = () => {
   };
 
   return (
-    <div className={`${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-black'} min-h-screen transition-colors duration-200`} dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="bg-white text-black min-h-screen transition-colors duration-200" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Category Hero Carousel */}
       <section className="mt-8 py-8 md:py-12 px-2 sm:px-4 md:px-8">
         <h2 className={`text-2xl md:text-3xl font-bold mb-12 md:mb-16 ${isRTL ? 'text-right' : 'text-left'} ${theme === 'dark' ? 'text-white' : 'text-black'}`}>

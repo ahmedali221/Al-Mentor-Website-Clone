@@ -419,6 +419,7 @@
     }
   },
   "profile": {
+    "instructorDashboard": "View My Dashboard",
     "subscribe": "Subscribe",
     "myCourses": "My Courses",
     "myProgress": "My Progress",

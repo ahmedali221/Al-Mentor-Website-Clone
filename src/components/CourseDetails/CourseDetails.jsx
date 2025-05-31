@@ -176,7 +176,7 @@ const CourseDetails = () => {
   // Update lessons fetching
   useEffect(() => {
     if (!course) return;
-    
+
     const fetchLessons = async () => {
       setLessonsLoading(true);
       try {
@@ -196,7 +196,7 @@ const CourseDetails = () => {
   const handleRatingSubmit = async (rating) => {
     setIsSubmitting(true);
     setRatingMessage('');
-    
+
     try {
       // Create new rating object
       const newRating = {
@@ -226,7 +226,7 @@ const CourseDetails = () => {
 
       setUserRating(rating);
       setRatingMessage(t('Thank you for your rating!'));
-      
+
       // Clear success message after 3 seconds
       setTimeout(() => {
         setRatingMessage('');
@@ -242,7 +242,7 @@ const CourseDetails = () => {
   // Fetch course ratings
   useEffect(() => {
     if (!course) return;
-    
+
     const fetchRatings = async () => {
       try {
         const response = await axios.get(`/api/courses/${id}/ratings`);
@@ -266,7 +266,7 @@ const CourseDetails = () => {
     if (!newComment.trim()) return;
 
     setIsSubmittingComment(true);
-    
+
     try {
       // Get token and check authentication
       const token = localStorage.getItem('token');
@@ -367,12 +367,12 @@ const CourseDetails = () => {
         : [];
   const image = course.thumbnail || 'https://placehold.co/600x340';
   const isNew = course.isNew;
-  
+
   // Calculate total duration and lesson count from actual lessons data
   const totalDuration = lessons.reduce((acc, lesson) => acc + (parseInt(lesson.duration) || 0), 0);
   const formattedDuration = `${Math.floor(totalDuration / 60)}h ${totalDuration % 60}m`;
   const lessonsCount = lessons.length;
-  
+
   const level = getLocalizedText(course.level);
   const language = getLocalizedText(course.language);
   const categories = Array.isArray(course.categories) ? course.categories : [];
@@ -387,9 +387,9 @@ const CourseDetails = () => {
   // Get instructor details for the course from the global instructors list
   const getCourseInstructorDetails = () => {
     if (!course || !allInstructors.length) return [];
-    
+
     let courseInstructorIds = [];
-    
+
     // Debug log the course data with full details
     console.log('Full course data:', JSON.stringify(course, null, 2));
 
@@ -443,14 +443,14 @@ const CourseDetails = () => {
 
     // Find matching instructors from allInstructors
     const matched = allInstructors.filter(inst => courseInstructorIds.includes(inst._id));
-    
+
     if (!matched.length) {
       console.warn('No instructor found for course. Course instructor IDs:', courseInstructorIds);
       console.warn('Available instructor IDs:', allInstructors.map(i => i._id));
     } else {
       console.log('Found matching instructor:', matched[0]);
     }
-    
+
     return matched;
   };
 
@@ -460,14 +460,14 @@ const CourseDetails = () => {
   // Get instructor details with proper fallbacks
   const getInstructorName = (instructor) => {
     if (!instructor) return 'Unknown Instructor';
-    
+
     // Try to get name from profile object first
     if (instructor.profile) {
       const firstName = getLocalizedText(instructor.profile.firstName);
       const lastName = getLocalizedText(instructor.profile.lastName);
       return `${firstName} ${lastName}`.trim() || 'Unknown Instructor';
     }
-    
+
     // Fallback to direct properties
     const firstName = getLocalizedText(instructor.firstName);
     const lastName = getLocalizedText(instructor.lastName);
@@ -476,42 +476,42 @@ const CourseDetails = () => {
 
   const getInstructorImage = (instructor) => {
     if (!instructor) return '/default-course-img.png';
-    
+
     // Try to get image from profile object first
     if (instructor.profile?.profilePicture) {
       return instructor.profile.profilePicture;
     }
-    
+
     // Fallback to direct property
     return instructor.profilePicture || '/default-course-img.png';
   };
 
   const getInstructorEmail = (instructor) => {
     if (!instructor) return '';
-    
+
     // Try to get email from profile object first
     if (instructor.profile?.email) {
       return instructor.profile.email;
     }
-    
+
     // Fallback to direct property
     return instructor.email || '';
   };
 
   const getInstructorUsername = (instructor) => {
     if (!instructor) return '';
-    
+
     // Try to get username from profile object first
     if (instructor.profile?.username) {
       return instructor.profile.username;
     }
-    
+
     // Fallback to direct property
     return instructor.username || '';
   };
 
   return (
-    <div className={`w-full min-h-[60vh] py-12 px-2 md:px-8 flex flex-col items-center mt-24 ${theme === 'dark' ? 'bg-gradient-to-b from-[#0d232b] to-[#121212]' : 'bg-gradient-to-b from-[#eaf6fa] to-[#fff]'}`}>
+    <div className={`w-full min-h-[60vh] py-12 px-2 md:px-8 flex flex-col items-center mt-24 ${theme === 'dark' ? 'bg-black' : 'bg-white'}`}>
       <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         {/* Main Content (Left 2/3) */}
         <div className="col-span-2 flex flex-col gap-10">
@@ -523,7 +523,7 @@ const CourseDetails = () => {
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-40 rounded-full p-4 border-2 border-white flex items-center justify-center"
               onClick={() => navigate(`/lesson-viewer/${id}`)}
             >
-              <svg width="48" height="48" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,0.5)"/><polygon points="20,16 36,24 20,32" fill="#fff"/></svg>
+              <svg width="48" height="48" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="24" fill="rgba(0,0,0,0.5)" /><polygon points="20,16 36,24 20,32" fill="#fff" /></svg>
             </button>
             {/* Instructor Names on Image */}
             {displayInstructors.length > 0 && (
@@ -782,15 +782,14 @@ const CourseDetails = () => {
                     {[1, 2, 3, 4, 5].map((star) => (
                       <FaStar
                         key={star}
-                        className={`w-5 h-5 ${
-                          star <= Math.round(courseRating.average)
-                            ? 'text-yellow-400'
-                            : theme === 'dark' ? 'text-gray-700' : 'text-gray-300'
-                        }`}
+                        className={`w-5 h-5 ${star <= Math.round(courseRating.average)
+                          ? 'text-yellow-400'
+                          : theme === 'dark' ? 'text-gray-700' : 'text-gray-300'
+                          }`}
                       />
                     ))}
                   </div>
-                  <div className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}> 
+                  <div className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                     {courseRating.totalRatings} {t('ratings')}
                   </div>
                 </div>
@@ -810,21 +809,19 @@ const CourseDetails = () => {
                       disabled={isSubmitting}
                     >
                       <FaStar
-                        className={`w-6 h-6 transition-colors ${
-                          star <= (hoverRating || userRating)
-                            ? 'text-yellow-400'
-                            : theme === 'dark' ? 'text-gray-700' : 'text-gray-300'
-                        } ${isSubmitting ? 'opacity-50' : ''}`}
+                        className={`w-6 h-6 transition-colors ${star <= (hoverRating || userRating)
+                          ? 'text-yellow-400'
+                          : theme === 'dark' ? 'text-gray-700' : 'text-gray-300'
+                          } ${isSubmitting ? 'opacity-50' : ''}`}
                       />
                     </button>
                   ))}
                 </div>
                 {ratingMessage && (
-                  <div className={`text-sm mt-2 ${
-                    ratingMessage.includes('Thank you') 
-                      ? 'text-green-500' 
-                      : 'text-red-500'
-                  }`}>
+                  <div className={`text-sm mt-2 ${ratingMessage.includes('Thank you')
+                    ? 'text-green-500'
+                    : 'text-red-500'
+                    }`}>
                     {ratingMessage}
                   </div>
                 )}
@@ -836,20 +833,19 @@ const CourseDetails = () => {
                   <h4 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>{t('Recent Ratings')}</h4>
                   <div className="space-y-3">
                     {courseRating.ratings.slice(-3).reverse().map((rating, index) => (
-                      <div key={index} className={`flex items-center gap-2 p-2 rounded ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}`}> 
+                      <div key={index} className={`flex items-center gap-2 p-2 rounded ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}`}>
                         <div className="flex items-center gap-1">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <FaStar
                               key={star}
-                              className={`w-4 h-4 ${
-                                star <= rating.rating
-                                  ? 'text-yellow-400'
-                                  : theme === 'dark' ? 'text-gray-700' : 'text-gray-300'
-                              }`}
+                              className={`w-4 h-4 ${star <= rating.rating
+                                ? 'text-yellow-400'
+                                : theme === 'dark' ? 'text-gray-700' : 'text-gray-300'
+                                }`}
                             />
                           ))}
                         </div>
-                        <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}> 
+                        <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                           {new Date(rating.timestamp).toLocaleDateString()}
                         </span>
                       </div>
@@ -871,21 +867,19 @@ const CourseDetails = () => {
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   placeholder={t('Write your comment here...')}
-                  className={`w-full p-4 rounded-lg resize-none min-h-[100px] ${
-                    theme === 'dark' 
-                      ? 'bg-gray-800 text-white border-gray-700' 
-                      : 'bg-white text-black border-gray-300'
-                  } border focus:outline-none focus:ring-2 focus:ring-[#00bcd4]`}
+                  className={`w-full p-4 rounded-lg resize-none min-h-[100px] ${theme === 'dark'
+                    ? 'bg-gray-800 text-white border-gray-700'
+                    : 'bg-white text-black border-gray-300'
+                    } border focus:outline-none focus:ring-2 focus:ring-[#00bcd4]`}
                   disabled={isSubmittingComment}
                 />
                 <button
                   type="submit"
                   disabled={isSubmittingComment || !newComment.trim()}
-                  className={`self-end px-6 py-2 rounded-lg font-semibold transition ${
-                    isSubmittingComment || !newComment.trim()
-                      ? 'bg-gray-400 cursor-not-allowed'
-                      : 'bg-[#00bcd4] hover:bg-[#0097a7] text-white'
-                  }`}
+                  className={`self-end px-6 py-2 rounded-lg font-semibold transition ${isSubmittingComment || !newComment.trim()
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-[#00bcd4] hover:bg-[#0097a7] text-white'
+                    }`}
                 >
                   {isSubmittingComment ? t('Posting...') : t('Post Comment')}
                 </button>
@@ -900,18 +894,17 @@ const CourseDetails = () => {
                 </div>
               ) : (
                 comments.map((comment) => (
-                  <div 
-                    key={comment.id} 
-                    className={`p-4 rounded-lg ${
-                      theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'
-                    }`}
+                  <div
+                    key={comment.id}
+                    className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'
+                      }`}
                   >
                     <div className="flex items-start gap-4">
                       <div className="flex-shrink-0">
                         <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
                           {comment.user.avatar ? (
-                            <img 
-                              src={comment.user.avatar} 
+                            <img
+                              src={comment.user.avatar}
                               alt={comment.user.name}
                               className="w-full h-full object-cover"
                             />
@@ -925,7 +918,7 @@ const CourseDetails = () => {
                           <h4 className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
                             {comment.user.name}
                           </h4>
-                          <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}> 
+                          <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                             {new Date(comment.timestamp).toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US', {
                               year: 'numeric',
                               month: 'long',
@@ -961,9 +954,9 @@ const CourseDetails = () => {
               <div className="flex items-center gap-2"><FaLayerGroup className="text-[#00bcd4]" /> {t('Level')}: {level}</div>
               <div className="flex items-center gap-2"><FaLanguage className="text-[#00bcd4]" /> {t('Language')}: {language}</div>
             </div>
-            <button 
+            <button
               onClick={handleSubscribe}
-              className="bg-red-600 text-white py-3 rounded-lg text-lg font-bold hover:bg-red-700 transition mb-2" 
+              className="bg-red-600 text-white py-3 rounded-lg text-lg font-bold hover:bg-red-700 transition mb-2"
               aria-label={t('Subscribe Now')}
             >
               {t('Subscribe Now')}
@@ -983,16 +976,15 @@ const CourseDetails = () => {
                   });
                 }
               }}
-              className={`flex items-center justify-center gap-2 py-3 rounded-lg text-lg font-bold transition ${
-                isCourseAdded(course._id)
-                  ? 'bg-green-600 hover:bg-green-700 text-white'
-                  : 'bg-[#00bcd4] hover:bg-[#0097a7] text-white'
-              }`}
+              className={`flex items-center justify-center gap-2 py-3 rounded-lg text-lg font-bold transition ${isCourseAdded(course._id)
+                ? 'bg-green-600 hover:bg-green-700 text-white'
+                : 'bg-[#00bcd4] hover:bg-[#0097a7] text-white'
+                }`}
             >
               <FaGraduationCap className={isCourseAdded(course._id) ? "text-white" : "text-white"} />
               {isCourseAdded(course._id) ? t('Added to My Courses') : t('Add to My Courses')}
             </button>
-            <button 
+            <button
               onClick={() => {
                 navigate('/my-courses');
               }}
@@ -1008,8 +1000,8 @@ const CourseDetails = () => {
               <FaHeart className="text-white" />
               {t('View Saved Courses')}
             </button>
-            <button 
-              className="flex items-center justify-center gap-2 text-gray-300 hover:text-white text-sm py-2" 
+            <button
+              className="flex items-center justify-center gap-2 text-gray-300 hover:text-white text-sm py-2"
               aria-label={t('Share Course')}
             >
               <FaShareAlt className="text-white" />
