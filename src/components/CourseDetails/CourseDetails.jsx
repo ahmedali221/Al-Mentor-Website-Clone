@@ -116,7 +116,7 @@ const CourseDetails = () => {
 
   useEffect(() => {
     setLoading(true);
-    axios.get(`/api/courses/${id}`)
+    axios.get(`https://al-mentor-database-production.up.railway.app/api/courses/${id}`)
       .then(res => {
         setCourse(res.data);
         setLoading(false);
@@ -130,7 +130,7 @@ const CourseDetails = () => {
 
   // Fetch all instructors (like in home.jsx)
   useEffect(() => {
-    axios.get('/api/instructors')
+    axios.get('https://al-mentor-database-production.up.railway.app/api/instructors')
       .then((res) => setAllInstructors(res.data.data))
       .catch((err) => console.error('Error fetching instructors:', err));
   }, []);
@@ -180,7 +180,7 @@ const CourseDetails = () => {
     const fetchLessons = async () => {
       setLessonsLoading(true);
       try {
-        const response = await axios.get(`/api/lessons/course/${id}`);
+        const response = await axios.get(`https://al-mentor-database-production.up.railway.app/api/lessons/course/${id}`);
         setLessons(response.data);
       } catch (error) {
         console.error('Error fetching lessons:', error);
@@ -245,7 +245,7 @@ const CourseDetails = () => {
 
     const fetchRatings = async () => {
       try {
-        const response = await axios.get(`/api/courses/${id}/ratings`);
+        const response = await axios.get(`https://al-mentor-database-production.up.railway.app/api/courses/${id}/ratings`);
         setCourseRating(response.data);
       } catch (error) {
         if (error.response && error.response.status === 404) {
@@ -281,7 +281,7 @@ const CourseDetails = () => {
       }
 
       // Fetch user data
-      const userResponse = await axios.get(`/api/users/${userId}`, {
+      const userResponse = await axios.get(`https://al-mentor-database-production.up.railway.app/api/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const userData = userResponse.data;

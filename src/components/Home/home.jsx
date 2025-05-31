@@ -31,7 +31,7 @@ const Home = () => {
     const fetchCourses = async () => {
       setLoadingCourses(true);
       try {
-        const res = await fetch('/api/courses');
+        const res = await fetch('https://al-mentor-database-production.up.railway.app/api/courses');
         if (!res.ok) throw new Error('Failed to fetch courses');
         const data = await res.json();
         setAllCourses(data.data || data);
@@ -48,7 +48,7 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    fetch('/api/category')
+    fetch('https://al-mentor-database-production.up.railway.app/api/category')
       .then(res => res.json())
       .then(data => setCategories(data.data || []))
       .catch(err => console.error('Error fetching categories:', err));
@@ -58,7 +58,7 @@ const Home = () => {
     const fetchInstructors = async () => {
       setLoadingInstructors(true);
       try {
-        const res = await fetch('/api/instructors');
+        const res = await fetch('https://al-mentor-database-production.up.railway.app/api/instructors');
         if (!res.ok) throw new Error('Failed to fetch instructors');
         const data = await res.json();
         setInstructors(data.data || []);
