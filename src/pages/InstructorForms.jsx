@@ -155,7 +155,7 @@ const InstructorForms = () => {
           {/* Basic Information */}
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
             <h2 className="text-xl font-semibold mb-4">{t('instructorForms.basicInfo')}</h2>
-            
+
             {/* Title */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
@@ -264,7 +264,7 @@ const InstructorForms = () => {
           {/* Content Information */}
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
             <h2 className="text-xl font-semibold mb-4">{t('instructorForms.contentInfo')}</h2>
-            
+
             {/* Description */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
@@ -336,7 +336,7 @@ const InstructorForms = () => {
           {/* Course Settings */}
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
             <h2 className="text-xl font-semibold mb-4">{t('instructorForms.courseSettings')}</h2>
-            
+
             {/* Level and Language */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
@@ -413,9 +413,8 @@ const InstructorForms = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`px-6 py-2 rounded-lg text-white ${
-                loading ? 'bg-gray-400' : 'bg-red-600 hover:bg-red-700'
-              }`}
+              className={`px-6 py-2 rounded-lg text-white ${loading ? 'bg-gray-400' : 'bg-red-600 hover:bg-red-700'
+                }`}
             >
               {loading ? t('common.loading') : t('instructorForms.createCourse')}
             </button>

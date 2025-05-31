@@ -307,13 +307,6 @@ const Navbar = () => {
               <span className="ml-1 px-2 py-0.5 text-xs font-bold bg-red-500 text-white rounded-full">{t('badges.new')}</span>
             </Link>
           </li>
-          {/*instructor form */}
-             <li className="relative">
-            <Link to="/instructor-form" className="hover:text-red-500 flex items-center">
-              {t('navigation.instructorForm')}
-              <span className="ml-1 px-2 py-0.5 text-xs font-bold bg-red-500 text-white rounded-full">{t('badges.new')}</span>
-            </Link>
-          </li>
           {/* Sessions with badge */}
           <li className="relative">
             <Link to="/my-sessions" className="hover:text-red-500 flex items-center">
@@ -533,8 +526,8 @@ const Navbar = () => {
                         <Link
                           to="/instructor-dashboard"
                           className={`flex items-center px-4 py-2 text-sm ${theme === 'dark'
-                              ? 'text-gray-300 hover:bg-gray-700'
-                              : 'text-gray-700 hover:bg-gray-100'
+                            ? 'text-gray-300 hover:bg-gray-700'
+                            : 'text-gray-700 hover:bg-gray-100'
                             }`}
                         >
                           <svg
@@ -551,8 +544,8 @@ const Navbar = () => {
                         <Link
                           to="/instructor-application"
                           className={`flex items-center px-4 py-2 text-sm ${theme === 'dark'
-                              ? 'text-gray-300 hover:bg-gray-700'
-                              : 'text-gray-700 hover:bg-gray-100'
+                            ? 'text-gray-300 hover:bg-gray-700'
+                            : 'text-gray-700 hover:bg-gray-100'
                             }`}
                         >
                           <svg

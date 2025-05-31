@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../context/ThemeContext';
-import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const CreateCourseForm = () => {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
-  const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const currentLang = i18n.language;
+
+  // Extract instructor ID from state, if available
+  const instructorIdFromState = location.state?.instructorId || '';
 
   // Form States
   const [loading, setLoading] = useState(false);
@@ -25,7 +27,7 @@ const CreateCourseForm = () => {
     slug: { en: '', ar: '' },
     topic: '',
     category: '',
-    instructor: '',
+    instructor: instructorIdFromState,
     thumbnail: '',
     description: { en: '', ar: '' },
     level: { en: 'beginner', ar: 'مبتدئ' },
@@ -41,7 +43,7 @@ const CreateCourseForm = () => {
           axios.get('http://localhost:5000/api/category'),
           axios.get('http://localhost:5000/api/topics')
         ]);
-        
+
         if (categoriesRes.data.success) {
           setCategories(categoriesRes.data.data || []);
         }
@@ -72,7 +74,7 @@ const CreateCourseForm = () => {
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, '-')
           .replace(/(^-|-$)/g, '');
-        
+
         setCourseForm(prev => ({
           ...prev,
           slug: {
@@ -97,7 +99,7 @@ const CreateCourseForm = () => {
     try {
       const courseData = {
         ...courseForm,
-        instructor: user._id,
+        instructor: instructorIdFromState || courseForm.instructor,
         slug: {
           ...courseForm.slug,
           en: `${courseForm.slug.en}-${Date.now()}`
@@ -115,19 +117,19 @@ const CreateCourseForm = () => {
 
       console.log('Raw server response:', response);
       console.log('Response data:', response.data);
-      
+
       const courseId = response.data._id || (response.data.data && response.data.data._id);
-      
+
       if (courseId) {
         console.log('Successfully created course with ID:', courseId);
-        
+
         setCreatedCourseId(courseId);
-        
+
         toast.success(t('messages.courseCreated'));
-        
+
         setTimeout(() => {
           navigate(`/instructor-module-form/${courseId}`, {
-            state: { 
+            state: {
               courseId: courseId,
               courseDetails: response.data
             }
@@ -144,7 +146,7 @@ const CreateCourseForm = () => {
         data: error.response?.data,
         message: error.message
       });
-      
+
       if (error.response?.data?.code === 11000) {
         toast.error(t('messages.slugExistsRetrying'));
         handleSubmit(e);
@@ -160,7 +162,7 @@ const CreateCourseForm = () => {
     if (createdCourseId) {
       console.log('Navigating to module form with course ID:', createdCourseId);
       navigate(`/instructor-module-form/${createdCourseId}`, {
-        state: { 
+        state: {
           courseId: createdCourseId,
           courseDetails: courseForm
         }
@@ -179,7 +181,7 @@ const CreateCourseForm = () => {
           {/* Basic Information */}
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
             <h2 className="text-xl font-semibold mb-4">{t('instructorForms.basicInfo')}</h2>
-            
+
             {/* Title */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
@@ -272,7 +274,7 @@ const CreateCourseForm = () => {
           {/* Content Information */}
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
             <h2 className="text-xl font-semibold mb-4">{t('instructorForms.contentInfo')}</h2>
-            
+
             {/* Description */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
@@ -317,7 +319,7 @@ const CreateCourseForm = () => {
           {/* Course Settings */}
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
             <h2 className="text-xl font-semibold mb-4">{t('instructorForms.courseSettings')}</h2>
-            
+
             {/* Level and Language */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
@@ -381,11 +383,10 @@ const CreateCourseForm = () => {
               <button
                 type="button"
                 onClick={handleSkipToModule}
-                className={`px-6 py-2 rounded-lg text-white ${
-                  createdCourseId 
-                    ? 'bg-blue-600 hover:bg-blue-700 transition' 
-                    : 'bg-gray-400 cursor-not-allowed'
-                }`}
+                className={`px-6 py-2 rounded-lg text-white ${createdCourseId
+                  ? 'bg-blue-600 hover:bg-blue-700 transition'
+                  : 'bg-gray-400 cursor-not-allowed'
+                  }`}
                 title={createdCourseId ? t('common.skipToModule') : t('messages.createCourseFirst')}
               >
                 {t('common.skipToModule')}
@@ -394,9 +395,8 @@ const CreateCourseForm = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className={`px-6 py-2 rounded-lg text-white ${
-                  loading ? 'bg-gray-400' : 'bg-red-600 hover:bg-red-700'
-                }`}
+                className={`px-6 py-2 rounded-lg text-white ${loading ? 'bg-gray-400' : 'bg-red-600 hover:bg-red-700'
+                  }`}
               >
                 {loading ? t('common.loading') : t('instructor.createCourse')}
               </button>
@@ -408,4 +408,4 @@ const CreateCourseForm = () => {
   );
 };
 
-export default CreateCourseForm; 
+export default CreateCourseForm;
