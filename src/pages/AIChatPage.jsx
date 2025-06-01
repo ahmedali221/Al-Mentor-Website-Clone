@@ -213,7 +213,7 @@ const AIChatHomepage = () => {
       const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
-          "Authorization": "Bearer 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",
+          "Authorization": "Bearer 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",
           "HTTP-Referer": window.location.origin,
           "X-Title": "Al-Mentor AI Chat",
           "Content-Type": "application/json"
