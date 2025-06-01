@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify'; // Add this if you use react-toastify for notifications
 
 function InstructorDashboard() {
     const { t, i18n } = useTranslation();
@@ -173,6 +174,28 @@ function InstructorDashboard() {
 
     const stats = getInstructorStats();
 
+    // Add a handler for the create course button
+    const handleCreateCourse = () => {
+        if (instructorData?.approvalStatus !== "approved") {
+            // Show a notification or alert
+            toast?.error
+                ? toast.error(
+                    i18n.language === "ar"
+                        ? "لا يمكنك إضافة دورة حتى يتم الموافقة على حسابك كمدرب."
+                        : "You cannot add a course until your instructor account is approved."
+                )
+                : alert(
+                    i18n.language === "ar"
+                        ? "لا يمكنك إضافة دورة حتى يتم الموافقة على حسابك كمدرب."
+                        : "You cannot add a course until your instructor account is approved."
+                );
+            return;
+        }
+        navigate('/instructor-form', {
+            state: { instructorId: instructorData?._id }
+        });
+    };
+
     return (
         <div className={`min-h-screen ${theme === 'dark' ? 'bg-[#1A1A1A] text-white' : 'bg-gray-50 text-gray-900'} pt-20`}>
             <div className="max-w-7xl mx-auto px-4 py-12">
@@ -325,9 +348,7 @@ function InstructorDashboard() {
                 {/* Quick Actions */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                     <button
-                        onClick={() => navigate('/instructor-form', {
-                            state: { instructorId: instructorData?._id }
-                        })}
+                        onClick={handleCreateCourse}
                         className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-left hover:shadow-xl transition-shadow ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}
                     >
                         <div className="flex items-center">
