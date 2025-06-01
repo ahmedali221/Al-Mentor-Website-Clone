@@ -194,7 +194,7 @@ const CreateLessonForm = () => {
         );
 
         setTimeout(() => {
-          navigate(`/instructor-module/${lessonForm.module}`, {
+          navigate(`/instructor-dashboard`, {
             state: {
               courseId: lessonForm.course,
               moduleId: lessonForm.module,
@@ -416,7 +416,7 @@ const CreateLessonForm = () => {
         <div className="flex justify-between pt-4">
           <button
             type="button"
-            onClick={() => navigate(`/instructor-module/${moduleId}`, {
+            onClick={() => navigate(`/instructor-dashboard`, {
               state: { courseId: lessonForm.course }
             })}
             className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"

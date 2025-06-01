@@ -23,6 +23,7 @@ i18n
   .init({
     resources,
     fallbackLng: 'en',
+    // eslint-disable-next-line no-undef
     debug: process.env.NODE_ENV === 'development',
     
     interpolation: {
